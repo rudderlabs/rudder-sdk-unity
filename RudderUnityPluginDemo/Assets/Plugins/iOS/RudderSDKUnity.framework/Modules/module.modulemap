@@ -1,0 +1,6 @@
+framework module RudderSDKUnity {
+  umbrella header "RudderSDKUnity.h"
+
+  export *
+  module * { export * }
+}

@@ -52,7 +52,7 @@ public class RudderClient
             AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
             androidClientClass = new AndroidJavaClass(androidClientName);
             androidClientClass.CallStatic(
-                "initiateInstance", 
+                "_initiateInstance", 
                 context, 
                 _writeKey, 
                 _endpointUri, 
@@ -133,13 +133,13 @@ public class RudderClient
         );
     }
 
-    public void Track(RudderElement element)
+    public void Track(RudderMessage element)
     {
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
-                "logEvent",
+                "_logEvent",
                 "track",
                 element.eventName,
                 element.userId,
@@ -164,13 +164,13 @@ public class RudderClient
 #endif
     }
 
-    public void Page(RudderElement element)
+    public void Page(RudderMessage element)
     {
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
-                "logEvent",
+                "_logEvent",
                 "page",
                 element.eventName,
                 element.userId,
@@ -195,13 +195,13 @@ public class RudderClient
 #endif
     }
 
-    public void Screen(RudderElement element)
+    public void Screen(RudderMessage element)
     {
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
-                "logEvent",
+                "_logEvent",
                 "screen",
                 element.eventName,
                 element.userId,
@@ -226,13 +226,13 @@ public class RudderClient
 #endif
     }
 
-    public void Identify(RudderElement element)
+    public void Identify(RudderMessage element)
     {
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
-                "logEvent",
+                "_logEvent",
                 "identify",
                 element.eventName,
                 element.userId,

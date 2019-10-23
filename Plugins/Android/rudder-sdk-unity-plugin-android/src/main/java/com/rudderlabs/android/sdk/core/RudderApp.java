@@ -4,17 +4,17 @@ import android.app.Application;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
+
 import com.google.gson.annotations.SerializedName;
-import com.rudderlabs.android.sdk.core.RudderLogger;
 
 class RudderApp {
-    @SerializedName("rl_build")
+    @SerializedName("build")
     private String build;
-    @SerializedName("rl_name")
+    @SerializedName("name")
     private String name;
-    @SerializedName("rl_namespace")
+    @SerializedName("namespace")
     private String nameSpace;
-    @SerializedName("rl_version")
+    @SerializedName("version")
     private String version;
 
     // internal constructor

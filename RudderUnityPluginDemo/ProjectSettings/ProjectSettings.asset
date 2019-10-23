@@ -4,7 +4,7 @@
 PlayerSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 15
-  productGUID: 707bcb15ff2324289bd220110e58f60b
+  productGUID: 930592b06889b4de1bf547a52ed4abdd
   AndroidProfiler: 0
   AndroidFilterTouchesWhenObscured: 0
   AndroidEnableSustainedPerformanceMode: 0
@@ -153,10 +153,10 @@ PlayerSettings:
   androidSupportedAspectRatio: 1
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
-    Android: com.rudderlabs.unity.plugin.android.demo
+    Android: com.rudderlabs.android.sample.unity.shooter
     Standalone: unity.Unity Technologies.Nightmares
     Tizen: com.Company.ProductName
-    iOS: com.rudderlabs.ios.testapp
+    iOS: com.Company.ProductName
     tvOS: com.Company.ProductName
   buildNumber:
     iOS: 0
@@ -175,7 +175,7 @@ PlayerSettings:
   keepLoadedShadersAlive: 0
   StripUnusedMeshComponents: 0
   VertexChannelCompressionMask: 214
-  iPhoneSdkVersion: 988
+  iPhoneSdkVersion: 989
   iOSTargetOSVersionString: 9.0
   tvOSSdkVersion: 0
   tvOSRequireExtendedGameController: 0
@@ -235,11 +235,11 @@ PlayerSettings:
   metalAPIValidation: 1
   iOSRenderExtraFrameOnPause: 1
   appleDeveloperTeamID: 
-  iOSManualSigningProvisioningProfileID: 84807062-cd52-4657-8bb6-b81db1c69ad9
+  iOSManualSigningProvisioningProfileID: 
   tvOSManualSigningProvisioningProfileID: 
-  iOSManualSigningProvisioningProfileType: 1
+  iOSManualSigningProvisioningProfileType: 0
   tvOSManualSigningProvisioningProfileType: 0
-  appleEnableAutomaticSigning: 2
+  appleEnableAutomaticSigning: 0
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
   appleEnableProMotion: 0
@@ -374,9 +374,6 @@ PlayerSettings:
   - m_BuildTarget: WebGL
     m_StaticBatching: 1
     m_DynamicBatching: 1
-  - m_BuildTarget: iPhone
-    m_StaticBatching: 0
-    m_DynamicBatching: 0
   m_BuildTargetGraphicsAPIs:
   - m_BuildTarget: AndroidPlayer
     m_APIs: 08000000
@@ -694,14 +691,13 @@ PlayerSettings:
   platformArchitecture:
     iOS: 2
   scriptingBackend:
-    Android: 1
+    Android: 0
     Metro: 2
     Standalone: 0
     WP8: 2
     WebGL: 1
     iOS: 2
-  il2cppCompilerConfiguration:
-    Android: 1
+  il2cppCompilerConfiguration: {}
   managedStrippingLevel: {}
   incrementalIl2cppBuild: {}
   allowUnsafeCode: 0
