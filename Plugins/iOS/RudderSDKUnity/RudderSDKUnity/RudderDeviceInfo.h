@@ -13,6 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface RudderDeviceInfo : NSObject
 
 - (NSDictionary<NSString* , NSObject *>*) dict;
+- (NSString*) getDeviceModel;
 
 @property (nonatomic, readwrite) NSString* identifier;
 @property (nonatomic, readwrite) NSString* manufacturer;
