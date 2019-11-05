@@ -21,17 +21,17 @@ class RudderIntegrationManager
         this.writeKey = writeKey;
         this.config = config;
         ServicePointManager.ServerCertificateValidationCallback = Validator;
-        UnityEngine.Debug.Log("downloading integrations");
+        // UnityEngine.Debug.Log("downloading integrations");
         downloadIntegrations();
     }
 
     private void prepareFactories()
     {
-        UnityEngine.Debug.Log("preparing factories");
+        // UnityEngine.Debug.Log("preparing factories");
         if (this.rudderServerConfig == null || this.config.factories == null || this.config.factories.Count == 0)
         {
             // no factory to initialize
-            UnityEngine.Debug.Log("no integrations");
+            // UnityEngine.Debug.Log("no integrations");
             return;
         }
 
@@ -42,39 +42,39 @@ class RudderIntegrationManager
         if (destinations.Count > 0)
         {
             Dictionary<string, object> destinationMap = new Dictionary<string, object>();
-            UnityEngine.Debug.Log("destinations are not empty");
+            // UnityEngine.Debug.Log("destinations are not empty");
             foreach (var destinationObj in destinations)
             {
-                UnityEngine.Debug.Log("loop started");
+                // UnityEngine.Debug.Log("loop started");
                 Dictionary<string, object> destination = destinationObj as Dictionary<string, object>;
-                UnityEngine.Debug.Log("object created");
+                // UnityEngine.Debug.Log("object created");
                 Dictionary<string, object> destinationDefinition = destination["destinationDefinition"] as Dictionary<string, object>;
-                UnityEngine.Debug.Log("destination definition created");
+                // UnityEngine.Debug.Log("destination definition created");
                 string definitionName = destinationDefinition["name"] as string;
-                UnityEngine.Debug.Log("definitionName: " + definitionName);
+                // UnityEngine.Debug.Log("definitionName: " + definitionName);
 
                 destinationMap[definitionName] = destination;
             }
 
             foreach (RudderIntegrationFactory factory in this.config.factories)
             {
-                UnityEngine.Debug.Log("facotory loop started");
+                // UnityEngine.Debug.Log("facotory loop started");
                 string factoryKey = factory.key();
-                UnityEngine.Debug.Log("factoryKey: " + factoryKey);
+                // UnityEngine.Debug.Log("factoryKey: " + factoryKey);
                 if (destinationMap.ContainsKey(factoryKey))
                 {
-                    UnityEngine.Debug.Log("factoryKey present in server config map");
+                    // UnityEngine.Debug.Log("factoryKey present in server config map");
                     Dictionary<string, object> serverDestination = destinationMap[factoryKey] as Dictionary<string, object>;
                     if (serverDestination != null)
                     {
                         bool? isDestinationEnabled = serverDestination["enabled"] as bool?;
-                        UnityEngine.Debug.Log("is destination enabled: " + isDestinationEnabled);
+                        // UnityEngine.Debug.Log("is destination enabled: " + isDestinationEnabled);
                         if (isDestinationEnabled != null && isDestinationEnabled == true)
                         {
                             Dictionary<string, object> destinationConfig = serverDestination["config"] as Dictionary<string, object>;
-                            UnityEngine.Debug.Log("server config for destination" );
+                            // UnityEngine.Debug.Log("server config for destination" );
                             RudderIntegration integrationOp = factory.create(destinationConfig, client);
-                            UnityEngine.Debug.Log("integration operation fixed");
+                            // UnityEngine.Debug.Log("integration operation fixed");
                             this.integrationOpsMap[factoryKey] = integrationOp;
                         }
                     }
@@ -90,8 +90,8 @@ class RudderIntegrationManager
             long lastUpdatedTime = long.Parse(PlayerPrefs.GetString("rl_server_update_time", "0"));
             string persistedConfig = PlayerPrefs.GetString("rl_server_config", null);
 
-            UnityEngine.Debug.Log("lastUpdatedTime: " + lastUpdatedTime);
-            UnityEngine.Debug.Log("persistedConfig: " + persistedConfig);
+            // UnityEngine.Debug.Log("lastUpdatedTime: " + lastUpdatedTime);
+            // UnityEngine.Debug.Log("persistedConfig: " + persistedConfig);
 
             if (persistedConfig == null || isServerConfigOutdated(lastUpdatedTime))
             {
@@ -106,7 +106,7 @@ class RudderIntegrationManager
         }
         catch (Exception ex)
         {
-            UnityEngine.Debug.Log("RudderSDK: CreateConnection ERROR: " + ex.Message);
+            // UnityEngine.Debug.Log("RudderSDK: CreateConnection ERROR: " + ex.Message);
         }
     }
 
@@ -122,7 +122,7 @@ class RudderIntegrationManager
         }
         catch (Exception ex)
         {
-            UnityEngine.Debug.Log(ex.StackTrace);
+            // UnityEngine.Debug.Log(ex.StackTrace);
         }
         return null;
     }
@@ -159,7 +159,7 @@ class RudderIntegrationManager
                 var sr = new StreamReader(stream);
                 // return the response as a string
                 string responseJson = sr.ReadToEnd();
-                UnityEngine.Debug.Log("responseJson: " + responseJson);
+                // UnityEngine.Debug.Log("responseJson: " + responseJson);
                 if (responseJson != null)
                 {
 #if !UNITY_EDITOR
@@ -170,7 +170,7 @@ class RudderIntegrationManager
 
                     this.rudderServerConfig = parseServerConfig(responseJson);
 
-                    UnityEngine.Debug.Log("rudderServerConfig: " + rudderServerConfig);
+                    // UnityEngine.Debug.Log("rudderServerConfig: " + rudderServerConfig);
 
                     prepareFactories();
                     isDone = true;
@@ -183,7 +183,7 @@ class RudderIntegrationManager
             }
             catch (Exception ex)
             {
-                UnityEngine.Debug.Log(ex.Message);
+                // UnityEngine.Debug.Log(ex.Message);
                 retryCount += 1;
                 Thread.Sleep(1000 * retryCount * retryTimeOut);
             }
@@ -216,7 +216,7 @@ class RudderIntegrationManager
                 return;
             }
 
-            UnityEngine.Debug.Log("serverConfig is not null");
+            // UnityEngine.Debug.Log("serverConfig is not null");
             this.integrations = new Dictionary<string, object>();
             Dictionary<string, object> source = this.rudderServerConfig["source"] as Dictionary<string, object>;
             List<object> destinations = source["destinations"] as List<object>;
@@ -228,8 +228,8 @@ class RudderIntegrationManager
                 string definitionName = destinationDefinition["name"] as string;
                 bool? isDestinationEnabled = destination["enabled"] as bool?;
 
-                UnityEngine.Debug.Log("destination definition name" + definitionName);
-                UnityEngine.Debug.Log("destinationeneable: " + isDestinationEnabled);
+                // UnityEngine.Debug.Log("destination definition name" + definitionName);
+                // UnityEngine.Debug.Log("destinationeneable: " + isDestinationEnabled);
 
                 this.integrations[definitionName] = isDestinationEnabled == null ? false : isDestinationEnabled;
             }

@@ -37,22 +37,25 @@ namespace CompleteProject
             gunLight = GetComponent<Light> ();
 			//faceLight = GetComponentInChildren<Light> ();
 
+            // string writeKey = "1TC7ktOMnOPPsLvcVPiCiYN7j0r";
+            // string endPointUrl = "https://c18d5e86.ngrok.io";
             string writeKey = "1SEkFBSRyXIUWmPoOpfcHiKEmOR";
-            string endPointUrl = "https://ace288d4.ngrok.io";
+            string endPointUrl = "https://c18d5e86.ngrok.io";
             RudderConfigBuilder configBuilder = new RudderConfigBuilder()
             .WithEndPointUrl(endPointUrl);
+            // .WithFactory(RudderAdjustIntegrationFactory.getFactory());
             rudderClient = RudderClient.GetInstance(
                 writeKey,
                 configBuilder.Build()
             );
 
             Amplitude amplitude = Amplitude.Instance;
-            amplitude.logging = true;
-            amplitude.init("e8850c1fa148e54c4acf547e79262771");
+            amplitude.logging = false;
+            amplitude.init("0c66ff8c17a1329360cba662da5563b1");
 
             RudderMessage message = new RudderMessageBuilder()
                 .WithEventName("Application_Installed")
-                .WithUserId("test_user_id_101")
+                .WithUserId("test_user_id_101_ios")
                 .WithEventProperty("test_key_1", "test_value_1")
                 .WithEventProperty("test_key_2", "test_value_2")
                 .WithUserProperty("test_user_key_1", "test_user_value_1")
@@ -67,14 +70,14 @@ namespace CompleteProject
             for (int index = 0; index < eventCount; index++) {
                 RudderMessage randomMessage = new RudderMessageBuilder()
                 .WithEventName("Random_Event")
-                .WithUserId("test_user_id_101")
+                .WithUserId("test_user_id_101_ios")
                 .WithEventProperty("test_key_1", "test_value_1")
                 .WithEventProperty("test_key_2", "test_value_2")
                 .WithEventProperty("event_count", eventCount)
                 .WithUserProperty("test_user_key_1", "test_user_value_1")
                 .WithUserProperty("test_user_key_2", "test_user_value_2")
                 .Build();
-                rudderClient.Track(message);
+                rudderClient.Track(randomMessage);
 
                 Amplitude.Instance.logEvent("Random_Event");
             }
@@ -165,6 +168,18 @@ namespace CompleteProject
                 // ... set the second position of the line renderer to the fullest extent of the gun's range.
                 gunLine.SetPosition (1, shootRay.origin + shootRay.direction * range);
             }
+
+            RudderMessage shootMessage = new RudderMessageBuilder()
+                .WithEventName("Player_Shoot")
+                .WithUserId("test_user_id_101_ios")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(shootMessage);
+
+            Amplitude.Instance.logEvent("Player_Shoot");
         }
     }
 }

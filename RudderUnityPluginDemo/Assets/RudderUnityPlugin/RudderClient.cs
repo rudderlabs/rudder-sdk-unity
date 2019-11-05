@@ -38,9 +38,9 @@ public class RudderClient
      */
     private RudderClient(
         string _writeKey,
-        string _endpointUri, 
-        int _flushQueueSize, 
-        int _dbCountThreshold, 
+        string _endpointUri,
+        int _flushQueueSize,
+        int _dbCountThreshold,
         int _sleepTimeout
     )
     {
@@ -87,10 +87,10 @@ public class RudderClient
         {
             // initialize the instance
             instance = new RudderClient(
-                writeKey, 
-                config.endPointUrl, 
-                config.flushQueueSize, 
-                config.dbCountThreshold, 
+                writeKey,
+                config.endPointUrl,
+                config.flushQueueSize,
+                config.dbCountThreshold,
                 config.sleepTimeOut
             );
 
@@ -246,7 +246,8 @@ public class RudderClient
 #endif
     }
 
-    public static RudderClient GetInstance() {
+    public static RudderClient GetInstance()
+    {
         return instance;
     }
 }

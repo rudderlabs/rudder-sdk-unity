@@ -47,6 +47,6 @@ class RudderAdjustIntegration : RudderIntegration
                 Adjust.trackEvent(adjustEvent);
             }
         }
-        Debug.Log("integration dump: " + message.eventName);
+        // Debug.Log("integration dump: " + message.eventName);
     }
 }
