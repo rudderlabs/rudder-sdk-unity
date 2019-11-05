@@ -8,7 +8,6 @@
 
 #import <Foundation/Foundation.h>
 #import "RudderMessage.h"
-#import "RudderServerConfigManager.h"
 #import "DBPersistentManager.h"
 #import "RudderConfig.h"
 
@@ -19,7 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
     NSString* authToken;
     RudderConfig* config;
     DBPersistentManager* dbpersistenceManager;
-    RudderServerConfigManager* configManager;
     NSMutableDictionary<NSString*, NSObject*>* integrations;
     NSMutableDictionary<NSString*, NSObject*>* integrationOperationMap;
 }
@@ -30,8 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void) __initiateProcessor;
 - (NSString*) __getPayloadFromMessages: (NSArray*) messages;
 - (NSString*) __flushEventsToServer: (NSString*) payload;
-
-- (RudderConfig* _Nullable) getConfig;
 
 @end
 

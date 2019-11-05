@@ -5,8 +5,8 @@ import com.rudderlabs.android.sdk.core.RudderClient
 
 class MainApplication : Application() {
     companion object {
-        private const val WRITE_KEY = "1R3JbxsqWZlbYjJlBxf0ZNWZOH6"
-        private const val END_POINT_URI = "https://2f0d770f.ngrok.io"
+        private const val WRITE_KEY = "1SuZEl2bawQm274slpZs9y6NdCi"
+        private const val END_POINT_URI = "https://4d3fc588.ngrok.io"
     }
 
     override fun onCreate() {

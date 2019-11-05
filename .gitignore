@@ -4,3 +4,9 @@
 *.iml
 **/build/
 **/.DS_Store
+RudderUnityPluginDemo/Assets/Adjust/
+RudderUnityPluginDemo/Assets/Amplitude/
+RudderUnityPluginDemo/Assets/Editor/
+RudderUnityPluginDemo/Assets/Plugins/iOS/Amplitude/
+RudderUnityPluginDemo/Assets/Plugins/Android/AndroidManifest.xml
+RudderUnityPluginDemo/Assets/Plugins/Android/amplitude-unity-2.20.0.jar

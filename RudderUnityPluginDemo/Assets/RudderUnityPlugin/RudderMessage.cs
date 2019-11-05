@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using LitJson;
+using MiniJSON;
 /* 
 wrapper class for Unity to form event
 */
@@ -30,9 +30,10 @@ public class RudderMessage
     {
         if (dict == null) return "{}";
 
-        JsonWriter writer = new JsonWriter();
-        writer.PrettyPrint = false;
-        JsonMapper.ToJson(dict, writer);
-        return writer.ToString();
+        // JsonWriter writer = new JsonWriter();
+        // writer.PrettyPrint = false;
+        // JsonMapper.ToJson(dict, writer);
+        // return writer.ToString();
+        return Json.Serialize(dict);
     }
 }

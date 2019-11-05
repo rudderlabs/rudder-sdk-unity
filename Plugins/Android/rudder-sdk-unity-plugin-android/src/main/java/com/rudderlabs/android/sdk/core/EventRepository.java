@@ -1,7 +1,6 @@
 package com.rudderlabs.android.sdk.core;
 
 import android.app.Application;
-import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Base64;
 
@@ -17,9 +16,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /*
  * utility class for event processing
@@ -28,9 +24,6 @@ class EventRepository {
     private String authHeaderString;
     private RudderConfig config;
     private DBPersistentManager dbManager;
-    private RudderServerConfigManager configManager;
-    private Map<String, Object> integrationsMap;
-    private Map<String, RudderIntegration> integrationOperationsMap = new HashMap<>();
 
     /*
      * constructor to be called from RudderClient internally.
@@ -38,9 +31,7 @@ class EventRepository {
      * 1. persist the value of config
      * 2. initiate RudderElementCache
      * 3. initiate DBPersistentManager for SQLite operations
-     * 4. initiate RudderServerConfigManager
-     * 5. start processor thread
-     * 6. initiate factories
+     * 4. start processor thread
      * */
     EventRepository(Application _application, String _writeKey, RudderConfig _config) {
         // 1. set the values of writeKey, config
@@ -58,50 +49,12 @@ class EventRepository {
             // 3. initiate DBPersistentManager for SQLite operations
             this.dbManager = DBPersistentManager.getInstance(_application);
 
-            // 4. initiate RudderServerConfigManager
-            this.configManager = RudderServerConfigManager.getInstance(_application, _writeKey);
-
             // 5. start processor thread
             Thread processorThread = new Thread(getProcessorRunnable());
             processorThread.start();
-
-            // 6. initiate factories
-            this.initiateFactories(_config);
         } catch (Exception ex) {
             RudderLogger.logError(ex.getCause());
         }
-    }
-
-    private void initiateFactories(final RudderConfig _config) {
-        // initiate factory initialization after 10s
-        // let the factories capture everything they want to capture
-        if (_config.getFactories() == null || _config.getFactories().isEmpty()) return;
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                RudderServerConfig config = configManager.getConfig();
-                if (config == null) return;
-
-                // get destinations from server
-                List<RudderServerDestination> destinations = config.source.destinations;
-                // create a map for ease of handling
-                Map<String, RudderServerDestination> destinationMap = new HashMap<>();
-                for (RudderServerDestination destination : destinations)
-                    destinationMap.put(destination.destinationDefinition.definitionName, destination);
-                // check the factories integrated
-                for (RudderIntegration.Factory factory : _config.getFactories()) {
-                    // if factory is present in the config
-                    if (destinationMap.containsKey(factory.key())) {
-                        RudderServerDestination destination = destinationMap.get(factory.key());
-                        // initiate factory if destination is enabled from the dashboard
-                        if (destination != null && destination.isDestinationEnabled) {
-                            Object destinationConfig = destination.destinationConfig;
-                            integrationOperationsMap.put(factory.key(), factory.create(destinationConfig, RudderClient.getInstance()));
-                        }
-                    }
-                }
-            }
-        }, 10000);
     }
 
     private Runnable getProcessorRunnable() {
@@ -202,8 +155,6 @@ class EventRepository {
             }
             // close batch array in the json
             builder.append("]");
-//            // add writeKey in the json
-//            builder.append("\"writeKey\":\"").append(writeKey).append("\"");
             // append closing token in the json
             builder.append("}");
             // finally return the entire payload
@@ -278,30 +229,12 @@ class EventRepository {
      * generic method for dumping all the events
      * */
     void dump(RudderMessage message) {
-        if (this.integrationsMap == null) prepareIntegrations();
-        message.setIntegrations(this.integrationsMap);
-        for (String key : integrationOperationsMap.keySet()) {
-            RudderIntegration integration = integrationOperationsMap.get(key);
-            if (integration != null) {
-                integration.dump(message);
-            }
-        }
         String eventJson = new Gson().toJson(message);
         dump(eventJson);
     }
 
     void dump(String eventJson) {
         dbManager.saveEvent(eventJson);
-    }
-
-    private void prepareIntegrations() {
-        if (this.configManager.getConfig() == null) return;
-
-        this.integrationsMap = new HashMap<>();
-        for (RudderServerDestination destination : this.configManager.getConfig().source.destinations) {
-            if (!this.integrationsMap.containsKey(destination.destinationDefinition.definitionName))
-                this.integrationsMap.put(destination.destinationDefinition.definitionName, destination.isDestinationEnabled);
-        }
     }
 
     void reset() {
@@ -312,6 +245,6 @@ class EventRepository {
     }
 
     public void optOut() {
-        // TODO:  decide optout functionality and restrictions
+        // TODO:  decide opt out functionality and restrictions
     }
 }

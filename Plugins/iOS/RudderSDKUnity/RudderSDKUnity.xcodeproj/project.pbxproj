@@ -13,18 +13,12 @@
 		06A026C7235F83960016BCA2 /* RudderMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026C5235F83950016BCA2 /* RudderMessage.m */; };
 		06A026C8235F83960016BCA2 /* RudderMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026C6235F83960016BCA2 /* RudderMessage.h */; };
 		06A026F1235F841A0016BCA2 /* RudderDBMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026C9235F84110016BCA2 /* RudderDBMessage.m */; };
-		06A026F2235F841A0016BCA2 /* RudderServerConfigSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026CA235F84110016BCA2 /* RudderServerConfigSource.h */; };
-		06A026F3235F841A0016BCA2 /* RudderServerDestination.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026CB235F84110016BCA2 /* RudderServerDestination.h */; };
 		06A026F4235F841A0016BCA2 /* RudderScreenInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026CC235F84120016BCA2 /* RudderScreenInfo.m */; };
-		06A026F5235F841A0016BCA2 /* RudderServerDestinationDefinition.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026CD235F84120016BCA2 /* RudderServerDestinationDefinition.m */; };
 		06A026F6235F841A0016BCA2 /* RudderMessageBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026CE235F84120016BCA2 /* RudderMessageBuilder.m */; };
 		06A026F7235F841A0016BCA2 /* Utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026CF235F84120016BCA2 /* Utils.m */; };
 		06A026F8235F841A0016BCA2 /* RudderIntegrationFactory.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026D0235F84120016BCA2 /* RudderIntegrationFactory.m */; };
 		06A026F9235F841A0016BCA2 /* RudderNetwork.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026D1235F84120016BCA2 /* RudderNetwork.m */; };
-		06A026FA235F841A0016BCA2 /* RudderServerConfigSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026D2235F84130016BCA2 /* RudderServerConfigSource.m */; };
 		06A026FB235F841A0016BCA2 /* Utils.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026D3235F84130016BCA2 /* Utils.h */; };
-		06A026FC235F841A0016BCA2 /* RudderServerConfigManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026D4235F84130016BCA2 /* RudderServerConfigManager.m */; };
-		06A026FD235F841A0016BCA2 /* RudderServerDestination.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026D5235F84130016BCA2 /* RudderServerDestination.m */; };
 		06A026FE235F841A0016BCA2 /* RudderIntegration.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026D6235F84130016BCA2 /* RudderIntegration.m */; };
 		06A026FF235F841A0016BCA2 /* RudderIntegration.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026D7235F84140016BCA2 /* RudderIntegration.h */; };
 		06A02700235F841A0016BCA2 /* DBPersistentManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026D8235F84140016BCA2 /* DBPersistentManager.h */; };
@@ -34,7 +28,6 @@
 		06A02704235F841A0016BCA2 /* RudderElementCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026DC235F84150016BCA2 /* RudderElementCache.m */; };
 		06A02705235F841A0016BCA2 /* RudderOSInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026DD235F84150016BCA2 /* RudderOSInfo.h */; };
 		06A02706235F841A0016BCA2 /* RudderScreenInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026DE235F84150016BCA2 /* RudderScreenInfo.h */; };
-		06A02707235F841A0016BCA2 /* RudderServerConfigManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026DF235F84160016BCA2 /* RudderServerConfigManager.h */; };
 		06A02708235F841A0016BCA2 /* RudderDeviceInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026E0235F84160016BCA2 /* RudderDeviceInfo.h */; };
 		06A02709235F841A0016BCA2 /* RudderIntegrationFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026E1235F84160016BCA2 /* RudderIntegrationFactory.h */; };
 		06A0270A235F841A0016BCA2 /* RudderTraits.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026E2235F84160016BCA2 /* RudderTraits.m */; };
@@ -50,7 +43,6 @@
 		06A02714235F841A0016BCA2 /* RudderMessageBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026EC235F84190016BCA2 /* RudderMessageBuilder.h */; };
 		06A02715235F841A0016BCA2 /* RudderTraits.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026ED235F84190016BCA2 /* RudderTraits.h */; };
 		06A02716235F841A0016BCA2 /* RudderApp.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026EE235F841A0016BCA2 /* RudderApp.h */; };
-		06A02717235F841A0016BCA2 /* RudderServerDestinationDefinition.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A026EF235F841A0016BCA2 /* RudderServerDestinationDefinition.h */; };
 		06A02718235F841A0016BCA2 /* RudderOSInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A026F0235F841A0016BCA2 /* RudderOSInfo.m */; };
 		06A0271B235F84380016BCA2 /* RudderProperty.m in Sources */ = {isa = PBXBuildFile; fileRef = 06A02719235F84370016BCA2 /* RudderProperty.m */; };
 		06A0271C235F84380016BCA2 /* RudderProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 06A0271A235F84370016BCA2 /* RudderProperty.h */; };
@@ -71,18 +63,12 @@
 		06A026C5235F83950016BCA2 /* RudderMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderMessage.m; sourceTree = "<group>"; };
 		06A026C6235F83960016BCA2 /* RudderMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderMessage.h; sourceTree = "<group>"; };
 		06A026C9235F84110016BCA2 /* RudderDBMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderDBMessage.m; sourceTree = "<group>"; };
-		06A026CA235F84110016BCA2 /* RudderServerConfigSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderServerConfigSource.h; sourceTree = "<group>"; };
-		06A026CB235F84110016BCA2 /* RudderServerDestination.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderServerDestination.h; sourceTree = "<group>"; };
 		06A026CC235F84120016BCA2 /* RudderScreenInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderScreenInfo.m; sourceTree = "<group>"; };
-		06A026CD235F84120016BCA2 /* RudderServerDestinationDefinition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderServerDestinationDefinition.m; sourceTree = "<group>"; };
 		06A026CE235F84120016BCA2 /* RudderMessageBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderMessageBuilder.m; sourceTree = "<group>"; };
 		06A026CF235F84120016BCA2 /* Utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Utils.m; sourceTree = "<group>"; };
 		06A026D0235F84120016BCA2 /* RudderIntegrationFactory.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderIntegrationFactory.m; sourceTree = "<group>"; };
 		06A026D1235F84120016BCA2 /* RudderNetwork.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderNetwork.m; sourceTree = "<group>"; };
-		06A026D2235F84130016BCA2 /* RudderServerConfigSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderServerConfigSource.m; sourceTree = "<group>"; };
 		06A026D3235F84130016BCA2 /* Utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Utils.h; sourceTree = "<group>"; };
-		06A026D4235F84130016BCA2 /* RudderServerConfigManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderServerConfigManager.m; sourceTree = "<group>"; };
-		06A026D5235F84130016BCA2 /* RudderServerDestination.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderServerDestination.m; sourceTree = "<group>"; };
 		06A026D6235F84130016BCA2 /* RudderIntegration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderIntegration.m; sourceTree = "<group>"; };
 		06A026D7235F84140016BCA2 /* RudderIntegration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderIntegration.h; sourceTree = "<group>"; };
 		06A026D8235F84140016BCA2 /* DBPersistentManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DBPersistentManager.h; sourceTree = "<group>"; };
@@ -92,7 +78,6 @@
 		06A026DC235F84150016BCA2 /* RudderElementCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderElementCache.m; sourceTree = "<group>"; };
 		06A026DD235F84150016BCA2 /* RudderOSInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderOSInfo.h; sourceTree = "<group>"; };
 		06A026DE235F84150016BCA2 /* RudderScreenInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderScreenInfo.h; sourceTree = "<group>"; };
-		06A026DF235F84160016BCA2 /* RudderServerConfigManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderServerConfigManager.h; sourceTree = "<group>"; };
 		06A026E0235F84160016BCA2 /* RudderDeviceInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderDeviceInfo.h; sourceTree = "<group>"; };
 		06A026E1235F84160016BCA2 /* RudderIntegrationFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderIntegrationFactory.h; sourceTree = "<group>"; };
 		06A026E2235F84160016BCA2 /* RudderTraits.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderTraits.m; sourceTree = "<group>"; };
@@ -108,7 +93,6 @@
 		06A026EC235F84190016BCA2 /* RudderMessageBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderMessageBuilder.h; sourceTree = "<group>"; };
 		06A026ED235F84190016BCA2 /* RudderTraits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderTraits.h; sourceTree = "<group>"; };
 		06A026EE235F841A0016BCA2 /* RudderApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderApp.h; sourceTree = "<group>"; };
-		06A026EF235F841A0016BCA2 /* RudderServerDestinationDefinition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderServerDestinationDefinition.h; sourceTree = "<group>"; };
 		06A026F0235F841A0016BCA2 /* RudderOSInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderOSInfo.m; sourceTree = "<group>"; };
 		06A02719235F84370016BCA2 /* RudderProperty.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RudderProperty.m; sourceTree = "<group>"; };
 		06A0271A235F84370016BCA2 /* RudderProperty.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RudderProperty.h; sourceTree = "<group>"; };
@@ -180,14 +164,6 @@
 				06A026F0235F841A0016BCA2 /* RudderOSInfo.m */,
 				06A026DE235F84150016BCA2 /* RudderScreenInfo.h */,
 				06A026CC235F84120016BCA2 /* RudderScreenInfo.m */,
-				06A026DF235F84160016BCA2 /* RudderServerConfigManager.h */,
-				06A026D4235F84130016BCA2 /* RudderServerConfigManager.m */,
-				06A026CA235F84110016BCA2 /* RudderServerConfigSource.h */,
-				06A026D2235F84130016BCA2 /* RudderServerConfigSource.m */,
-				06A026CB235F84110016BCA2 /* RudderServerDestination.h */,
-				06A026D5235F84130016BCA2 /* RudderServerDestination.m */,
-				06A026EF235F841A0016BCA2 /* RudderServerDestinationDefinition.h */,
-				06A026CD235F84120016BCA2 /* RudderServerDestinationDefinition.m */,
 				06A026ED235F84190016BCA2 /* RudderTraits.h */,
 				06A026E2235F84160016BCA2 /* RudderTraits.m */,
 				06A026D3235F84130016BCA2 /* Utils.h */,
@@ -216,9 +192,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				06A0270B235F841A0016BCA2 /* RudderDBMessage.h in Headers */,
-				06A026F2235F841A0016BCA2 /* RudderServerConfigSource.h in Headers */,
 				06A0270F235F841A0016BCA2 /* RudderElementCache.h in Headers */,
-				06A02717235F841A0016BCA2 /* RudderServerDestinationDefinition.h in Headers */,
 				06B53C4D235F824400E468C7 /* RudderConfig.h in Headers */,
 				0656B84C235F7DFC0068C69B /* RudderSDKUnity.h in Headers */,
 				06A026C8235F83960016BCA2 /* RudderMessage.h in Headers */,
@@ -232,14 +206,12 @@
 				06A0270E235F841A0016BCA2 /* RudderOption.h in Headers */,
 				06B53C38235F7EC900E468C7 /* RudderClient.h in Headers */,
 				06A02714235F841A0016BCA2 /* RudderMessageBuilder.h in Headers */,
-				06A02707235F841A0016BCA2 /* RudderServerConfigManager.h in Headers */,
 				06B53C4A235F821600E468C7 /* EventRepository.h in Headers */,
 				06A02716235F841A0016BCA2 /* RudderApp.h in Headers */,
 				06A02713235F841A0016BCA2 /* RudderLibraryInfo.h in Headers */,
 				06A02708235F841A0016BCA2 /* RudderDeviceInfo.h in Headers */,
 				06A026FB235F841A0016BCA2 /* Utils.h in Headers */,
 				06A02700235F841A0016BCA2 /* DBPersistentManager.h in Headers */,
-				06A026F3235F841A0016BCA2 /* RudderServerDestination.h in Headers */,
 				06A02705235F841A0016BCA2 /* RudderOSInfo.h in Headers */,
 				06A026FF235F841A0016BCA2 /* RudderIntegration.h in Headers */,
 			);
@@ -313,13 +285,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				06A02712235F841A0016BCA2 /* RudderDeviceInfo.m in Sources */,
-				06A026FC235F841A0016BCA2 /* RudderServerConfigManager.m in Sources */,
 				06A026F7235F841A0016BCA2 /* Utils.m in Sources */,
 				06A0270D235F841A0016BCA2 /* DBPersistentManager.m in Sources */,
 				06A026FE235F841A0016BCA2 /* RudderIntegration.m in Sources */,
 				06A02718235F841A0016BCA2 /* RudderOSInfo.m in Sources */,
-				06A026FA235F841A0016BCA2 /* RudderServerConfigSource.m in Sources */,
-				06A026F5235F841A0016BCA2 /* RudderServerDestinationDefinition.m in Sources */,
 				06A02703235F841A0016BCA2 /* RudderLibraryInfo.m in Sources */,
 				06A02710235F841A0016BCA2 /* RudderContext.m in Sources */,
 				061D67F5236072CA00925AD2 /* UnityBridge.mm in Sources */,
@@ -328,7 +297,6 @@
 				06A026C7235F83960016BCA2 /* RudderMessage.m in Sources */,
 				06A02711235F841A0016BCA2 /* RudderApp.m in Sources */,
 				06A026F9235F841A0016BCA2 /* RudderNetwork.m in Sources */,
-				06A026FD235F841A0016BCA2 /* RudderServerDestination.m in Sources */,
 				06A026F6235F841A0016BCA2 /* RudderMessageBuilder.m in Sources */,
 				06B53C39235F7EC900E468C7 /* RudderClient.m in Sources */,
 				06A0270A235F841A0016BCA2 /* RudderTraits.m in Sources */,

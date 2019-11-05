@@ -32,6 +32,7 @@ public class RudderClient
 #endif
 
     private static RudderClient instance;
+    private static RudderIntegrationManager integrationManager;
     /* 
     private constructor to prevent instantiating
      */
@@ -79,10 +80,7 @@ public class RudderClient
 
     public static RudderClient GetInstance(
         string writeKey,
-        string endPointUri,
-        int flushQueueSize,
-        int dbCountThreshold,
-        int sleepTimeOut
+        RudderConfig config
     )
     {
         if (instance == null)
@@ -90,10 +88,15 @@ public class RudderClient
             // initialize the instance
             instance = new RudderClient(
                 writeKey, 
-                endPointUri, 
-                flushQueueSize, 
-                dbCountThreshold, 
-                sleepTimeOut
+                config.endPointUrl, 
+                config.flushQueueSize, 
+                config.dbCountThreshold, 
+                config.sleepTimeOut
+            );
+
+            integrationManager = new RudderIntegrationManager(
+                writeKey,
+                config
             );
         }
 
@@ -102,50 +105,30 @@ public class RudderClient
 
     public static RudderClient GetInstance(string writeKey)
     {
-        return GetInstance(
-            writeKey,
-            Constants.BASE_URL,
-            Constants.FLUSH_QUEUE_SIZE,
-            Constants.DB_COUNT_THRESHOLD,
-            Constants.SLEEP_TIME_OUT
-        );
+        return GetInstance(writeKey, new RudderConfig());
     }
 
     public static RudderClient GetInstance(string writeKey, string endPointUri)
     {
-        return GetInstance(
-            writeKey,
-            endPointUri,
-            Constants.FLUSH_QUEUE_SIZE,
-            Constants.DB_COUNT_THRESHOLD,
-            Constants.SLEEP_TIME_OUT
-        );
+        RudderConfig config = new RudderConfigBuilder().WithEndPointUrl(endPointUri).Build();
+        return GetInstance(writeKey, config);
     }
 
-    public static RudderClient GetInstance(string writeKey, string endPointUri, int flushQueueSize)
+    public void Track(RudderMessage message)
     {
-        return GetInstance(
-            writeKey,
-            endPointUri,
-            flushQueueSize,
-            Constants.DB_COUNT_THRESHOLD,
-            Constants.SLEEP_TIME_OUT
-        );
-    }
-
-    public void Track(RudderMessage element)
-    {
+        message.integrations = integrationManager.getIntegrations();
+        integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
                 "_logEvent",
                 "track",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
@@ -154,29 +137,31 @@ public class RudderClient
         {
             _logEvent(
                 "track",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
     }
 
-    public void Page(RudderMessage element)
+    public void Page(RudderMessage message)
     {
+        message.integrations = integrationManager.getIntegrations();
+        integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
                 "_logEvent",
                 "page",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
@@ -185,29 +170,31 @@ public class RudderClient
         {
             _logEvent(
                 "page",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
     }
 
-    public void Screen(RudderMessage element)
+    public void Screen(RudderMessage message)
     {
+        message.integrations = integrationManager.getIntegrations();
+        integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
                 "_logEvent",
                 "screen",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
@@ -216,29 +203,31 @@ public class RudderClient
         {
             _logEvent(
                 "screen",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
     }
 
-    public void Identify(RudderMessage element)
+    public void Identify(RudderMessage message)
     {
+        message.integrations = integrationManager.getIntegrations();
+        integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
             androidClientClass.CallStatic(
                 "_logEvent",
                 "identify",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
@@ -247,13 +236,17 @@ public class RudderClient
         {
             _logEvent(
                 "identify",
-                element.eventName,
-                element.userId,
-                element.getEventPropertiesJson(),
-                element.getUserPropertiesJson(),
-                element.getIntegrationsJson()
+                message.eventName,
+                message.userId,
+                message.getEventPropertiesJson(),
+                message.getUserPropertiesJson(),
+                message.getIntegrationsJson()
             );
         }
 #endif
+    }
+
+    public static RudderClient GetInstance() {
+        return instance;
     }
 }

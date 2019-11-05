@@ -46,6 +46,8 @@ static EventRepository *_repository = nil;
     NSDictionary *userProperties = [NSJSONSerialization JSONObjectWithData:[userPropertiesJson dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];;
     [builder setUserProperty:userProperties];
     
+    [builder setUserId:userId];
+    
     RudderMessage *message = [builder build];
     NSDictionary *integrations = [NSJSONSerialization JSONObjectWithData:[integrationsJson dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];;
     message.integrations = integrations;

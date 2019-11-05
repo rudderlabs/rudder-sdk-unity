@@ -34,7 +34,6 @@ static EventRepository* _instance;
         [RudderElementCache initiate];
         
         dbpersistenceManager = [[DBPersistentManager alloc] init];
-        configManager = [RudderServerConfigManager getInstance:writeKey];
         
         [self __initiateFactories];
         
@@ -140,22 +139,10 @@ static EventRepository* _instance;
 - (void) dump:(RudderMessage *)message {
     if (message == nil) return;
     
-    if (self->integrations == nil) {
-        [self __prepareIntegrations];
-    }
-    
-    message.integrations = self->integrations;
-    
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[message dict] options:0 error:nil];
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
     [self->dbpersistenceManager saveEvent:jsonString];
-}
-
-// TODO
-- (void) __prepareIntegrations {
-    self->integrations = [[NSMutableDictionary alloc] init];
-    [self->integrations setValue:[NSNumber numberWithBool:YES] forKey:@"All"];
 }
 
 - (RudderConfig *)getConfig {

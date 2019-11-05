@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\_Complete-Game\MobileInput\Scripts\Editor\CrossPlatformInputInitialize.cs" />
+     <Compile Include="Assets\Editor\AdjustEditor.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
