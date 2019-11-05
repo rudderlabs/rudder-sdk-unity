@@ -7,6 +7,7 @@
 //
 
 #import "UnityBridge.h"
+#import <sqlite3.h>
 
 void _initiateInstance(const char* _writeKey,
                        const char* _endPointUrl,
@@ -32,4 +33,8 @@ void _logEvent(const char* _eventType,
         eventPropertiesJson:[[NSString alloc] initWithUTF8String:_eventPropertyJson]
          userPropertiesJson:[[NSString alloc] initWithUTF8String:_userPropertyJson]
            integrationsJson:[[NSString alloc] initWithUTF8String:_integrationJson]];
+}
+
+void _serializeSqlite() {
+    sqlite3_config(SQLITE_CONFIG_SERIALIZED);
 }

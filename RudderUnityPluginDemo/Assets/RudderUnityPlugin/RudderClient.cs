@@ -29,6 +29,8 @@ public class RudderClient
         string userPropertiesJson,
         string integrationsJson
     );
+    [DllImport("__Internal")]
+    private static extern void _serializeSqlite();
 #endif
 
     private static RudderClient instance;
@@ -249,5 +251,15 @@ public class RudderClient
     public static RudderClient GetInstance()
     {
         return instance;
+    }
+
+    public static void SerializeSqlite()
+    {
+#if UNITY_IPHONE
+        if (Application.platform == RuntimePlatform.IPhonePlayer)
+        {
+            _serializeSqlite();
+        }
+#endif
     }
 }
