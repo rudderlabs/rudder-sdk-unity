@@ -1,101 +1,104 @@
 using System.Collections.Generic;
 
-public class RudderMessageBuilder
+namespace Rudderlabs
 {
-    private string eventName;
-    public RudderMessageBuilder WithEventName(string eventName)
+    public class RudderMessageBuilder
     {
-        this.eventName = eventName;
-        return this;
-    }
-    private string userId;
-    public RudderMessageBuilder WithUserId(string userId)
-    {
-        this.userId = userId;
-        return this;
-    }
-    private Dictionary<string, object> eventProperties;
-    public RudderMessageBuilder WithEventProperties(Dictionary<string, object> eventProperties)
-    {
-        if (eventProperties == null)
+        private string eventName;
+        public RudderMessageBuilder WithEventName(string eventName)
         {
-            // do not set null value
+            this.eventName = eventName;
             return this;
         }
-        else
+        private string userId;
+        public RudderMessageBuilder WithUserId(string userId)
+        {
+            this.userId = userId;
+            return this;
+        }
+        private Dictionary<string, object> eventProperties;
+        public RudderMessageBuilder WithEventProperties(Dictionary<string, object> eventProperties)
+        {
+            if (eventProperties == null)
+            {
+                // do not set null value
+                return this;
+            }
+            else
+            {
+                if (this.eventProperties == null)
+                {
+                    this.eventProperties = new Dictionary<string, object>();
+                }
+                foreach (var key in eventProperties.Keys)
+                {
+                    var value = eventProperties[key];
+                    if (value != null)
+                    {
+                        this.eventProperties.Add(key, value);
+                    }
+                }
+            }
+            return this;
+        }
+        public RudderMessageBuilder WithEventProperty(string key, object value)
         {
             if (this.eventProperties == null)
             {
                 this.eventProperties = new Dictionary<string, object>();
             }
-            foreach (var key in eventProperties.Keys)
+            if (value != null)
             {
-                var value = eventProperties[key];
-                if (value != null)
-                {
-                    this.eventProperties.Add(key, value);
-                }
+                this.eventProperties.Add(key, value);
             }
-        }
-        return this;
-    }
-    public RudderMessageBuilder WithEventProperty(string key, object value)
-    {
-        if (this.eventProperties == null)
-        {
-            this.eventProperties = new Dictionary<string, object>();
-        }
-        if (value != null)
-        {
-            this.eventProperties.Add(key, value);
-        }
-        return this;
-    }
-    private Dictionary<string, object> userProperties;
-    public RudderMessageBuilder WithUserProperties(Dictionary<string, object> userProperties)
-    {
-        if (userProperties == null)
-        {
-            // do not set null values
             return this;
         }
-        else
+        private Dictionary<string, object> userProperties;
+        public RudderMessageBuilder WithUserProperties(Dictionary<string, object> userProperties)
+        {
+            if (userProperties == null)
+            {
+                // do not set null values
+                return this;
+            }
+            else
+            {
+                if (this.userProperties == null)
+                {
+                    this.userProperties = new Dictionary<string, object>();
+                }
+                foreach (var key in userProperties.Keys)
+                {
+                    var value = userProperties[key];
+                    if (value != null)
+                    {
+                        this.userProperties.Add(key, value);
+                    }
+                }
+            }
+            return this;
+        }
+        public RudderMessageBuilder WithUserProperty(string key, object value)
         {
             if (this.userProperties == null)
             {
                 this.userProperties = new Dictionary<string, object>();
             }
-            foreach (var key in userProperties.Keys)
+            if (value != null)
             {
-                var value = userProperties[key];
-                if (value != null)
-                {
-                    this.userProperties.Add(key, value);
-                }
+                this.userProperties.Add(key, value);
             }
+            return this;
         }
-        return this;
-    }
-    public RudderMessageBuilder WithUserProperty(string key, object value)
-    {
-        if (this.userProperties == null)
+        public RudderMessage Build()
         {
-            this.userProperties = new Dictionary<string, object>();
+            RudderMessage element = new RudderMessage();
+            element.eventName = this.eventName;
+            element.userId = this.userId;
+            element.eventProperties = this.eventProperties;
+            element.userProperties = this.userProperties;
+            return element;
         }
-        if (value != null)
-        {
-            this.userProperties.Add(key, value);
-        }
-        return this;
-    }
-    public RudderMessage Build()
-    {
-        RudderMessage element = new RudderMessage();
-        element.eventName = this.eventName;
-        element.userId = this.userId;
-        element.eventProperties = this.eventProperties;
-        element.userProperties = this.userProperties;
-        return element;
-    }
 
+    }
 }

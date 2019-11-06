@@ -1,22 +1,25 @@
 using System.Collections.Generic;
 
-class ScreenPropertyBuilder
+namespace Rudderlabs
 {
-    private string name;
-    public ScreenPropertyBuilder SetName(string name)
+    class ScreenPropertyBuilder
     {
-        this.name = name;
-        return this;
-    }
-
-    public Dictionary<string, object> Build()
-    {
-        if (name == null)
+        private string name;
+        public ScreenPropertyBuilder SetName(string name)
         {
-            throw new RudderException("Key \"name\" is required in properties");
+            this.name = name;
+            return this;
         }
-        Dictionary<string, object> property = new Dictionary<string, object>();
-        property.Add("name", name);
-        return property;
+
+        public Dictionary<string, object> Build()
+        {
+            if (name == null)
+            {
+                throw new RudderException("Key \"name\" is required in properties");
+            }
+            Dictionary<string, object> property = new Dictionary<string, object>();
+            property.Add("name", name);
+            return property;
+        }
     }
 }

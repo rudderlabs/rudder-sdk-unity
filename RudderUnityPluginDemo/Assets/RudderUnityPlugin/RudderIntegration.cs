@@ -1,4 +1,7 @@
-public abstract class RudderIntegration
+namespace Rudderlabs
 {
-    public abstract void Dump(RudderMessage message);
+    public abstract class RudderIntegration
+    {
+        public abstract void Dump(RudderMessage message);
+    }
 }

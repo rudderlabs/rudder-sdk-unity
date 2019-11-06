@@ -3,8 +3,12 @@ using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
 
-public class RudderClient
+namespace Rudderlabs
 {
+
+
+    public class RudderClient
+    {
 
 #if UNITY_ANDROID
     private static readonly string androidClientName = "com.rudderlabs.android.sdk.core.RudderClient";
@@ -12,41 +16,41 @@ public class RudderClient
 #endif
 
 #if UNITY_IPHONE
-    [DllImport("__Internal")]
-    private static extern void _initiateInstance(
-        string _writeKey,
-        string _endpointUri,
-        int _flushQueueSize,
-        int _dbCountThreshold,
-        int _sleepTimeout
-    );
-    [DllImport("__Internal")]
-    private static extern void _logEvent(
-        string eventType,
-        string eventName,
-        string userId,
-        string eventPropertiesJson,
-        string userPropertiesJson,
-        string integrationsJson
-    );
-    [DllImport("__Internal")]
-    private static extern void _serializeSqlite();
+        [DllImport("__Internal")]
+        private static extern void _initiateInstance(
+            string _writeKey,
+            string _endpointUri,
+            int _flushQueueSize,
+            int _dbCountThreshold,
+            int _sleepTimeout
+        );
+        [DllImport("__Internal")]
+        private static extern void _logEvent(
+            string eventType,
+            string eventName,
+            string userId,
+            string eventPropertiesJson,
+            string userPropertiesJson,
+            string integrationsJson
+        );
+        [DllImport("__Internal")]
+        private static extern void _serializeSqlite();
 #endif
 
-    private static RudderClient instance;
-    private static RudderIntegrationManager integrationManager;
-    /* 
-    private constructor to prevent instantiating
-     */
-    private RudderClient(
-        string _writeKey,
-        string _endpointUri,
-        int _flushQueueSize,
-        int _dbCountThreshold,
-        int _sleepTimeout
-    )
-    {
-        // initialize android
+        private static RudderClient instance;
+        private static RudderIntegrationManager integrationManager;
+        /* 
+        private constructor to prevent instantiating
+         */
+        private RudderClient(
+            string _writeKey,
+            string _endpointUri,
+            int _flushQueueSize,
+            int _dbCountThreshold,
+            int _sleepTimeout
+        )
+        {
+            // initialize android
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -67,59 +71,59 @@ public class RudderClient
 #endif
 
 #if UNITY_IPHONE
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            _initiateInstance(
-                _writeKey,
-                _endpointUri,
-                _flushQueueSize,
-                _dbCountThreshold,
-                _sleepTimeout
-            );
-        }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _initiateInstance(
+                    _writeKey,
+                    _endpointUri,
+                    _flushQueueSize,
+                    _dbCountThreshold,
+                    _sleepTimeout
+                );
+            }
 #endif
-    }
-
-    public static RudderClient GetInstance(
-        string writeKey,
-        RudderConfig config
-    )
-    {
-        if (instance == null)
-        {
-            // initialize the instance
-            instance = new RudderClient(
-                writeKey,
-                config.endPointUrl,
-                config.flushQueueSize,
-                config.dbCountThreshold,
-                config.sleepTimeOut
-            );
-
-            integrationManager = new RudderIntegrationManager(
-                writeKey,
-                config
-            );
         }
 
-        return instance;
-    }
+        public static RudderClient GetInstance(
+            string writeKey,
+            RudderConfig config
+        )
+        {
+            if (instance == null)
+            {
+                // initialize the instance
+                instance = new RudderClient(
+                    writeKey,
+                    config.endPointUrl,
+                    config.flushQueueSize,
+                    config.dbCountThreshold,
+                    config.sleepTimeOut
+                );
 
-    public static RudderClient GetInstance(string writeKey)
-    {
-        return GetInstance(writeKey, new RudderConfig());
-    }
+                integrationManager = new RudderIntegrationManager(
+                    writeKey,
+                    config
+                );
+            }
 
-    public static RudderClient GetInstance(string writeKey, string endPointUri)
-    {
-        RudderConfig config = new RudderConfigBuilder().WithEndPointUrl(endPointUri).Build();
-        return GetInstance(writeKey, config);
-    }
+            return instance;
+        }
 
-    public void Track(RudderMessage message)
-    {
-        message.integrations = integrationManager.getIntegrations();
-        integrationManager.makeIntegrationDump(message);
+        public static RudderClient GetInstance(string writeKey)
+        {
+            return GetInstance(writeKey, new RudderConfig());
+        }
+
+        public static RudderClient GetInstance(string writeKey, string endPointUri)
+        {
+            RudderConfig config = new RudderConfigBuilder().WithEndPointUrl(endPointUri).Build();
+            return GetInstance(writeKey, config);
+        }
+
+        public void Track(RudderMessage message)
+        {
+            message.integrations = integrationManager.getIntegrations();
+            integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -135,24 +139,24 @@ public class RudderClient
         }
 #endif
 #if UNITY_IPHONE
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            _logEvent(
-                "track",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _logEvent(
+                    "track",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
-    }
+        }
 
-    public void Page(RudderMessage message)
-    {
-        message.integrations = integrationManager.getIntegrations();
-        integrationManager.makeIntegrationDump(message);
+        public void Page(RudderMessage message)
+        {
+            message.integrations = integrationManager.getIntegrations();
+            integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -168,24 +172,24 @@ public class RudderClient
         }
 #endif
 #if UNITY_IPHONE
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            _logEvent(
-                "page",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _logEvent(
+                    "page",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
-    }
+        }
 
-    public void Screen(RudderMessage message)
-    {
-        message.integrations = integrationManager.getIntegrations();
-        integrationManager.makeIntegrationDump(message);
+        public void Screen(RudderMessage message)
+        {
+            message.integrations = integrationManager.getIntegrations();
+            integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -201,24 +205,24 @@ public class RudderClient
         }
 #endif
 #if UNITY_IPHONE
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            _logEvent(
-                "screen",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _logEvent(
+                    "screen",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
-    }
+        }
 
-    public void Identify(RudderMessage message)
-    {
-        message.integrations = integrationManager.getIntegrations();
-        integrationManager.makeIntegrationDump(message);
+        public void Identify(RudderMessage message)
+        {
+            message.integrations = integrationManager.getIntegrations();
+            integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
         if (Application.platform == RuntimePlatform.Android)
         {
@@ -234,32 +238,33 @@ public class RudderClient
         }
 #endif
 #if UNITY_IPHONE
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            _logEvent(
-                "identify",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _logEvent(
+                    "identify",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
-    }
+        }
 
-    public static RudderClient GetInstance()
-    {
-        return instance;
-    }
+        public static RudderClient GetInstance()
+        {
+            return instance;
+        }
 
-    public static void SerializeSqlite()
-    {
+        public static void SerializeSqlite()
+        {
 #if UNITY_IPHONE
-        if (Application.platform == RuntimePlatform.IPhonePlayer)
-        {
-            _serializeSqlite();
-        }
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _serializeSqlite();
+            }
 #endif
+        }
     }
 }

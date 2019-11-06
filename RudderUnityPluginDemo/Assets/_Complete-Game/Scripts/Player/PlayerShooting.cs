@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Rudderlabs;
 using UnityEngine;
-using UnitySampleAssets.CrossPlatformInput;
 
 namespace CompleteProject
 {

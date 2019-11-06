@@ -1,39 +1,42 @@
 using System.Collections.Generic;
-using MiniJSON;
+using Rudderlabs.MiniJSON;
 /* 
 wrapper class for Unity to form event
 */
-public class RudderMessage
+namespace Rudderlabs
 {
-    public string eventName;
-    public string userId;
-    public Dictionary<string, object> eventProperties;
-    public Dictionary<string, object> userProperties;
-    public Dictionary<string, object> integrations;
-
-    public string getEventPropertiesJson()
+    public class RudderMessage
     {
-        return convertToJson(eventProperties);
-    }
+        public string eventName;
+        public string userId;
+        public Dictionary<string, object> eventProperties;
+        public Dictionary<string, object> userProperties;
+        public Dictionary<string, object> integrations;
 
-    public string getUserPropertiesJson()
-    {
-        return convertToJson(userProperties);
-    }
+        public string getEventPropertiesJson()
+        {
+            return convertToJson(eventProperties);
+        }
 
-    public string getIntegrationsJson()
-    {
-        return convertToJson(integrations);
-    }
+        public string getUserPropertiesJson()
+        {
+            return convertToJson(userProperties);
+        }
 
-    public string convertToJson(Dictionary<string, object> dict)
-    {
-        if (dict == null) return "{}";
+        public string getIntegrationsJson()
+        {
+            return convertToJson(integrations);
+        }
 
-        // JsonWriter writer = new JsonWriter();
-        // writer.PrettyPrint = false;
-        // JsonMapper.ToJson(dict, writer);
-        // return writer.ToString();
-        return Json.Serialize(dict);
+        public string convertToJson(Dictionary<string, object> dict)
+        {
+            if (dict == null) return "{}";
+
+            // JsonWriter writer = new JsonWriter();
+            // writer.PrettyPrint = false;
+            // JsonMapper.ToJson(dict, writer);
+            // return writer.ToString();
+            return Json.Serialize(dict);
+        }
     }
 }

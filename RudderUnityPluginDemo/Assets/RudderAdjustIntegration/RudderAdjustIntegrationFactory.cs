@@ -1,24 +1,27 @@
 using System.Collections.Generic;
 
-class RudderAdjustIntegrationFactory : RudderIntegrationFactory
+namespace Rudderlabs
 {
-    public override RudderIntegration create(Dictionary<string, object> config, RudderClient client)
+    class RudderAdjustIntegrationFactory : RudderIntegrationFactory
     {
-        return new RudderAdjustIntegration(config, client);
-    }
-
-    public override string key()
-    {
-        return "ADJ";
-    }
-
-    private static RudderAdjustIntegrationFactory instance;
-    public static RudderAdjustIntegrationFactory getFactory()
-    {
-        if (instance == null)
+        public override RudderIntegration create(Dictionary<string, object> config, RudderClient client)
         {
-            instance = new RudderAdjustIntegrationFactory();
+            return new RudderAdjustIntegration(config, client);
         }
-        return instance;
+
+        public override string key()
+        {
+            return "Adjust";
+        }
+
+        private static RudderAdjustIntegrationFactory instance;
+        public static RudderAdjustIntegrationFactory getFactory()
+        {
+            if (instance == null)
+            {
+                instance = new RudderAdjustIntegrationFactory();
+            }
+            return instance;
+        }
     }
 }

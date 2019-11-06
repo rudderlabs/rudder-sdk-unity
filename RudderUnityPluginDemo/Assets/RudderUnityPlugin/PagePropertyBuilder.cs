@@ -1,78 +1,83 @@
 using System.Collections.Generic;
 
-class PagePropertyBuilder
+namespace Rudderlabs
 {
-    private string title;
-    public PagePropertyBuilder SetTitle(string title)
-    {
-        this.title = title;
-        return this;
-    }
 
-    private string url;
-    public PagePropertyBuilder SetUrl(string url)
-    {
-        this.url = url;
-        return this;
-    }
 
-    private string path;
-    public PagePropertyBuilder SetPath(string path)
+    class PagePropertyBuilder
     {
-        this.path = path;
-        return this;
-    }
-
-    private string referrer;
-    public PagePropertyBuilder SetReferrer(string referrer)
-    {
-        this.referrer = referrer;
-        return this;
-    }
-
-    private string search;
-    public PagePropertyBuilder SetSearch(string search)
-    {
-        this.search = search;
-        return this;
-    }
-
-    private string keywords;
-    public PagePropertyBuilder SetKeywords(string keywords)
-    {
-        this.keywords = keywords;
-        return this;
-    }
-
-    public Dictionary<string, object> Build()
-    {
-        if (url == null)
+        private string title;
+        public PagePropertyBuilder SetTitle(string title)
         {
-            throw new RudderException("Key \"url\" is required for track event");
+            this.title = title;
+            return this;
         }
 
-        Dictionary<string, object> property = new Dictionary<string, object>();
-        if (title != null)
+        private string url;
+        public PagePropertyBuilder SetUrl(string url)
         {
-            property.Add("title", title);
+            this.url = url;
+            return this;
         }
-        property.Add("url", url);
-        if (url != null)
+
+        private string path;
+        public PagePropertyBuilder SetPath(string path)
         {
-            property.Add("path", path);
+            this.path = path;
+            return this;
         }
-        if (referrer != null)
+
+        private string referrer;
+        public PagePropertyBuilder SetReferrer(string referrer)
         {
-            property.Add("referrer", referrer);
+            this.referrer = referrer;
+            return this;
         }
-        if (search != null)
+
+        private string search;
+        public PagePropertyBuilder SetSearch(string search)
         {
-            property.Add("search", search);
+            this.search = search;
+            return this;
         }
-        if (keywords != null)
+
+        private string keywords;
+        public PagePropertyBuilder SetKeywords(string keywords)
         {
-            property.Add("keywords", keywords);
+            this.keywords = keywords;
+            return this;
         }
-        return property;
+
+        public Dictionary<string, object> Build()
+        {
+            if (url == null)
+            {
+                throw new RudderException("Key \"url\" is required for track event");
+            }
+
+            Dictionary<string, object> property = new Dictionary<string, object>();
+            if (title != null)
+            {
+                property.Add("title", title);
+            }
+            property.Add("url", url);
+            if (url != null)
+            {
+                property.Add("path", path);
+            }
+            if (referrer != null)
+            {
+                property.Add("referrer", referrer);
+            }
+            if (search != null)
+            {
+                property.Add("search", search);
+            }
+            if (keywords != null)
+            {
+                property.Add("keywords", keywords);
+            }
+            return property;
+        }
     }
 }

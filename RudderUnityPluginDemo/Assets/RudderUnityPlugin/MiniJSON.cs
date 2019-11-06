@@ -32,13 +32,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace MiniJSON {
+namespace Rudderlabs.MiniJSON {
     // Example usage:
     //
     //  using UnityEngine;
     //  using System.Collections;
     //  using System.Collections.Generic;
-    //  using MiniJSON;
+    //  using Rudder.MiniJSON;
     //
     //  public class MiniJSONTest : MonoBehaviour {
     //      void Start () {
