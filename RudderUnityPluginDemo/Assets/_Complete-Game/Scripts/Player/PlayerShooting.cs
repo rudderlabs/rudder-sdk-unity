@@ -35,6 +35,8 @@ namespace CompleteProject
             gunLight = GetComponent<Light> ();
 			//faceLight = GetComponentInChildren<Light> ();
 
+            RudderClient.SerializeSqlite();
+
             // string writeKey = "1TC7ktOMnOPPsLvcVPiCiYN7j0r";
             // string endPointUrl = "https://c18d5e86.ngrok.io";
             string writeKey = "1SEkFBSRyXIUWmPoOpfcHiKEmOR";
