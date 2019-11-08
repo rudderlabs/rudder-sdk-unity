@@ -1,4 +1,5 @@
-﻿using Rudderlabs;
+﻿using com.adjust.sdk;
+using Rudderlabs;
 using UnityEngine;
 
 namespace CompleteProject
@@ -40,18 +41,22 @@ namespace CompleteProject
             // string writeKey = "1TC7ktOMnOPPsLvcVPiCiYN7j0r";
             // string endPointUrl = "https://c18d5e86.ngrok.io";
             string writeKey = "1SEkFBSRyXIUWmPoOpfcHiKEmOR";
-            string endPointUrl = "https://c18d5e86.ngrok.io";
+            string endPointUrl = "https://d018f0e9.ngrok.io";
             RudderConfigBuilder configBuilder = new RudderConfigBuilder()
-            .WithEndPointUrl(endPointUrl);
-            // .WithFactory(RudderAdjustIntegrationFactory.getFactory());
+            .WithEndPointUrl(endPointUrl) 
+            .WithFactory(RudderAdjustIntegrationFactory.getFactory());
             rudderClient = RudderClient.GetInstance(
                 writeKey,
                 configBuilder.Build()
             );
 
-            Amplitude amplitude = Amplitude.Instance;
-            amplitude.logging = false;
-            amplitude.init("0c66ff8c17a1329360cba662da5563b1");
+            // AdjustConfig adjustConfig = new AdjustConfig("fauyi0vaf4zk", AdjustEnvironment.Sandbox, true);
+            // adjustConfig.setLogLevel(AdjustLogLevel.Verbose);
+            // Adjust.start(adjustConfig);
+
+            // Amplitude amplitude = Amplitude.Instance;
+            // amplitude.logging = false;
+            // amplitude.init("0c66ff8c17a1329360cba662da5563b1");
 
             RudderMessage message = new RudderMessageBuilder()
                 .WithEventName("Application_Installed")
@@ -63,7 +68,7 @@ namespace CompleteProject
                 .Build();
             rudderClient.Track(message);
 
-            Amplitude.Instance.logEvent("Application_Installed");
+            // Amplitude.Instance.logEvent("Application_Installed");
 
             System.Random random = new System.Random();
             int eventCount = random.Next(30); 
@@ -79,7 +84,7 @@ namespace CompleteProject
                 .Build();
                 rudderClient.Track(randomMessage);
 
-                Amplitude.Instance.logEvent("Random_Event");
+                // Amplitude.Instance.logEvent("Random_Event");
             }
         }
 
@@ -179,7 +184,39 @@ namespace CompleteProject
                 .Build();
             rudderClient.Track(shootMessage);
 
-            Amplitude.Instance.logEvent("Player_Shoot");
+            // Amplitude.Instance.logEvent("Player_Shoot");
+
+            RudderMessage message1 = new RudderMessageBuilder()
+                .WithEventName("daily_rewards_claim")
+                .WithUserId("test_user_id_101_ios")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(message1);
+
+            RudderMessage message2 = new RudderMessageBuilder()
+                .WithEventName("level_up")
+                .WithUserId("test_user_id_101_ios")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(message2);
+
+            RudderMessage message3 = new RudderMessageBuilder()
+                .WithEventName("revenue")
+                .WithUserId("test_user_id_101_ios")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithEventProperty("price", 1.99)
+                .WithEventProperty("currency", "USD")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(message3);
         }
     }
 }

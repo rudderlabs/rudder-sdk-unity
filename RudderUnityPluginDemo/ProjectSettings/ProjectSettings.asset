@@ -156,7 +156,7 @@ PlayerSettings:
     Android: com.torpedolabs.wynn.wscci
     Standalone: unity.Unity Technologies.Nightmares
     Tizen: com.Company.ProductName
-    iOS: com.rudderlabs.demo.ios
+    iOS: com.torpedolabs.wynn.wscci.dev
     tvOS: com.Company.ProductName
   buildNumber:
     iOS: 1
@@ -234,12 +234,12 @@ PlayerSettings:
   metalEditorSupport: 0
   metalAPIValidation: 1
   iOSRenderExtraFrameOnPause: 1
-  appleDeveloperTeamID: 
+  appleDeveloperTeamID: Arnab Pal
   iOSManualSigningProvisioningProfileID: 
   tvOSManualSigningProvisioningProfileID: 
   iOSManualSigningProvisioningProfileType: 0
   tvOSManualSigningProvisioningProfileType: 0
-  appleEnableAutomaticSigning: 0
+  appleEnableAutomaticSigning: 1
   iOSRequireARKit: 0
   iOSAutomaticallyDetectAndAddCapabilities: 1
   appleEnableProMotion: 0

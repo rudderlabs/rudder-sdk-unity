@@ -1,5 +1,6 @@
-using System.Collections.Generic;
+    using System.Collections.Generic;
 using com.adjust.sdk;
+using UnityEngine;
 
 namespace Rudderlabs
 {
@@ -14,7 +15,9 @@ namespace Rudderlabs
             {
                 Dictionary<string, object> eventTokenDict = eventConfig as Dictionary<string, object>;
                 string eventName = eventTokenDict["from"] as string;
+                // UnityEngine.Debug.Log("eventName: " + eventName);
                 string eventToken = eventTokenDict["to"] as string;
+                // UnityEngine.Debug.Log("eventToken: " + eventToken);
                 this.eventTokenMap[eventName] = eventToken;
             }
 
@@ -26,11 +29,14 @@ namespace Rudderlabs
 
         public override void Dump(RudderMessage message)
         {
+            // UnityEngine.Debug.Log("Dump: event:" + message.eventName);
             if (this.eventTokenMap.ContainsKey(message.eventName))
             {
                 string eventToken = this.eventTokenMap[message.eventName];
+                // UnityEngine.Debug.Log("Dump: event token:" + eventToken);
                 if (eventToken != null && eventToken.Equals(""))
                 {
+                    // Debug.Log("eventToken dump: " + eventToken);   
                     AdjustEvent adjustEvent = new AdjustEvent(eventToken);
 
                     Dictionary<string, object> eventProperties = message.eventProperties;
@@ -45,10 +51,22 @@ namespace Rudderlabs
                         adjustEvent.addPartnerParameter(key, userProperties[key].ToString());
                     }
 
+                    if (message.eventName.Equals("revenue")) {
+                        if (message.eventProperties.ContainsKey("price")) {
+                            double amount = (double) message.eventProperties["price"];
+                            string currency = "USD";
+                            if (message.eventProperties.ContainsKey("currency")) {
+                                 currency = message.eventProperties["currency"] as string;
+                            }
+                            adjustEvent.setRevenue(amount, currency);
+                        }
+                    }
+                    
                     Adjust.trackEvent(adjustEvent);
                 }
+            } else {
+                // UnityEngine.Debug.Log("Dump: event: not found");
             }
-            // Debug.Log("integration dump: " + message.eventName);
         }
     }
 }

@@ -11,7 +11,7 @@ namespace Rudderlabs
 
         public override string key()
         {
-            return "Adjust";
+            return "ADJ";
         }
 
         private static RudderAdjustIntegrationFactory instance;

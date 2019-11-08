@@ -1,18 +1,16 @@
-#if UNITY_IPHONE
+﻿#if UNITY_IPHONE
 using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
 
 namespace Rudderlabs
 {
-
-
-    public class RudderClient
+    public class RudderClient : MonoBehaviour
     {
 
 #if UNITY_ANDROID
-    private static readonly string androidClientName = "com.rudderlabs.android.sdk.core.RudderClient";
-    private static AndroidJavaClass androidClientClass;
+        private static readonly string androidClientName = "com.rudderlabs.android.sdk.core.RudderClient";
+        private static AndroidJavaClass androidClientClass;
 #endif
 
 #if UNITY_IPHONE
@@ -52,22 +50,22 @@ namespace Rudderlabs
         {
             // initialize android
 #if UNITY_ANDROID
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
-            AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
-            AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
-            androidClientClass = new AndroidJavaClass(androidClientName);
-            androidClientClass.CallStatic(
-                "_initiateInstance", 
-                context, 
-                _writeKey, 
-                _endpointUri, 
-                _flushQueueSize, 
-                _dbCountThreshold, 
-                _sleepTimeout
-            );
-        }
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
+                AndroidJavaObject activity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity");
+                AndroidJavaObject context = activity.Call<AndroidJavaObject>("getApplicationContext");
+                androidClientClass = new AndroidJavaClass(androidClientName);
+                androidClientClass.CallStatic(
+                    "_initiateInstance",
+                    context,
+                    _writeKey,
+                    _endpointUri,
+                    _flushQueueSize,
+                    _dbCountThreshold,
+                    _sleepTimeout
+                );
+            }
 #endif
 
 #if UNITY_IPHONE
@@ -125,18 +123,18 @@ namespace Rudderlabs
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            androidClientClass.CallStatic(
-                "_logEvent",
-                "track",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                androidClientClass.CallStatic(
+                    "_logEvent",
+                    "track",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
 #if UNITY_IPHONE
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -158,18 +156,18 @@ namespace Rudderlabs
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            androidClientClass.CallStatic(
-                "_logEvent",
-                "page",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                androidClientClass.CallStatic(
+                    "_logEvent",
+                    "page",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
 #if UNITY_IPHONE
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -191,18 +189,18 @@ namespace Rudderlabs
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            androidClientClass.CallStatic(
-                "_logEvent",
-                "screen",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                androidClientClass.CallStatic(
+                    "_logEvent",
+                    "screen",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
 #if UNITY_IPHONE
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -224,18 +222,18 @@ namespace Rudderlabs
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
-        if (Application.platform == RuntimePlatform.Android)
-        {
-            androidClientClass.CallStatic(
-                "_logEvent",
-                "identify",
-                message.eventName,
-                message.userId,
-                message.getEventPropertiesJson(),
-                message.getUserPropertiesJson(),
-                message.getIntegrationsJson()
-            );
-        }
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                androidClientClass.CallStatic(
+                    "_logEvent",
+                    "identify",
+                    message.eventName,
+                    message.userId,
+                    message.getEventPropertiesJson(),
+                    message.getUserPropertiesJson(),
+                    message.getIntegrationsJson()
+                );
+            }
 #endif
 #if UNITY_IPHONE
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -265,6 +263,13 @@ namespace Rudderlabs
                 _serializeSqlite();
             }
 #endif
+        }
+        void Update()
+        {
+            if (integrationManager != null)
+            {
+                integrationManager.Update();
+            }
         }
     }
 }
