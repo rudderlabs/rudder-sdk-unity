@@ -15,7 +15,10 @@ Download the SDK plugin file: **```rudder-unity-plugin.unitypackage```** and imp
 ## Initialize ```RudderClient```
 Put this code under the ```Awake``` method of your main scene.
 ```
-RudderClient rudderClient = RudderClient.GetInstance(YOUR_WRITE_KEY, YOUR_DATAPLANE_URI);
+RudderConfig config = new RudderConfigBuilder()
+.WithEndPointUrl(YOUR_DATAPLANE_URI)
+.Build();
+RudderClient rudderClient = RudderClient.GetInstance(YOUR_WRITE_KEY, config);
 ```
 ## Send Events
 A simple track event. Other options are ```Screen```, ```Page```
@@ -29,6 +32,20 @@ RudderMessage message = new RudderMessageBuilder()
   .WithUserProperty("test_user_key_2", "test_user_value_2")
   .Build();
 rudderClient.Track(message);
+```
+
+## Adding Other Native SDKs
+
+### [Adjust](https://adjust.com)
+Import ```rudder-unity-extension-adjust.unitypackage``` in your current project. The extension package comes with [Adjust](https://adjust.com) SDK v4.15.0 
+
+Now during intialization of ```RudderClient```:
+```
+RudderConfig config = new RudderConfigBuilder()
+.WithEndPointUrl(YOUR_DATAPLANE_URI)
+.WithFactory(RudderAdjustIntegrationFactory.getFactory())
+.Build();
+RudderClient rudderClient = RudderClient.GetInstance(YOUR_WRITE_KEY, config);
 ```
 
 # Coming Soon
