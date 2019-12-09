@@ -14,12 +14,14 @@ extern "C"
                            const char* _endPointUrl,
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
-                           const int _sleepTimeout) {
+                           const int _sleepTimeout,
+                           const int _logLevel) {
         [RudderClient _initiateInstance:[[NSString alloc] initWithUTF8String:_writeKey]
                             endPointUrl:[[NSString alloc] initWithUTF8String:_endPointUrl]
                          flushQueueSize:_flushQueueSize
                        dbCountThreshold:_dbCountThreshold
-                           sleepTimeout:_sleepTimeout];
+                           sleepTimeout:_sleepTimeout
+                               logLevel:_logLevel];
     }
 
     void _logEvent(const char* _eventType,

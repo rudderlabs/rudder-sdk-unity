@@ -15,7 +15,8 @@ extern "C" {
                            const char* _endPointUrl,
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
-                           const int _sleepTimeout);
+                           const int _sleepTimeout,
+                           const int _logLevel);
     
     void _logEvent(const char* _eventType,
                    const char* _eventName,

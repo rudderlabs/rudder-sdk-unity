@@ -20,7 +20,8 @@ namespace Rudderlabs
             string _endpointUri,
             int _flushQueueSize,
             int _dbCountThreshold,
-            int _sleepTimeout
+            int _sleepTimeout,
+            int _logLevel
         );
         [DllImport("__Internal")]
         private static extern void _logEvent(
@@ -45,11 +46,13 @@ namespace Rudderlabs
             string _endpointUri,
             int _flushQueueSize,
             int _dbCountThreshold,
-            int _sleepTimeout
+            int _sleepTimeout,
+            int _logLevel
         )
         {
             // initialize android
 #if UNITY_ANDROID
+            RudderLogger.LogDebug("Initializing Android Core SDK");
             if (Application.platform == RuntimePlatform.Android)
             {
                 AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer");
@@ -63,12 +66,15 @@ namespace Rudderlabs
                     _endpointUri,
                     _flushQueueSize,
                     _dbCountThreshold,
-                    _sleepTimeout
+                    _sleepTimeout,
+                    _logLevel
                 );
+                RudderLogger.LogDebug("Android Core SDK initiated");
             }
 #endif
 
 #if UNITY_IPHONE
+            RudderLogger.LogDebug("Initializing iOS Core SDK");
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 _initiateInstance(
@@ -76,8 +82,10 @@ namespace Rudderlabs
                     _endpointUri,
                     _flushQueueSize,
                     _dbCountThreshold,
-                    _sleepTimeout
+                    _sleepTimeout,
+                    _logLevel
                 );
+                RudderLogger.LogDebug("iOS Core SDK initiated");
             }
 #endif
         }
@@ -89,15 +97,18 @@ namespace Rudderlabs
         {
             if (instance == null)
             {
+                RudderLogger.LogDebug("Instantiating RudderClient SDK");
                 // initialize the instance
                 instance = new RudderClient(
                     writeKey,
                     config.endPointUrl,
                     config.flushQueueSize,
                     config.dbCountThreshold,
-                    config.sleepTimeOut
+                    config.sleepTimeOut,
+                    config.logLevel
                 );
 
+                RudderLogger.LogDebug("Instantiating RudderIntegrationManager");
                 integrationManager = new RudderIntegrationManager(
                     writeKey,
                     config
@@ -120,6 +131,7 @@ namespace Rudderlabs
 
         public void Track(RudderMessage message)
         {
+            RudderLogger.LogDebug("Track Event: " + message.eventName);
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
@@ -153,6 +165,7 @@ namespace Rudderlabs
 
         public void Page(RudderMessage message)
         {
+            RudderLogger.LogDebug("Page Event: " + message.eventName);
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
@@ -186,6 +199,7 @@ namespace Rudderlabs
 
         public void Screen(RudderMessage message)
         {
+            RudderLogger.LogDebug("Screen Event: " + message.eventName);
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
@@ -219,6 +233,7 @@ namespace Rudderlabs
 
         public void Identify(RudderMessage message)
         {
+            RudderLogger.LogDebug("Identify Event: " + message.eventName);
             message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
@@ -258,6 +273,7 @@ namespace Rudderlabs
         public static void SerializeSqlite()
         {
 #if UNITY_IPHONE
+            RudderLogger.LogDebug("SQLite Serialized");
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 _serializeSqlite();

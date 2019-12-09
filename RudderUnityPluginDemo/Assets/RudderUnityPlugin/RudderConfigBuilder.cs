@@ -47,6 +47,20 @@ namespace Rudderlabs
             return this;
         }
 
+        int logLevel = RudderLogLevel.NONE;
+        public RudderConfigBuilder WithLogLevel(int logLevel)
+        {
+            this.logLevel = logLevel;
+            return this;
+        }
+
+        int configRefreshInterval = Constants.CONFIG_REFRESH_INTERVAL;
+        public RudderConfigBuilder WithConfigRefreshInterval(int configRefreshInterval)
+        {
+            this.configRefreshInterval = configRefreshInterval;
+            return this;
+        }
+
         public RudderConfig Build()
         {
             return new RudderConfig(
@@ -54,6 +68,8 @@ namespace Rudderlabs
                 this.flushQueueSize,
                 this.dbCountThreshold,
                 this.sleepTimeOut,
+                this.logLevel,
+                this.configRefreshInterval,
                 this.factories
             );
         }
