@@ -2,6 +2,7 @@
 using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
+using Rudderlabs.MiniJSON;
 
 namespace Rudderlabs
 {
@@ -9,7 +10,7 @@ namespace Rudderlabs
     {
 
 #if UNITY_ANDROID
-        private static readonly string androidClientName = "com.rudderlabs.android.sdk.core.RudderClient";
+        private static readonly string androidClientName = "com.rudderlabs.android.sdk.core.RudderClientWrapper";
         private static AndroidJavaClass androidClientClass;
 #endif
 
@@ -17,7 +18,7 @@ namespace Rudderlabs
         [DllImport("__Internal")]
         private static extern void _initiateInstance(
             string _writeKey,
-            string _endpointUri,
+            string _endPointUrl,
             int _flushQueueSize,
             int _dbCountThreshold,
             int _sleepTimeout,
@@ -43,7 +44,7 @@ namespace Rudderlabs
          */
         private RudderClient(
             string _writeKey,
-            string _endpointUri,
+            string _endPointUrl,
             int _flushQueueSize,
             int _dbCountThreshold,
             int _sleepTimeout,
@@ -63,7 +64,7 @@ namespace Rudderlabs
                     "_initiateInstance",
                     context,
                     _writeKey,
-                    _endpointUri,
+                    _endPointUrl,
                     _flushQueueSize,
                     _dbCountThreshold,
                     _sleepTimeout,
@@ -79,7 +80,7 @@ namespace Rudderlabs
             {
                 _initiateInstance(
                     _writeKey,
-                    _endpointUri,
+                    _endPointUrl,
                     _flushQueueSize,
                     _dbCountThreshold,
                     _sleepTimeout,
@@ -132,7 +133,6 @@ namespace Rudderlabs
         public void Track(RudderMessage message)
         {
             RudderLogger.LogDebug("Track Event: " + message.eventName);
-            message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
@@ -141,10 +141,9 @@ namespace Rudderlabs
                     "_logEvent",
                     "track",
                     message.eventName,
-                    message.userId,
                     message.getEventPropertiesJson(),
                     message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
+                    message.getOptionsJson()
                 );
             }
 #endif
@@ -153,40 +152,6 @@ namespace Rudderlabs
             {
                 _logEvent(
                     "track",
-                    message.eventName,
-                    message.userId,
-                    message.getEventPropertiesJson(),
-                    message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
-                );
-            }
-#endif
-        }
-
-        public void Page(RudderMessage message)
-        {
-            RudderLogger.LogDebug("Page Event: " + message.eventName);
-            message.integrations = integrationManager.getIntegrations();
-            integrationManager.makeIntegrationDump(message);
-#if UNITY_ANDROID
-            if (Application.platform == RuntimePlatform.Android)
-            {
-                androidClientClass.CallStatic(
-                    "_logEvent",
-                    "page",
-                    message.eventName,
-                    message.userId,
-                    message.getEventPropertiesJson(),
-                    message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
-                );
-            }
-#endif
-#if UNITY_IPHONE
-            if (Application.platform == RuntimePlatform.IPhonePlayer)
-            {
-                _logEvent(
-                    "page",
                     message.eventName,
                     message.userId,
                     message.getEventPropertiesJson(),
@@ -200,7 +165,6 @@ namespace Rudderlabs
         public void Screen(RudderMessage message)
         {
             RudderLogger.LogDebug("Screen Event: " + message.eventName);
-            message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
@@ -209,10 +173,9 @@ namespace Rudderlabs
                     "_logEvent",
                     "screen",
                     message.eventName,
-                    message.userId,
                     message.getEventPropertiesJson(),
                     message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
+                    message.getOptionsJson()
                 );
             }
 #endif
@@ -231,22 +194,24 @@ namespace Rudderlabs
 #endif
         }
 
-        public void Identify(RudderMessage message)
+        public void Identify(string userId, RudderTraits traits, RudderMessage message)
         {
             RudderLogger.LogDebug("Identify Event: " + message.eventName);
-            message.integrations = integrationManager.getIntegrations();
             integrationManager.makeIntegrationDump(message);
+
+            // put supplied userId under traits as well if it is not set
+            if (traits.getId() == null)
+            {
+                traits.PutId(userId);
+            }
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
                 androidClientClass.CallStatic(
-                    "_logEvent",
-                    "identify",
-                    message.eventName,
-                    message.userId,
-                    message.getEventPropertiesJson(),
-                    message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
+                    "_identify",
+                    userId,
+                    Json.Serialize(traits.traitsDict),
+                    message.getOptionsJson()
                 );
             }
 #endif
@@ -261,6 +226,31 @@ namespace Rudderlabs
                     message.getUserPropertiesJson(),
                     message.getIntegrationsJson()
                 );
+            }
+#endif
+        }
+
+        public void Reset()
+        {
+#if UNITY_ANDROID
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                androidClientClass.CallStatic(
+                    "_reset"
+                );
+            }
+#endif
+#if UNITY_IPHONE
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                // _logEvent(
+                //     "identify",
+                //     message.eventName,
+                //     message.userId,
+                //     message.getEventPropertiesJson(),
+                //     message.getUserPropertiesJson(),
+                //     message.getIntegrationsJson()
+                // );
             }
 #endif
         }

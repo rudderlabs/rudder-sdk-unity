@@ -423,7 +423,7 @@ namespace Rudderlabs.MiniJSON {
                 string asStr;
 
                 if (value == null) {
-                    builder.Append("null");
+                    // builder.Append("null");
                 } else if ((asStr = value as string) != null) {
                     SerializeString(asStr);
                 } else if (value is bool) {
@@ -445,6 +445,11 @@ namespace Rudderlabs.MiniJSON {
                 builder.Append('{');
 
                 foreach (object e in obj.Keys) {
+                    // skip the keys having null value
+                    if (obj[e] == null) {
+                        continue;
+                    }
+                    
                     if (!first) {
                         builder.Append(',');
                     }
@@ -466,6 +471,11 @@ namespace Rudderlabs.MiniJSON {
                 bool first = true;
 
                 foreach (object obj in anArray) {
+                    // skip null value
+                    if (obj == null) {
+                        continue;
+                    }
+                    
                     if (!first) {
                         builder.Append(',');
                     }

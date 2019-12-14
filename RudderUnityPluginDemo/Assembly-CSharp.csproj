@@ -100,8 +100,10 @@
      <Compile Include="Assets\RudderUnityPlugin\RudderIntegration.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderIntegrationFactory.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderIntegrationManager.cs" />
+     <Compile Include="Assets\RudderUnityPlugin\RudderLogger.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderMessage.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderMessageBuilder.cs" />
+     <Compile Include="Assets\RudderUnityPlugin\RudderTraits.cs" />
      <Compile Include="Assets\RudderUnityPlugin\ScreenPropertyBuilder.cs" />
      <Compile Include="Assets\RudderUnityPlugin\TrackPropertyBuilder.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyAttack.cs" />

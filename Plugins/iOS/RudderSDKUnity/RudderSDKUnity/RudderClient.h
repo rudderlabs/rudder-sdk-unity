@@ -16,7 +16,8 @@ NS_ASSUME_NONNULL_BEGIN
                        endPointUrl: (NSString*) endPointUrl
                     flushQueueSize: (int) flushQueueSize
                   dbCountThreshold: (int) dbCountThreshold
-                      sleepTimeout: (int) sleepTimeout;
+                      sleepTimeout: (int) sleepTimeout
+                          logLevel: (int) logLevel;
 
 + (void) _logEvent : (NSString*) eventType
           eventName: (NSString*) eventName

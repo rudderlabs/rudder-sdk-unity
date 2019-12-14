@@ -28,6 +28,8 @@ namespace Rudderlabs
             this.factories = factories;
             this.logLevel = logLevel;
             this.configRefreshInterval = configRefreshInterval;
+
+            RudderLogger.Init(logLevel);
         }
 
         public RudderConfig()

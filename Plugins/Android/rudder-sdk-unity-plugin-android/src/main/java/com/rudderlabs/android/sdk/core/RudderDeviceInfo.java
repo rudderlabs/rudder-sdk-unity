@@ -12,12 +12,14 @@ class RudderDeviceInfo {
     private String model = Build.MODEL;
     @SerializedName("name")
     private String name = Build.DEVICE;
+    @SerializedName("type")
+    private String type = "android";
 
     RudderDeviceInfo(String deviceId) {
         this.deviceId = deviceId;
     }
 
-    public String getDeviceId() {
+    String getDeviceId() {
         return deviceId;
     }
 }
