@@ -1,5 +1,5 @@
 //
-//  RudderOption.h
+//  RudderTraitsBuilder.h
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
@@ -10,9 +10,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RudderOption : NSObject
-
-- (instancetype) initWithDict:(NSDictionary*) options;
+@interface RudderTraitsBuilder : NSObject
 
 @end
 

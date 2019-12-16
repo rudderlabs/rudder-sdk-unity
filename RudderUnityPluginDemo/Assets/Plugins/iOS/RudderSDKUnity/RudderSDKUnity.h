@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <Foundation/Foundation.h>
 
-#import "RudderClient.h"
+#import "RudderClientWrapper.h"
 
 //! Project version number for RudderSDKUnity.
 FOUNDATION_EXPORT double RudderSDKUnityVersionNumber;

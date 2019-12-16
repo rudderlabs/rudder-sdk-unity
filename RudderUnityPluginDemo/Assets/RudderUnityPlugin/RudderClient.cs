@@ -26,13 +26,20 @@ namespace Rudderlabs
         );
         [DllImport("__Internal")]
         private static extern void _logEvent(
-            string eventType,
-            string eventName,
-            string userId,
-            string eventPropertiesJson,
-            string userPropertiesJson,
-            string integrationsJson
+            string _eventType,
+            string _eventName,
+            string _eventPropsJson,
+            string _userPropsJson,
+            string _optionsJson
         );
+        [DllImport("__Internal")]
+        private static extern void _identify(
+            string _userId,
+            string _traitsJson,
+            string _optionsJson
+        );
+        [DllImport("__Internal")]
+        private static extern void _reset();
         [DllImport("__Internal")]
         private static extern void _serializeSqlite();
 #endif
@@ -153,10 +160,9 @@ namespace Rudderlabs
                 _logEvent(
                     "track",
                     message.eventName,
-                    message.userId,
                     message.getEventPropertiesJson(),
                     message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
+                    message.getOptionsJson()
                 );
             }
 #endif
@@ -185,10 +191,9 @@ namespace Rudderlabs
                 _logEvent(
                     "screen",
                     message.eventName,
-                    message.userId,
                     message.getEventPropertiesJson(),
                     message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
+                    message.getOptionsJson()
                 );
             }
 #endif
@@ -204,13 +209,14 @@ namespace Rudderlabs
             {
                 traits.PutId(userId);
             }
+            string traitsJson = Json.Serialize(traits.traitsDict);
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
                 androidClientClass.CallStatic(
                     "_identify",
                     userId,
-                    Json.Serialize(traits.traitsDict),
+                    traitsJson,
                     message.getOptionsJson()
                 );
             }
@@ -218,13 +224,10 @@ namespace Rudderlabs
 #if UNITY_IPHONE
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                _logEvent(
-                    "identify",
-                    message.eventName,
-                    message.userId,
-                    message.getEventPropertiesJson(),
-                    message.getUserPropertiesJson(),
-                    message.getIntegrationsJson()
+                _identify(
+                    userId,
+                    traitsJson,
+                    message.getOptionsJson()
                 );
             }
 #endif
@@ -232,6 +235,7 @@ namespace Rudderlabs
 
         public void Reset()
         {
+            RudderLogger.LogDebug("SDK reset");
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -243,14 +247,7 @@ namespace Rudderlabs
 #if UNITY_IPHONE
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
-                // _logEvent(
-                //     "identify",
-                //     message.eventName,
-                //     message.userId,
-                //     message.getEventPropertiesJson(),
-                //     message.getUserPropertiesJson(),
-                //     message.getIntegrationsJson()
-                // );
+                _reset();
             }
 #endif
         }

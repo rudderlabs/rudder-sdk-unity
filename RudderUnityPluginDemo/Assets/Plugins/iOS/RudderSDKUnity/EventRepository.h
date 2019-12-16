@@ -18,16 +18,16 @@ NS_ASSUME_NONNULL_BEGIN
     NSString* authToken;
     RudderConfig* config;
     DBPersistentManager* dbpersistenceManager;
-    NSMutableDictionary<NSString*, NSObject*>* integrations;
-    NSMutableDictionary<NSString*, NSObject*>* integrationOperationMap;
+    BOOL isFactoryInitialized;
 }
 
 + (instancetype) initiate: (NSString*) writeKey config: (RudderConfig*) config;
 - (void) dump:(RudderMessage*) message;
-- (void) __initiateFactories;
 - (void) __initiateProcessor;
 - (NSString*) __getPayloadFromMessages: (NSArray*) messages;
 - (NSString*) __flushEventsToServer: (NSString*) payload;
+
+- (RudderConfig* _Nullable) getConfig;
 
 @end
 
