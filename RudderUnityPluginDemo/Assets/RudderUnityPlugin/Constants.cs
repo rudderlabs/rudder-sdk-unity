@@ -18,6 +18,6 @@ namespace Rudderlabs
         // default threshold of number of events to be persisted in sqlite db
         public static int DB_COUNT_THRESHOLD = 10000;
         // config-plane url to get the config for the writeKey
-        public static string CONFIG_PLANE_URL = "https://api.rudderlabs.com/";
+        public static string CONFIG_PLANE_URL = "https://api.rudderlabs.com";
     }
 }

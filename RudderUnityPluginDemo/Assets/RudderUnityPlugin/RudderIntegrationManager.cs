@@ -77,7 +77,7 @@ namespace Rudderlabs
                         {
                             Dictionary<string, object> destination = destinationObj as Dictionary<string, object>;
                             Dictionary<string, object> destinationDefinition = destination["destinationDefinition"] as Dictionary<string, object>;
-                            string definitionName = destinationDefinition["name"] as string;
+                            string definitionName = destinationDefinition["displayName"] as string;
                             RudderLogger.LogDebug("Extracted Native Destination information: " + definitionName);
 
                             destinationMap[definitionName] = destination;
@@ -96,7 +96,7 @@ namespace Rudderlabs
                                     if (isDestinationEnabled != null && isDestinationEnabled == true)
                                     {
                                         Dictionary<string, object> destinationConfig = serverDestination["config"] as Dictionary<string, object>;
-                                        RudderIntegration integrationOp = factory.create(destinationConfig, client);
+                                        RudderIntegration integrationOp = factory.create(destinationConfig, client, this.config);
                                         RudderLogger.LogDebug("Native integration initiated for " + factoryKey);
                                         this.integrationOpsMap[factoryKey] = integrationOp;
                                     }
@@ -152,7 +152,7 @@ namespace Rudderlabs
             {
                 try
                 {
-                    string configEndpointUrl = Constants.CONFIG_PLANE_URL;
+                    string configEndpointUrl = Constants.CONFIG_PLANE_URL + "/sourceConfig";
                     // create http request object
                     var http = (HttpWebRequest)WebRequest.Create(new Uri(configEndpointUrl));
                     http.Method = "GET";
@@ -197,32 +197,6 @@ namespace Rudderlabs
                 this.integrations["All"] = true;
             }
             return this.integrations;
-        }
-
-        private void prepareIntegrations()
-        {
-            // prepare integration dict
-            if (this.integrations == null)
-            {
-                if (this.rudderServerConfig == null)
-                {
-                    return;
-                }
-
-                this.integrations = new Dictionary<string, object>();
-                Dictionary<string, object> source = this.rudderServerConfig["source"] as Dictionary<string, object>;
-                List<object> destinations = source["destinations"] as List<object>;
-
-                foreach (var destinationObj in destinations)
-                {
-                    Dictionary<string, object> destination = destinationObj as Dictionary<string, object>;
-                    Dictionary<string, object> destinationDefinition = destination["destinationDefinition"] as Dictionary<string, object>;
-                    string definitionName = destinationDefinition["name"] as string;
-                    bool? isDestinationEnabled = destination["enabled"] as bool?;
-                    this.integrations[definitionName] = isDestinationEnabled == null ? false : isDestinationEnabled;
-                }
-
-            }
         }
 
         public void makeIntegrationDump(RudderMessage message)

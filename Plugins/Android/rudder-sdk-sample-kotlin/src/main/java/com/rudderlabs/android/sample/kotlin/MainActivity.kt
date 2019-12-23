@@ -27,6 +27,17 @@ class MainActivity : AppCompatActivity() {
 
         val optionsJson = "null"
 
+        for (index in 0..1000) {
+            RudderClientWrapper._logEvent(
+                "track",
+                "some_test_event",
+                eventJson,
+                userJson,
+                optionsJson
+            )
+        }
+
+
         trackBtn.setOnClickListener {
             RudderClientWrapper._logEvent(
                 "track",

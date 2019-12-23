@@ -257,21 +257,14 @@ class EventRepository {
      * */
     void dump(@NonNull RudderMessage message) {
         if (!initiated) return;
-        makeFactoryDump(message);
+        Map<String, Object> integrations = new HashMap<>();
+        integrations.put("All", true);
+        message.setIntegrations(integrations);
         String eventJson = new Gson().toJson(message);
         RudderLogger.logDebug(String.format(Locale.US, "EventRepository: dump: message: %s", eventJson));
-        dbManager.saveEvent(eventJson);
-    }
-
-    private void makeFactoryDump(RudderMessage message) {
-        RudderLogger.logDebug("EventRepository: makeFactoryDump: settings integrations field");
-        message.setIntegrations(prepareIntegrations());
-    }
-
-    private Map<String, Object> prepareIntegrations() {
-        Map<String, Object> integrationPlaceholder = new HashMap<>();
-        integrationPlaceholder.put("All", true);
-        return integrationPlaceholder;
+        if (dbManager != null) {
+            dbManager.saveEvent(eventJson);
+        }
     }
 
     void reset() {

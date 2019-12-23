@@ -4,14 +4,14 @@ namespace Rudderlabs
 {
     class RudderAdjustIntegrationFactory : RudderIntegrationFactory
     {
-        public override RudderIntegration create(Dictionary<string, object> config, RudderClient client)
+        public override RudderIntegration create(Dictionary<string, object> config, RudderClient client, RudderConfig rudderConfig)
         {
-            return new RudderAdjustIntegration(config, client);
+            return new RudderAdjustIntegration(config, client, rudderConfig);
         }
 
         public override string key()
         {
-            return "ADJ";
+            return "Adjust";
         }
 
         private static RudderAdjustIntegrationFactory instance;
