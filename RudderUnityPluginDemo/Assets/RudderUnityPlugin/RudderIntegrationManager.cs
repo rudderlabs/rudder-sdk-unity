@@ -39,10 +39,12 @@ namespace Rudderlabs
                 lock (this._lockingObj)
                 {
                     this.lastUpdatedTimestamp = long.Parse(PlayerPrefs.GetString("rl_server_update_time", "0"));
+                    RudderLogger.LogDebug("RudderIntegrationManager: downloadIntegrations: lastUpdatedTimeStamp: " + lastUpdatedTimestamp);
                     this.serverConfigJson = PlayerPrefs.GetString("rl_server_config", null);
+                    RudderLogger.LogDebug("RudderIntegrationManager: downloadIntegrations: serverConfigJson: " + this.serverConfigJson);
                 }
 
-                if (this.serverConfigJson == null || isServerConfigOutdated())
+                if (this.serverConfigJson == null || this.serverConfigJson.Equals("") || isServerConfigOutdated())
                 {
                     Thread t = new Thread(downloadConfig);
                     t.Start();
@@ -58,10 +60,17 @@ namespace Rudderlabs
         {
             try
             {
-                if (this.rudderServerConfig == null || this.config.factories == null || this.config.factories.Count == 0)
+                if (this.rudderServerConfig == null)
                 {
-                    // no factory to initialize
-                    RudderLogger.LogInfo("No integrations");
+                    RudderLogger.LogInfo("No integrations: rudderServerConfig is null");
+                }
+                else if (this.config.factories == null)
+                {
+                    RudderLogger.LogInfo("No integrations: config.factories is null");
+                }
+                else if (this.config.factories.Count == 0)
+                {
+                    RudderLogger.LogInfo("No integrations: config.factories.Count is 0");
                 }
                 else
                 {
@@ -85,7 +94,7 @@ namespace Rudderlabs
 
                         foreach (RudderIntegrationFactory factory in this.config.factories)
                         {
-                            string factoryKey = factory.key();
+                            string factoryKey = factory.Key();
                             RudderLogger.LogDebug("Initiating native destination factory: " + factoryKey);
                             if (destinationMap.ContainsKey(factoryKey))
                             {
@@ -96,7 +105,7 @@ namespace Rudderlabs
                                     if (isDestinationEnabled != null && isDestinationEnabled == true)
                                     {
                                         Dictionary<string, object> destinationConfig = serverDestination["config"] as Dictionary<string, object>;
-                                        RudderIntegration integrationOp = factory.create(destinationConfig, client, this.config);
+                                        RudderIntegration integrationOp = factory.Create(destinationConfig, client, this.config);
                                         RudderLogger.LogDebug("Native integration initiated for " + factoryKey);
                                         this.integrationOpsMap[factoryKey] = integrationOp;
                                     }
@@ -106,6 +115,18 @@ namespace Rudderlabs
                     }
                 }
                 this.isFactoryPrepared = true;
+
+                lock (this._lockingObj)
+                {
+                    if (this.factoryDumpQueue.Count > 0)
+                    {
+                        for (int index = 0; index < this.factoryDumpQueue.Count; index++)
+                        {
+                            this.makeIntegrationDump(this.factoryDumpQueue[index]);
+                        }
+                        this.factoryDumpQueue.Clear();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -119,6 +140,7 @@ namespace Rudderlabs
         {
             if (configJson == null || configJson.Equals(""))
             {
+                RudderLogger.LogDebug("parseServerConfig: configJson is null");
                 return null;
             }
             try
@@ -127,7 +149,7 @@ namespace Rudderlabs
             }
             catch (Exception ex)
             {
-                RudderLogger.LogError(ex.StackTrace);
+                RudderLogger.LogError(ex.Message);
             }
             return null;
         }
@@ -199,13 +221,28 @@ namespace Rudderlabs
             return this.integrations;
         }
 
+        private List<RudderMessage> factoryDumpQueue = new List<RudderMessage>();
         public void makeIntegrationDump(RudderMessage message)
         {
-            // make native integration calls
-            foreach (string key in integrationOpsMap.Keys)
+            // if factories are not prepared dump those in the queue
+            if (!this.isFactoryPrepared)
             {
-                integrationOpsMap[key].Dump(message);
+                lock (this._lockingObj)
+                {
+                    factoryDumpQueue.Add(message);
+                }
             }
+            // make native integration calls
+            else
+            {
+                foreach (string key in integrationOpsMap.Keys)
+                {
+                    RudderLogger.LogDebug("Dumping " + message.eventName + " to " + key + " native SDK");
+                    integrationOpsMap[key].Dump(message);
+                }
+            }
+
+
         }
 
         // ssl check validator
@@ -220,8 +257,9 @@ namespace Rudderlabs
             {
                 lock (this._lockingObj)
                 {
-                    if (this.serverConfigJson != null)
+                    if (this.serverConfigJson != null && !this.serverConfigJson.Equals(""))
                     {
+                        RudderLogger.LogDebug("RudderIntegrationManager Update: serverConfigJson: " + this.serverConfigJson);
                         if (isServerConfigOutdated())
                         {
 #if !UNITY_EDITOR
@@ -231,6 +269,7 @@ namespace Rudderlabs
 #endif
                         }
 
+                        RudderLogger.LogDebug("RudderIntegrationManager Update: serverConfigJson: " + this.serverConfigJson);
                         this.rudderServerConfig = parseServerConfig(this.serverConfigJson);
                         this.prepareFactories();
                     }

@@ -121,6 +121,8 @@ namespace Rudderlabs
                     writeKey,
                     config
                 );
+            } else {
+                RudderLogger.LogDebug("RudderClient SDK is already initiated");
             }
 
             return instance;

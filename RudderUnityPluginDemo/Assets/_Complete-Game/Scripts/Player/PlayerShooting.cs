@@ -39,10 +39,11 @@ namespace CompleteProject
             RudderClient.SerializeSqlite();
 
             string writeKey = "1TSRSskqa15PG7F89tkwEbl5Td8";
-            string endPointUrl = "https://c94d7782.ngrok.io";
+            string endPointUrl = "https://8254ac02.ngrok.io";
 
             RudderConfigBuilder configBuilder = new RudderConfigBuilder()
             .WithEndPointUrl(endPointUrl)
+            .WithFactory(RudderAdjustIntegrationFactory.GetFactory())
             .WithLogLevel(RudderLogLevel.DEBUG);
             rudderClient = RudderClient.GetInstance(
                 writeKey,
