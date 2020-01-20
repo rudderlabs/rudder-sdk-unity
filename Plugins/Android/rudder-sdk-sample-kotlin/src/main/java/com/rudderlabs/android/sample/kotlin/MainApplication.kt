@@ -7,7 +7,7 @@ import com.rudderlabs.android.sdk.core.RudderLogger
 class MainApplication : Application() {
     companion object {
         private const val WRITE_KEY = "1QH0xOiRBxiKht41YBe90rJVVXR"
-        private const val END_POINT_URI = "https://c94d7782.ngrok.io"
+        private const val END_POINT_URI = "https://365a346b.ngrok.io"
     }
 
     override fun onCreate() {

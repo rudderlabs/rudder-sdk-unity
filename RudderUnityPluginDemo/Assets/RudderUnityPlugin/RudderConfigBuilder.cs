@@ -2,8 +2,6 @@ using System.Collections.Generic;
 
 namespace Rudderlabs
 {
-
-
     class RudderConfigBuilder
     {
         private string endPointUrl = Constants.BASE_URL;
