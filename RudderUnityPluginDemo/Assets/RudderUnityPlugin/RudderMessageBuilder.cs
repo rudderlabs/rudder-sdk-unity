@@ -10,12 +10,6 @@ namespace Rudderlabs
             this.eventName = eventName;
             return this;
         }
-        private string userId;
-        public RudderMessageBuilder WithUserId(string userId)
-        {
-            this.userId = userId;
-            return this;
-        }
         private Dictionary<string, object> eventProperties;
         public RudderMessageBuilder WithEventProperties(Dictionary<string, object> eventProperties)
         {
@@ -94,7 +88,6 @@ namespace Rudderlabs
         {
             RudderMessage element = new RudderMessage();
             element.eventName = this.eventName;
-            element.userId = this.userId;
             element.eventProperties = this.eventProperties;
             element.userProperties = this.userProperties;
             return element;

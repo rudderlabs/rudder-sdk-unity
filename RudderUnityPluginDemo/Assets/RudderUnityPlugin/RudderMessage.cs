@@ -8,10 +8,9 @@ namespace Rudderlabs
     public class RudderMessage
     {
         public string eventName;
-        public string userId;
         public Dictionary<string, object> eventProperties;
         public Dictionary<string, object> userProperties;
-        public Dictionary<string, object> integrations;
+        public Dictionary<string, object> options;
 
         public string getEventPropertiesJson()
         {
@@ -23,19 +22,15 @@ namespace Rudderlabs
             return convertToJson(userProperties);
         }
 
-        public string getIntegrationsJson()
+        public string getOptionsJson()
         {
-            return convertToJson(integrations);
+            return convertToJson(options);
         }
 
         public string convertToJson(Dictionary<string, object> dict)
         {
             if (dict == null) return "{}";
 
-            // JsonWriter writer = new JsonWriter();
-            // writer.PrettyPrint = false;
-            // JsonMapper.ToJson(dict, writer);
-            // return writer.ToString();
             return Json.Serialize(dict);
         }
     }

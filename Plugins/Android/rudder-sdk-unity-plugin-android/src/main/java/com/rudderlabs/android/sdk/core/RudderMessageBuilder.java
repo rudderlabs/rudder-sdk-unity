@@ -59,6 +59,11 @@ public class RudderMessageBuilder {
         return this;
     }
 
+    public RudderMessageBuilder setRudderOption(Map<String, Object> options) {
+
+        return this;
+    }
+
     public RudderMessage build() {
         RudderMessage event = new RudderMessage();
         if (this.userId != null) event.setUserId(this.userId);

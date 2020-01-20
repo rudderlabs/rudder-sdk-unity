@@ -15,14 +15,20 @@ extern "C" {
                            const char* _endPointUrl,
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
-                           const int _sleepTimeout);
+                           const int _sleepTimeout,
+                           const int _logLevel);
     
     void _logEvent(const char* _eventType,
                    const char* _eventName,
-                   const char* _userId,
-                   const char* _eventPropertyJson,
-                   const char* _userPropertyJson,
-                   const char* _integrationJson);
+                   const char* _eventPropsJson,
+                   const char* _userPropsJson,
+                   const char* _optionsJson);
+    
+    void _identify(const char* _userId,
+                   const char* _traitsJson,
+                   const char* _optionsJson);
+    
+    void _reset();
 
 #ifdef __cplusplus
 }
