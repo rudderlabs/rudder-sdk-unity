@@ -45,15 +45,11 @@ public class RudderTraits {
     private transient Map<String, Object> extras;
 
     public RudderTraits() {
-        RudderContext rudderContext = RudderElementCache.getCachedContext();
-        if (rudderContext != null) this.anonymousId = rudderContext.getDeviceId();
-    }
-
-    RudderTraits(String anonymousId) {
-        this.anonymousId = anonymousId;
+        this.anonymousId = RudderElementCache.getAnonymousId();
     }
 
     public RudderTraits(Address address, String age, String birthday, Company company, String createdAt, String description, String email, String firstName, String gender, String id, String lastName, String name, String phone, String title, String userName) {
+        this.anonymousId = RudderElementCache.getAnonymousId();
         this.address = address;
         this.age = age;
         this.birthday = birthday;

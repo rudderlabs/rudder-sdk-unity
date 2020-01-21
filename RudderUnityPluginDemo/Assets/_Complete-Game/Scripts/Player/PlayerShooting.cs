@@ -19,7 +19,7 @@ namespace CompleteProject
         LineRenderer gunLine;                           // Reference to the line renderer.
         AudioSource gunAudio;                           // Reference to the audio source.
         Light gunLight;                                 // Reference to the light component.
-        public Light faceLight;								// Duh
+        public Light faceLight;							// Duh
         float effectsDisplayTime = 0.2f;                // The proportion of the timeBetweenBullets that the effects will display for.
 
 
@@ -39,7 +39,7 @@ namespace CompleteProject
             RudderClient.SerializeSqlite();
 
             string writeKey = "1TSRSskqa15PG7F89tkwEbl5Td8";
-            string endPointUrl = "https://8254ac02.ngrok.io";
+            string endPointUrl = "https://76aeb180.ngrok.io";
 
             RudderConfigBuilder configBuilder = new RudderConfigBuilder()
             .WithEndPointUrl(endPointUrl)
@@ -60,11 +60,6 @@ namespace CompleteProject
                 .Build();
             rudderClient.Track(shootMessage);
 
-            // build a message 
-            RudderMessage identifyMessage = new RudderMessageBuilder().Build();
-            RudderTraits traits = new RudderTraits().PutEmail("some@example.com");
-            rudderClient.Identify("some_user_id", traits, identifyMessage);
-
             RudderMessage message1 = new RudderMessageBuilder()
                 .WithEventName("daily_rewards_claim")
                 .WithEventProperty("test_key_1", "test_value_1")
@@ -74,6 +69,11 @@ namespace CompleteProject
                 .Build();
             rudderClient.Track(message1);
 
+            // build a message 
+            RudderMessage identifyMessage = new RudderMessageBuilder().Build();
+            RudderTraits traits = new RudderTraits().PutEmail("some@example.com");
+            rudderClient.Identify("some_user_id", traits, identifyMessage);
+
             RudderMessage message2 = new RudderMessageBuilder()
                 .WithEventName("level_up")
                 .WithEventProperty("test_key_1", "test_value_1")
@@ -82,6 +82,9 @@ namespace CompleteProject
                 .WithUserProperty("test_user_key_2", "test_user_value_2")
                 .Build();
             rudderClient.Track(message2);
+
+            // reset identify
+            rudderClient.Reset();
 
             RudderMessage message3 = new RudderMessageBuilder()
                 .WithEventName("revenue")
@@ -93,9 +96,6 @@ namespace CompleteProject
                 .WithUserProperty("test_user_key_2", "test_user_value_2")
                 .Build();
             rudderClient.Track(message3);
-
-            // reset identify
-            rudderClient.Reset();
 
             // fire another track event to check for reset 
             RudderMessage anotherShootMessage = new RudderMessageBuilder()

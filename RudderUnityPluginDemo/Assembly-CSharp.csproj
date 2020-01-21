@@ -93,6 +93,7 @@
      <Compile Include="Assets\RudderUnityPlugin\Constants.cs" />
      <Compile Include="Assets\RudderUnityPlugin\MiniJSON.cs" />
      <Compile Include="Assets\RudderUnityPlugin\PagePropertyBuilder.cs" />
+     <Compile Include="Assets\RudderUnityPlugin\RudderCache.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderClient.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderConfig.cs" />
      <Compile Include="Assets\RudderUnityPlugin\RudderConfigBuilder.cs" />

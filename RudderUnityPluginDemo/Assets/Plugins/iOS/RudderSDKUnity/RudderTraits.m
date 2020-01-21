@@ -18,8 +18,7 @@
         // if anonymousId is not present in supplied dict
         NSString *anonymousId = [dict objectForKey:@"anonymousId"];
         if (anonymousId == nil) {
-            RudderContext *context = [RudderElementCache getContext];
-            _anonymousId = context.device.identifier;
+            _anonymousId = [RudderElementCache getAnonymousId];
         }
         __extras = [[NSMutableDictionary alloc] init];
         [__extras setValuesForKeysWithDictionary:dict];

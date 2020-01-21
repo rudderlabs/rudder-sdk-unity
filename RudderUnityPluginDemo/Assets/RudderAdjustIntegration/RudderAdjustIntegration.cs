@@ -9,27 +9,74 @@ namespace Rudderlabs
         public RudderAdjustIntegration(Dictionary<string, object> config, RudderClient client, RudderConfig rudderConfig)
         {
             RudderLogger.LogDebug("Instantiating RudderAdjustIntegration");
-            string appToken = config["appToken"] as string;
-            RudderLogger.LogDebug("Adjust: appToken: " + appToken);
-            List<object> eventTokens = config["customMappings"] as List<object>;
-            foreach (var eventConfig in eventTokens)
+            string appToken = null;
+            if (config.ContainsKey("appToken"))
             {
-                Dictionary<string, object> eventTokenDict = eventConfig as Dictionary<string, object>;
-                string eventName = eventTokenDict["from"] as string;
-                string eventToken = eventTokenDict["to"] as string;
-                RudderLogger.LogDebug("Adjust: " + eventName + " : " + eventToken);
-                this.eventTokenMap[eventName] = eventToken;
+                appToken = config["appToken"] as string;
+                RudderLogger.LogDebug("Adjust: appToken: " + appToken);
             }
 
-            RudderLogger.LogDebug("Initiating Adjust native SDK");
-            AdjustConfig adjustConfig = new AdjustConfig(
-                appToken,
-                rudderConfig.logLevel >= RudderLogLevel.DEBUG ? AdjustEnvironment.Sandbox : AdjustEnvironment.Production,
-                true);
-            adjustConfig.setLogLevel(rudderConfig.logLevel >= RudderLogLevel.DEBUG ? AdjustLogLevel.Verbose : AdjustLogLevel.Error);
+            List<object> eventTokens = new List<object>();
+            if (config.ContainsKey("customMappings"))
+            {
+                eventTokens = config["customMappings"] as List<object>;
+                foreach (var eventConfig in eventTokens)
+                {
+                    Dictionary<string, object> eventTokenDict = eventConfig as Dictionary<string, object>;
+                    string eventName = eventTokenDict["from"] as string;
+                    string eventToken = eventTokenDict["to"] as string;
+                    RudderLogger.LogDebug("Adjust: " + eventName + " : " + eventToken);
+                    this.eventTokenMap[eventName] = eventToken;
+                }
+            }
 
-            RudderLogger.LogDebug("Starting Adjust native SDK");
-            Adjust.start(adjustConfig);
+            string delayTime = null;
+            if (config.ContainsKey("delay"))
+            {
+                delayTime = config["delay"] as string;
+                RudderLogger.LogDebug("delayTime:" + delayTime);
+            }
+
+            if (appToken != null && !appToken.Equals(""))
+            {
+                RudderLogger.LogDebug("Initiating Adjust native SDK");
+                AdjustConfig adjustConfig = new AdjustConfig(
+                                appToken,
+                                rudderConfig.logLevel >= RudderLogLevel.DEBUG ? AdjustEnvironment.Sandbox : AdjustEnvironment.Production,
+                                true);
+                adjustConfig.setLogLevel(rudderConfig.logLevel >= RudderLogLevel.DEBUG ? AdjustLogLevel.Verbose : AdjustLogLevel.Error);
+                double delay = 0;
+                try
+                {
+                    if (delayTime != null)
+                    {
+                        delay = double.Parse(delayTime);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    RudderLogger.LogError("Invalid delay time" + ex.Message);
+                }
+                if (delay < 0)
+                {
+                    delay = 0;
+                }
+                else if (delay > 10)
+                {
+                    delay = 10;
+                }
+                if (delay > 0)
+                {
+                    adjustConfig.setDelayStart(delay);
+                }
+
+                RudderLogger.LogDebug("Starting Adjust native SDK");
+                Adjust.start(adjustConfig);
+            }
+            else
+            {
+                RudderLogger.LogError("appToken was not set in Dashboard");
+            }
         }
 
         public override void Dump(RudderMessage message)
@@ -41,6 +88,8 @@ namespace Rudderlabs
                 RudderLogger.LogDebug("Adjust integration dump: eventToken: " + eventToken);
                 if (eventToken != null && !eventToken.Equals(""))
                 {
+                    this.AddSessionParameter(RudderCache.GetAnonymousId());
+
                     RudderLogger.LogDebug("Creating Adjust event");
                     AdjustEvent adjustEvent = new AdjustEvent(eventToken);
 
@@ -92,6 +141,12 @@ namespace Rudderlabs
 
         public override void Identify(string userId, RudderTraits traits)
         {
+            this.AddSessionParameter(RudderCache.GetUserId());
+        }
+
+        private void AddSessionParameter(string userId)
+        {
+            Adjust.addSessionPartnerParameter("anonymousId", RudderCache.GetAnonymousId());
             if (userId != null)
             {
                 Adjust.addSessionPartnerParameter("userId", userId);

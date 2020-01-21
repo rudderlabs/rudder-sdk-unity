@@ -9,19 +9,21 @@
 #import "RudderClient.h"
 #import "Utils.h"
 #import "RudderLogger.h"
+#import "RudderElementCache.h"
 
 static RudderClient *_rudderClient;
 
 @implementation RudderClientWrapper
 
-+ (void)_initiateInstance:(NSString *)_writeKey
++ (void)_initiateInstance:(NSString *)_anonymousId
+                 writeKey:(NSString *)_writeKey
               endPointUrl:(NSString *)_endPointUrl
            flushQueueSize:(int)_flushQueueSize
          dbCountThreshold:(int)_dbCountThreshold
              sleepTimeOut:(int)_sleepTimeout
-                 logLevel:(int)_logLevel
-{
+                 logLevel:(int)_logLevel {
     if (_rudderClient == nil) {
+        [RudderElementCache setAnonymousId:_anonymousId];
         RudderConfigBuilder *builder = [[RudderConfigBuilder alloc] init];
         [builder withEndPointUrl:_endPointUrl];
         [builder withFlushQueueSize:_flushQueueSize];

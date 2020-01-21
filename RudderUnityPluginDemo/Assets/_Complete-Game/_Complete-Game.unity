@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 8900000, guid: a7bed68887a07e34394d4191b3081359, type: 3}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.13346997, g: 0.18373775, b: 0.26000538, a: 1}
+  m_IndirectSpecularColor: {r: 0.4008573, g: 0.46579695, b: 0.54685944, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &4
 LightmapSettings:
@@ -2294,6 +2294,75 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1038376789}
   m_CullTransparentMesh: 0
+--- !u!1001 &1112335451
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 1851598982}
+    m_Modifications:
+    - target: {fileID: 7072519499881408558, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_Name
+      value: RudderPreferbs
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 562e8821828954b5fa519f2a49527632, type: 3}
 --- !u!1 &1125301618
 GameObject:
   m_ObjectHideFlags: 0
@@ -3035,6 +3104,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &1510766648 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7500226600108721394, guid: 562e8821828954b5fa519f2a49527632,
+    type: 3}
+  m_PrefabInstance: {fileID: 1112335451}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1591794898
 GameObject:
   m_ObjectHideFlags: 0
@@ -3604,7 +3679,8 @@ Transform:
   m_LocalRotation: {x: 0.25881907, y: 0, z: 0, w: 0.9659259}
   m_LocalPosition: {x: 1, y: 15, z: -22}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 1510766648}
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3634,7 +3710,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff26db721962cdf4a8edcdfa9a767d2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  profile: {fileID: 11400000, guid: ecb5505292659ad448cc9a62efa59feb, type: 2}
 --- !u!1 &1859424391
 GameObject:
   m_ObjectHideFlags: 0

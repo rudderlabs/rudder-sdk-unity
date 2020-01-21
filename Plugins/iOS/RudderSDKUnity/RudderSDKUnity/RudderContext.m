@@ -7,6 +7,7 @@
 //
 
 #import "RudderContext.h"
+#import "RudderElementCache.h"
 #import "Utils.h"
 
 @implementation RudderContext
@@ -47,7 +48,7 @@
 
 - (void) createAndPersistTraits {
     RudderTraits* traits = [[RudderTraits alloc] init];
-    traits.anonymousId = _device.identifier;
+    traits.anonymousId = [RudderElementCache getAnonymousId];
     _traits = [[traits dict]  mutableCopy];
     
     [self persistTraits];

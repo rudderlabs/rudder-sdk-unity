@@ -17,6 +17,7 @@ namespace Rudderlabs
 #if UNITY_IPHONE
         [DllImport("__Internal")]
         private static extern void _initiateInstance(
+            string _anonymousId,
             string _writeKey,
             string _endPointUrl,
             int _flushQueueSize,
@@ -70,6 +71,7 @@ namespace Rudderlabs
                 androidClientClass.CallStatic(
                     "_initiateInstance",
                     context,
+                    RudderCache.GetAnonymousId(),
                     _writeKey,
                     _endPointUrl,
                     _flushQueueSize,
@@ -86,6 +88,7 @@ namespace Rudderlabs
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 _initiateInstance(
+                    RudderCache.GetAnonymousId(),
                     _writeKey,
                     _endPointUrl,
                     _flushQueueSize,
@@ -121,6 +124,8 @@ namespace Rudderlabs
                     writeKey,
                     config
                 );
+
+                RudderCache.Init();
             } else {
                 RudderLogger.LogDebug("RudderClient SDK is already initiated");
             }
@@ -204,6 +209,8 @@ namespace Rudderlabs
         public void Identify(string userId, RudderTraits traits, RudderMessage message)
         {
             RudderLogger.LogDebug("Identify Event: " + message.eventName);
+            RudderCache.SetUserId(userId);
+
             integrationManager.makeIntegrationIdentify(userId, traits);
 
             // put supplied userId under traits as well if it is not set
@@ -241,6 +248,7 @@ namespace Rudderlabs
             if (integrationManager != null) {
                 integrationManager.Reset();
             }
+            RudderCache.Reset();
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {

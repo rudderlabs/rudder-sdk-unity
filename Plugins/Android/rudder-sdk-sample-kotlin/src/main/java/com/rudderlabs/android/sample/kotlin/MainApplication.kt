@@ -6,8 +6,8 @@ import com.rudderlabs.android.sdk.core.RudderLogger
 
 class MainApplication : Application() {
     companion object {
-        private const val WRITE_KEY = "1QH0xOiRBxiKht41YBe90rJVVXR"
-        private const val END_POINT_URI = "https://365a346b.ngrok.io"
+        private const val WRITE_KEY = "1TSRSskqa15PG7F89tkwEbl5Td8"
+        private const val END_POINT_URI = "https://76aeb180.ngrok.io"
     }
 
     override fun onCreate() {
@@ -15,6 +15,7 @@ class MainApplication : Application() {
 
         RudderClientWrapper._initiateInstance(
             this,
+            "some_anonymous_id",
             WRITE_KEY,
             END_POINT_URI,
             30,

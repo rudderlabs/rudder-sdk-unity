@@ -1,6 +1,5 @@
 package com.rudderlabs.android.sdk.core.util;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
@@ -32,6 +31,7 @@ public class Utils {
     public static final String RUDDER_SERVER_CONFIG_KEY = "rl_server_config";
     public static final String RUDDER_SERVER_CONFIG_LAST_UPDATE_KEY = "rl_server_last_updated";
     public static final String RUDDER_TRAITS_KEY = "rl_traits";
+    public static final String RUDDER_ANONYMOUS_ID_KEY = "rl_anonymous_id";
 
     public static String getTimeZone() {
         TimeZone timeZone = TimeZone.getDefault();
@@ -49,9 +49,9 @@ public class Utils {
         return formatter.format(date);
     }
 
-    public static String getDeviceId(Application application) {
+    public static String getDeviceId(Context context) {
         if (Build.VERSION.SDK_INT >= 17) {
-            String androidId = getString(application.getContentResolver(), ANDROID_ID);
+            String androidId = getString(context.getContentResolver(), ANDROID_ID);
             if (!TextUtils.isEmpty(androidId)
                     && !"9774d56d682e549c".equals(androidId)
                     && !"unknown".equals(androidId)

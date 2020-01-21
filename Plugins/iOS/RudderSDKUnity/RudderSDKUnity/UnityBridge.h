@@ -11,7 +11,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    void _initiateInstance(const char* _writeKey,
+    void _initiateInstance(const char* _anonymousId,
+                           const char* _writeKey,
                            const char* _endPointUrl,
                            const int _flushQueueSize,
                            const int _dbCountThreshold,

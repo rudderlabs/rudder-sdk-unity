@@ -20,7 +20,7 @@
         _channel = @"mobile";
         _context = [RudderElementCache getContext];
         _originalTimestamp = [Utils getTimestamp];
-        _anonymousId = [[NSString alloc] initWithFormat:@"%@", [Utils getDeviceId]];
+        _anonymousId = [RudderElementCache getAnonymousId];
         NSObject *userId = [_context.traits valueForKey:@"userId"];
         if (userId != nil) {
             _userId = [[NSString alloc] initWithFormat:@"%@", userId];

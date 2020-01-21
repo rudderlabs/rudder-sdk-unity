@@ -14,6 +14,7 @@ public class RudderClientWrapper {
 
     public static void _initiateInstance(
             Context _context,
+            String _anonymousId,
             String _writeKey,
             String _endPointUrl,
             int _flushQueueSize,
@@ -30,6 +31,11 @@ public class RudderClientWrapper {
             RudderLogger.logError("WriteKey can not be null or empty");
             return;
         }
+
+        if (TextUtils.isEmpty(_anonymousId)) {
+            _anonymousId = Utils.getDeviceId(_context);
+        }
+        RudderElementCache.setAnonymousId(_anonymousId);
 
         RudderConfig config = new RudderConfig.Builder()
                 .withEndPointUri(_endPointUrl)

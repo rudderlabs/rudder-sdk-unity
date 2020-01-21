@@ -11,7 +11,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface RudderClientWrapper : NSObject
 
-+ (void) _initiateInstance: (NSString*) _writeKey
++ (void) _initiateInstance: (NSString*) _anonymousId
+                  writeKey: (NSString*) _writeKey
                endPointUrl: (NSString*) _endPointUrl
             flushQueueSize: (int) _flushQueueSize
           dbCountThreshold: (int) _dbCountThreshold

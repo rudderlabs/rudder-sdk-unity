@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         val eventProps = mapOf(
             "test_key_1" to "test_value_1",
             "test_key_2" to "test_value_2",
-            "price" to 2.9999,
+            "revenue" to 2.9999,
             "quantity" to 1
         )
         val eventJson = Gson().toJson(eventProps)
@@ -27,46 +27,81 @@ class MainActivity : AppCompatActivity() {
 
         val optionsJson = "null"
 
-        trackBtn.setOnClickListener {
-            RudderClientWrapper._logEvent(
-                "track",
-                "some_test_event",
-                eventJson,
-                userJson,
-                optionsJson
-            )
-        }
+        RudderClientWrapper._logEvent(
+            "track",
+            "some_test_event",
+            eventJson,
+            userJson,
+            optionsJson
+        )
 
-        screenBtn.setOnClickListener {
-            RudderClientWrapper._logEvent(
-                "screen",
-                "some_test_event",
-                eventJson,
-                userJson,
-                optionsJson
-            )
-        }
+        RudderClientWrapper._logEvent(
+            "screen",
+            "some_test_event",
+            eventJson,
+            userJson,
+            optionsJson
+        )
 
-        identifyBtn.setOnClickListener {
-            val traits: RudderTraits = RudderTraits()
-                .putAddress(
-                    RudderTraits.Address()
-                        .putCity("some_city")
-                        .putCountry("some_country")
-                        .putPostalCode("123456")
-                        .putState("some_state")
-                        .putStreet("some_street")
-                )
-                .put("userId", userId.text.toString())
-                .put("some_test_key", "some_test_value")
-            val traitsJson = Gson().toJson(traits)
-
-            RudderClientWrapper._identify(
-                "some_user_id",
-                traitsJson,
-                optionsJson
+        val traits: RudderTraits = RudderTraits()
+            .putAddress(
+                RudderTraits.Address()
+                    .putCity("some_city")
+                    .putCountry("some_country")
+                    .putPostalCode("123456")
+                    .putState("some_state")
+                    .putStreet("some_street")
             )
-        }
+            .put("userId", userId.text.toString())
+            .put("some_test_key", "some_test_value")
+        val traitsJson = Gson().toJson(traits)
+
+        RudderClientWrapper._identify(
+            "some_user_id",
+            traitsJson,
+            optionsJson
+        )
+
+//        trackBtn.setOnClickListener {
+//            RudderClientWrapper._logEvent(
+//                "track",
+//                "some_test_event",
+//                eventJson,
+//                userJson,
+//                optionsJson
+//            )
+//        }
+//
+//        screenBtn.setOnClickListener {
+//            RudderClientWrapper._logEvent(
+//                "screen",
+//                "some_test_event",
+//                eventJson,
+//                userJson,
+//                optionsJson
+//            )
+//        }
+//
+//        identifyBtn.setOnClickListener {
+//            val traits: RudderTraits = RudderTraits()
+//                .putAddress(
+//                    RudderTraits.Address()
+//                        .putCity("some_city")
+//                        .putCountry("some_country")
+//                        .putPostalCode("123456")
+//                        .putState("some_state")
+//                        .putStreet("some_street")
+//                )
+//                .put("userId", userId.text.toString())
+//                .put("some_test_key", "some_test_value")
+//            val traitsJson = Gson().toJson(traits)
+//
+//            RudderClientWrapper._identify(
+//                "some_user_id",
+//                traitsJson,
+//                optionsJson
+//            )
+//        }
 
         resetBtn.setOnClickListener {
             RudderClientWrapper._reset()

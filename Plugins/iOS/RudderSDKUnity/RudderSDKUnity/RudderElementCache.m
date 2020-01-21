@@ -9,6 +9,7 @@
 #import "RudderElementCache.h"
 
 static RudderContext* cachedContext;
+static NSString* cachedAnonymousId;
 
 @implementation RudderElementCache
 
@@ -39,5 +40,12 @@ static RudderContext* cachedContext;
     [cachedContext updateTraitsDict: traitsDict];
 }
 
++ (void)setAnonymousId:(NSString *)anonymousId {
+    cachedAnonymousId = anonymousId;
+}
+
++ (NSString *)getAnonymousId {
+    return cachedAnonymousId;
+}
 
 @end

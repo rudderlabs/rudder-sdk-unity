@@ -9,19 +9,21 @@
 #import "RudderClient.h"
 #import "Utils.h"
 #import "RudderLogger.h"
+#import "RudderElementCache.h"
 
 static RudderClient *_rudderClient;
 
 @implementation RudderClientWrapper
 
-+ (void)_initiateInstance:(NSString *)_writeKey
++ (void)_initiateInstance:(NSString *)_anonymousId
+                 writeKey:(NSString *)_writeKey
               endPointUrl:(NSString *)_endPointUrl
            flushQueueSize:(int)_flushQueueSize
          dbCountThreshold:(int)_dbCountThreshold
              sleepTimeOut:(int)_sleepTimeout
-                 logLevel:(int)_logLevel
-{
+                 logLevel:(int)_logLevel {
     if (_rudderClient == nil) {
+        [RudderElementCache setAnonymousId:_anonymousId];
         RudderConfigBuilder *builder = [[RudderConfigBuilder alloc] init];
         [builder withEndPointUrl:_endPointUrl];
         [builder withFlushQueueSize:_flushQueueSize];
@@ -60,12 +62,12 @@ static RudderClient *_rudderClient;
     NSDictionary *traitsDict = [self _convertToDict:_traitsJson];
     if (traitsDict == nil) {
         // if traits is not filled in, fill with anonymousId
-        traitsDict = @{@"anonymousId": [[[[UIDevice currentDevice] identifierForVendor] UUIDString]lowercaseString]};
+        traitsDict = @{@"anonymousId": [RudderElementCache getAnonymousId]};
     } else {
         // if anonymousId is not filled in
         NSString *anonymoysId = [traitsDict valueForKey:@"anonymousId"];
         if (anonymoysId == nil) {
-            [[traitsDict mutableCopy] setObject:[[[[UIDevice currentDevice] identifierForVendor] UUIDString]lowercaseString] forKey:@"anonymousId"];
+            [[traitsDict mutableCopy] setObject:[RudderElementCache getAnonymousId] forKey:@"anonymousId"];
         }
     }
     NSDictionary *optinsDict = [self _convertToDict:_optionsJson];

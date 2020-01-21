@@ -12,6 +12,7 @@
 #import "RudderLogger.h"
 
 static EventRepository* _instance;
+BOOL initiated;
 
 @implementation EventRepository
 

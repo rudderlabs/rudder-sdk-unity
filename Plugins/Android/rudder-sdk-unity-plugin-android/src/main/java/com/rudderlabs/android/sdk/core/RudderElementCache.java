@@ -37,5 +37,15 @@ class RudderElementCache {
     static void updateTraits(Map<String, Object> traits) {
         cachedContext.updateTraitsMap(traits);
     }
+
+    private static String _anonymousId;
+
+    static String getAnonymousId() {
+        return _anonymousId;
+    }
+
+    static void setAnonymousId(String anonymousId) {
+        _anonymousId = anonymousId;
+    }
 }
 

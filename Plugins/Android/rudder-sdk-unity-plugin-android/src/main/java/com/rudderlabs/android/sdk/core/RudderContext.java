@@ -48,7 +48,7 @@ class RudderContext {
         String traitsJson = preferences.getString(Utils.RUDDER_TRAITS_KEY, null);
         RudderLogger.logDebug(String.format(Locale.US, "Traits from persistence storage%s", traitsJson));
         if (traitsJson == null) {
-            RudderTraits traits = new RudderTraits(deviceId);
+            RudderTraits traits = new RudderTraits();
             traitsJson = new Gson().toJson(traits);
             this.traits = Utils.convertToMap(traitsJson);
             preferences.edit().putString(Utils.RUDDER_TRAITS_KEY, traitsJson).apply();
@@ -69,7 +69,7 @@ class RudderContext {
     void updateTraits(RudderTraits traits) {
         // if traits is null reset the traits to a new one with only anonymousId
         if (traits == null) {
-            traits = new RudderTraits(this.getDeviceId());
+            traits = new RudderTraits();
         }
         // convert the whole traits to map and take care of the extras
         Map<String, Object> traitsMap = Utils.convertToMap(new Gson().toJson(traits));
@@ -98,9 +98,5 @@ class RudderContext {
 
     void updateTraitsMap(Map<String, Object> traits) {
         this.traits = traits;
-    }
-
-    String getDeviceId() {
-        return deviceInfo.getDeviceId();
     }
 }

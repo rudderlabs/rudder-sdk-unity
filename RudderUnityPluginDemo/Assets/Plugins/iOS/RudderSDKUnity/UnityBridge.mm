@@ -10,13 +10,15 @@
 #import <sqlite3.h>
 extern "C"
 {
-    void _initiateInstance(const char* _writeKey,
+    void _initiateInstance(const char* _anonymousId,
+                           const char* _writeKey,
                            const char* _endPointUrl,
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
                            const int _sleepTimeout,
                            const int _logLevel) {
-        [RudderClientWrapper _initiateInstance:[[NSString alloc] initWithUTF8String:_writeKey]
+        [RudderClientWrapper _initiateInstance:[[NSString alloc] initWithUTF8String:_anonymousId]
+                                      writeKey:[[NSString alloc] initWithUTF8String:_writeKey]
                                    endPointUrl:[[NSString alloc] initWithUTF8String:_endPointUrl]
                                 flushQueueSize:_flushQueueSize
                               dbCountThreshold:_dbCountThreshold
