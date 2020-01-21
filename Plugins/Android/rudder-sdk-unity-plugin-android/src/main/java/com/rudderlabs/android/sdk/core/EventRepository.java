@@ -4,6 +4,8 @@ import android.app.Application;
 import android.text.TextUtils;
 import android.util.Base64;
 
+import androidx.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.rudderlabs.android.sdk.core.util.Utils;
 
@@ -16,6 +18,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /*
  * utility class for event processing
@@ -25,37 +30,51 @@ class EventRepository {
     private RudderConfig config;
     private DBPersistentManager dbManager;
 
+    private boolean initiated = false;
+
     /*
      * constructor to be called from RudderClient internally.
      * -- tasks to be performed
      * 1. persist the value of config
      * 2. initiate RudderElementCache
      * 3. initiate DBPersistentManager for SQLite operations
-     * 4. start processor thread
+     * 4. initiate RudderServerConfigManager
+     * 5. start processor thread
+     * 6. initiate factories
      * */
     EventRepository(Application _application, String _writeKey, RudderConfig _config) {
         // 1. set the values of writeKey, config
         try {
-            this.authHeaderString = Base64.encodeToString((_writeKey + ":").getBytes("UTF-8"), Base64.DEFAULT);
+            RudderLogger.logDebug(String.format("EventRepository: constructor: writeKey: %s", _writeKey));
+            this.authHeaderString = Base64.encodeToString((String.format(Locale.US, "%s:", _writeKey)).getBytes("UTF-8"), Base64.DEFAULT);
+            RudderLogger.logDebug(String.format("EventRepository: constructor: authHeaderString: %s", this.authHeaderString));
         } catch (UnsupportedEncodingException ex) {
             RudderLogger.logError(ex);
         }
         this.config = _config;
+        RudderLogger.logDebug(String.format("EventRepository: constructor: %s", this.config.toString()));
 
         try {
             // 2. initiate RudderElementCache
+            RudderLogger.logDebug("EventRepository: constructor: Initiating RudderElementCache");
             RudderElementCache.initiate(_application);
 
             // 3. initiate DBPersistentManager for SQLite operations
+            RudderLogger.logDebug("EventRepository: constructor: Initiating DBPersistentManager");
             this.dbManager = DBPersistentManager.getInstance(_application);
 
             // 5. start processor thread
+            RudderLogger.logDebug("EventRepository: constructor: Starting Processor thread");
             Thread processorThread = new Thread(getProcessorRunnable());
             processorThread.start();
+
+            this.initiated = true;
         } catch (Exception ex) {
             RudderLogger.logError(ex.getCause());
         }
     }
+
+    private boolean isFactoryInitialized = false;
 
     private Runnable getProcessorRunnable() {
         return new Runnable() {
@@ -76,11 +95,12 @@ class EventRepository {
 
                         // get current record count from db
                         int recordCount = dbManager.getDBRecordCount();
+                        RudderLogger.logDebug(String.format(Locale.US, "EventRepository: processor: DBRecordCount: %d", recordCount));
                         // if record count exceeds threshold count, remove older events
                         if (recordCount > config.getDbCountThreshold()) {
                             // fetch extra old events
-                            dbManager.fetchEventsFromDB(messageIds, messages,
-                                    recordCount - config.getDbCountThreshold());
+                            RudderLogger.logDebug(String.format(Locale.US, "EventRepository: processor: OldRecordCount: %d", (recordCount - config.getDbCountThreshold())));
+                            dbManager.fetchEventsFromDB(messageIds, messages, recordCount - config.getDbCountThreshold());
                             // remove events
                             dbManager.clearEventsFromDB(messageIds);
                             // clear lists for reuse
@@ -89,6 +109,7 @@ class EventRepository {
                         }
 
                         // fetch enough events to form a batch
+                        RudderLogger.logDebug("Fetching events to flush to sever");
                         dbManager.fetchEventsFromDB(messageIds, messages, config.getFlushQueueSize());
                         // if there are enough events to form a batch and flush to server
                         // OR
@@ -97,11 +118,12 @@ class EventRepository {
                         if (messages.size() >= config.getFlushQueueSize() || (!messages.isEmpty() && sleepCount >= config.getSleepTimeOut())) {
                             // form payload JSON form the list of messages
                             String payload = getPayloadFromMessages(messages);
+                            RudderLogger.logDebug(String.format(Locale.US, "EventRepository: processor: payload: %s", payload));
                             if (payload != null) {
                                 // send payload to server if it is not null
                                 String response = flushEventsToServer(payload);
-                                RudderLogger.logInfo("ServerResponse: " + response);
-                                RudderLogger.logInfo("EventCount: " + messages.size());
+                                RudderLogger.logInfo(String.format(Locale.US, "EventRepository: processor: ServerResponse: %s", response));
+                                RudderLogger.logInfo(String.format(Locale.US, "EventRepository: processor: EventCount: %d", messages.size()));
                                 // if success received from server
                                 if (response != null && response.equalsIgnoreCase("OK")) {
                                     // remove events from DB
@@ -112,12 +134,12 @@ class EventRepository {
                             }
                         }
                         // increment sleepCount to track total elapsed seconds
+                        RudderLogger.logDebug(String.format(Locale.US, "EventRepository: processor: SleepCount: %d", sleepCount));
                         sleepCount += 1;
                         // retry entire logic in 1 second
                         Thread.sleep(1000);
                     } catch (Exception ex) {
                         RudderLogger.logError(ex);
-                        ex.printStackTrace();
                     }
                 }
             }
@@ -132,7 +154,9 @@ class EventRepository {
      * */
     private String getPayloadFromMessages(ArrayList<String> messages) {
         try {
+            RudderLogger.logDebug("EventRepository: getPayloadFromMessages: recordCount: " + messages.size());
             String sentAtTimestamp = Utils.getTimeStamp();
+            RudderLogger.logDebug("EventRepository: getPayloadFromMessages: sentAtTimestamp: " + sentAtTimestamp);
             // get string builder
             StringBuilder builder = new StringBuilder();
             // append initial json token
@@ -151,7 +175,9 @@ class EventRepository {
                 // finally add message string to builder
                 builder.append(message);
                 // if not last item in the list, add a ","
-                if (index != messages.size() - 1) builder.append(",");
+                if (index != messages.size() - 1) {
+                    builder.append(",");
+                }
             }
             // close batch array in the json
             builder.append("]");
@@ -170,12 +196,13 @@ class EventRepository {
      * */
     private String flushEventsToServer(String payload) throws IOException {
         if (TextUtils.isEmpty(this.authHeaderString)) {
-            RudderLogger.logError("WriteKey was not correct. Aborting flush to server");
+            RudderLogger.logError("EventRepository: flushEventsToServer: WriteKey was not correct. Aborting flush to server");
             return null;
         }
 
         // get endPointUrl form config object
         String endPointUri = config.getEndPointUri() + "v1/batch";
+        RudderLogger.logDebug("EventRepository: flushEventsToServer: endPointRepository: " + endPointUri);
 
         // create url object
         URL url = new URL(endPointUri);
@@ -219,7 +246,7 @@ class EventRepository {
                 res = bis.read();
             }
             // finally return response when reading from server is completed
-            RudderLogger.logError("ServerError: " + baos.toString());
+            RudderLogger.logError("EventRepository: flushEventsToServer: ServerError: " + baos.toString());
 
             return null;
         }
@@ -228,23 +255,32 @@ class EventRepository {
     /*
      * generic method for dumping all the events
      * */
-    void dump(RudderMessage message) {
+    void dump(@NonNull RudderMessage message) {
+        if (!initiated) return;
+        Map<String, Object> integrations = new HashMap<>();
+        integrations.put("All", true);
+        message.setIntegrations(integrations);
         String eventJson = new Gson().toJson(message);
-        dump(eventJson);
-    }
-
-    void dump(String eventJson) {
-        dbManager.saveEvent(eventJson);
+        RudderLogger.logDebug(String.format(Locale.US, "EventRepository: dump: message: %s", eventJson));
+        if (dbManager != null) {
+            dbManager.saveEvent(eventJson);
+        }
     }
 
     void reset() {
+        RudderLogger.logDebug("EventRepository: reset: resetting the SDK");
         dbManager.deleteAllEvents();
     }
 
-    public void shutdown() {
+    void onIntegrationReady(String key, RudderClient.Callback callback) {
+        RudderLogger.logDebug("EventRepository: onIntegrationReady: not supported for unity");
     }
 
-    public void optOut() {
-        // TODO:  decide opt out functionality and restrictions
+    void shutdown() {
+        // TODO: decide shutdown behavior
+    }
+
+    void optOut() {
+        // TODO:  decide optout functionality and restrictions
     }
 }

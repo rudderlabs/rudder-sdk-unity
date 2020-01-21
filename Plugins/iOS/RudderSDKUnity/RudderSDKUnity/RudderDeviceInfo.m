@@ -7,8 +7,8 @@
 //
 
 #import "RudderDeviceInfo.h"
+#import "Utils.h"
 #import <UIKit/UIKit.h>
-#import <sys/utsname.h>
 
 @implementation RudderDeviceInfo
 
@@ -16,20 +16,12 @@
 {
     self = [super init];
     if (self) {
-        _identifier = [[[[UIDevice currentDevice] identifierForVendor] UUIDString]lowercaseString];
+        _identifier = [Utils getDeviceId];
         _manufacturer = @"Apple";
-        _model = [self getDeviceModel];
+        _model = [[UIDevice currentDevice] model];
         _name = [[UIDevice currentDevice] name];
     }
     return self;
-}
-
-- (NSString*) getDeviceModel {
-    struct utsname systemInfo;
-    uname(&systemInfo);
-
-    return [NSString stringWithCString:systemInfo.machine
-                              encoding:NSUTF8StringEncoding];
 }
 
 - (NSDictionary<NSString *,NSObject *> *)dict {

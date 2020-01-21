@@ -1,9 +1,14 @@
 package com.rudderlabs.android.sdk.core;
 
+import androidx.annotation.Nullable;
+
 import com.google.gson.annotations.SerializedName;
 import com.rudderlabs.android.sdk.core.util.Utils;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 public class RudderMessage {
     @SerializedName("messageId")
@@ -35,7 +40,11 @@ public class RudderMessage {
 
     RudderMessage() {
         context = RudderElementCache.getCachedContext();
-        this.anonymousId = context.getDeviceId();
+        this.anonymousId = RudderElementCache.getAnonymousId();
+
+        Map<String, Object> traits = context.getTraits();
+        if (traits != null && traits.containsKey("userId"))
+            this.userId = String.valueOf(traits.get("userId"));
     }
 
     void setProperty(RudderProperty property) {
@@ -50,11 +59,11 @@ public class RudderMessage {
         this.type = type;
     }
 
-    public void setUserId(String userId) {
+    void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public void setEventName(String eventName) {
+    void setEventName(String eventName) {
         this.event = eventName;
     }
 
@@ -62,10 +71,24 @@ public class RudderMessage {
         this.context.updateTraits(traits);
     }
 
+    void updateTraits(Map<String, Object> traits) {
+        this.context.updateTraitsMap(traits);
+    }
+
+    /**
+     * @return Name of the event tracked
+     */
+    @Nullable
     public String getEventName() {
         return event;
     }
 
+    /**
+     * Get the properties back as set to the event
+     *
+     * @return Map of String-Object
+     */
+    @Nullable
     public Map<String, Object> getProperties() {
         return properties;
     }
@@ -79,6 +102,10 @@ public class RudderMessage {
         }
     }
 
+    /**
+     * @return Type of event (track, identify, screen)
+     */
+    @Nullable
     public String getType() {
         return type;
     }
@@ -87,16 +114,32 @@ public class RudderMessage {
         return action;
     }
 
+    /**
+     * Get your User properties for the event
+     *
+     * @return Map of String-Object
+     */
+    @Nullable
     public Map<String, Object> getUserProperties() {
         return userProperties;
     }
 
+    /**
+     * @return User ID for the event
+     */
+    @Nullable
+    public String getUserId() {
+        return userId;
+    }
+
     void setIntegrations(Map<String, Object> integrations) {
-        if (integrations == null) {
-            return;
-        }
+        if (integrations == null) return;
         for (String key : integrations.keySet()) {
             this.integrations.put(key, (Boolean) integrations.get(key));
         }
+    }
+
+    Map<String, Object> getTraits() {
+        return this.context.getTraits();
     }
 }

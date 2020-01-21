@@ -19,87 +19,107 @@ namespace CompleteProject
         LineRenderer gunLine;                           // Reference to the line renderer.
         AudioSource gunAudio;                           // Reference to the audio source.
         Light gunLight;                                 // Reference to the light component.
-		public Light faceLight;								// Duh
+        public Light faceLight;							// Duh
         float effectsDisplayTime = 0.2f;                // The proportion of the timeBetweenBullets that the effects will display for.
 
 
         private static RudderClient rudderClient;
-        void Awake ()
+        void Awake()
         {
             // Create a layer mask for the Shootable layer.
-            shootableMask = LayerMask.GetMask ("Shootable");
+            shootableMask = LayerMask.GetMask("Shootable");
 
             // Set up the references.
-            gunParticles = GetComponent<ParticleSystem> ();
-            gunLine = GetComponent <LineRenderer> ();
-            gunAudio = GetComponent<AudioSource> ();
-            gunLight = GetComponent<Light> ();
-			//faceLight = GetComponentInChildren<Light> ();
+            gunParticles = GetComponent<ParticleSystem>();
+            gunLine = GetComponent<LineRenderer>();
+            gunAudio = GetComponent<AudioSource>();
+            gunLight = GetComponent<Light>();
+            //faceLight = GetComponentInChildren<Light> ();
 
             RudderClient.SerializeSqlite();
 
-            // string writeKey = "1TC7ktOMnOPPsLvcVPiCiYN7j0r";
-            // string endPointUrl = "https://c18d5e86.ngrok.io";
-            string writeKey = "1SEkFBSRyXIUWmPoOpfcHiKEmOR";
-            string endPointUrl = "https://d018f0e9.ngrok.io";
+            string writeKey = "1TSRSskqa15PG7F89tkwEbl5Td8";
+            string endPointUrl = "https://76aeb180.ngrok.io";
+
             RudderConfigBuilder configBuilder = new RudderConfigBuilder()
-            .WithEndPointUrl(endPointUrl) 
-            .WithFactory(RudderAdjustIntegrationFactory.getFactory());
+            .WithEndPointUrl(endPointUrl)
+            .WithFactory(RudderAdjustIntegrationFactory.GetFactory())
+            .WithLogLevel(RudderLogLevel.DEBUG);
             rudderClient = RudderClient.GetInstance(
                 writeKey,
                 configBuilder.Build()
             );
 
-            // AdjustConfig adjustConfig = new AdjustConfig("fauyi0vaf4zk", AdjustEnvironment.Sandbox, true);
-            // adjustConfig.setLogLevel(AdjustLogLevel.Verbose);
-            // Adjust.start(adjustConfig);
-
-            // Amplitude amplitude = Amplitude.Instance;
-            // amplitude.logging = false;
-            // amplitude.init("0c66ff8c17a1329360cba662da5563b1");
-
-            RudderMessage message = new RudderMessageBuilder()
-                .WithEventName("Application_Installed")
-                .WithUserId("test_user_id_101_ios")
+            // generic track event before identify
+            RudderMessage shootMessage = new RudderMessageBuilder()
+                .WithEventName("player_shoot")
                 .WithEventProperty("test_key_1", "test_value_1")
                 .WithEventProperty("test_key_2", "test_value_2")
                 .WithUserProperty("test_user_key_1", "test_user_value_1")
                 .WithUserProperty("test_user_key_2", "test_user_value_2")
                 .Build();
-            rudderClient.Track(message);
+            rudderClient.Track(shootMessage);
 
-            // Amplitude.Instance.logEvent("Application_Installed");
-
-            System.Random random = new System.Random();
-            int eventCount = random.Next(30); 
-            for (int index = 0; index < eventCount; index++) {
-                RudderMessage randomMessage = new RudderMessageBuilder()
-                .WithEventName("Random_Event")
-                .WithUserId("test_user_id_101_ios")
+            RudderMessage message1 = new RudderMessageBuilder()
+                .WithEventName("daily_rewards_claim")
                 .WithEventProperty("test_key_1", "test_value_1")
                 .WithEventProperty("test_key_2", "test_value_2")
-                .WithEventProperty("event_count", eventCount)
                 .WithUserProperty("test_user_key_1", "test_user_value_1")
                 .WithUserProperty("test_user_key_2", "test_user_value_2")
                 .Build();
-                rudderClient.Track(randomMessage);
+            rudderClient.Track(message1);
 
-                // Amplitude.Instance.logEvent("Random_Event");
-            }
+            // build a message 
+            RudderMessage identifyMessage = new RudderMessageBuilder().Build();
+            RudderTraits traits = new RudderTraits().PutEmail("some@example.com");
+            rudderClient.Identify("some_user_id", traits, identifyMessage);
+
+            RudderMessage message2 = new RudderMessageBuilder()
+                .WithEventName("level_up")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(message2);
+
+            // reset identify
+            rudderClient.Reset();
+
+            RudderMessage message3 = new RudderMessageBuilder()
+                .WithEventName("revenue")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithEventProperty("price", 1.99)
+                .WithEventProperty("currency", "USD")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(message3);
+
+            // fire another track event to check for reset 
+            RudderMessage anotherShootMessage = new RudderMessageBuilder()
+                .WithEventName("player_shoot_reset")
+                .WithEventProperty("test_key_1", "test_value_1")
+                .WithEventProperty("test_key_2", "test_value_2")
+                .WithUserProperty("test_user_key_1", "test_user_value_1")
+                .WithUserProperty("test_user_key_2", "test_user_value_2")
+                .Build();
+            rudderClient.Track(anotherShootMessage);
         }
 
 
-        void Update ()
+        void Update()
         {
             // Add the time since Update was last called to the timer.
             timer += Time.deltaTime;
 
 #if !MOBILE_INPUT
             // If the Fire1 button is being press and it's time to fire...
-			if(Input.GetButton ("Fire1") && timer >= timeBetweenBullets && Time.timeScale != 0)
+            if (Input.GetButton("Fire1") && timer >= timeBetweenBullets && Time.timeScale != 0)
             {
                 // ... shoot the gun.
-                Shoot ();
+                Shoot();
             }
 #else
             // If there is input on the shoot direction stick and it's time to fire...
@@ -110,113 +130,69 @@ namespace CompleteProject
             }
 #endif
             // If the timer has exceeded the proportion of timeBetweenBullets that the effects should be displayed for...
-            if(timer >= timeBetweenBullets * effectsDisplayTime)
+            if (timer >= timeBetweenBullets * effectsDisplayTime)
             {
                 // ... disable the effects.
-                DisableEffects ();
+                DisableEffects();
             }
         }
 
 
-        public void DisableEffects ()
+        public void DisableEffects()
         {
             // Disable the line renderer and the light.
             gunLine.enabled = false;
-			faceLight.enabled = false;
+            faceLight.enabled = false;
             gunLight.enabled = false;
         }
 
 
-        void Shoot ()
+        void Shoot()
         {
             // Reset the timer.
             timer = 0f;
 
             // Play the gun shot audioclip.
-            gunAudio.Play ();
+            gunAudio.Play();
 
             // Enable the lights.
             gunLight.enabled = true;
-			faceLight.enabled = true;
+            faceLight.enabled = true;
 
             // Stop the particles from playing if they were, then start the particles.
-            gunParticles.Stop ();
-            gunParticles.Play ();
+            gunParticles.Stop();
+            gunParticles.Play();
 
             // Enable the line renderer and set it's first position to be the end of the gun.
             gunLine.enabled = true;
-            gunLine.SetPosition (0, transform.position);
+            gunLine.SetPosition(0, transform.position);
 
             // Set the shootRay so that it starts at the end of the gun and points forward from the barrel.
             shootRay.origin = transform.position;
             shootRay.direction = transform.forward;
 
             // Perform the raycast against gameobjects on the shootable layer and if it hits something...
-            if(Physics.Raycast (shootRay, out shootHit, range, shootableMask))
+            if (Physics.Raycast(shootRay, out shootHit, range, shootableMask))
             {
                 // Try and find an EnemyHealth script on the gameobject hit.
-                EnemyHealth enemyHealth = shootHit.collider.GetComponent <EnemyHealth> ();
+                EnemyHealth enemyHealth = shootHit.collider.GetComponent<EnemyHealth>();
 
                 // If the EnemyHealth component exist...
-                if(enemyHealth != null)
+                if (enemyHealth != null)
                 {
                     // ... the enemy should take damage.
-                    enemyHealth.TakeDamage (damagePerShot, shootHit.point);
+                    enemyHealth.TakeDamage(damagePerShot, shootHit.point);
                 }
 
                 // Set the second position of the line renderer to the point the raycast hit.
-                gunLine.SetPosition (1, shootHit.point);
+                gunLine.SetPosition(1, shootHit.point);
             }
             // If the raycast didn't hit anything on the shootable layer...
             else
             {
                 // ... set the second position of the line renderer to the fullest extent of the gun's range.
-                gunLine.SetPosition (1, shootRay.origin + shootRay.direction * range);
+                gunLine.SetPosition(1, shootRay.origin + shootRay.direction * range);
             }
-
-            RudderMessage shootMessage = new RudderMessageBuilder()
-                .WithEventName("Player_Shoot")
-                .WithUserId("test_user_id_101_ios")
-                .WithEventProperty("test_key_1", "test_value_1")
-                .WithEventProperty("test_key_2", "test_value_2")
-                .WithUserProperty("test_user_key_1", "test_user_value_1")
-                .WithUserProperty("test_user_key_2", "test_user_value_2")
-                .Build();
-            rudderClient.Track(shootMessage);
-
-            // Amplitude.Instance.logEvent("Player_Shoot");
-
-            RudderMessage message1 = new RudderMessageBuilder()
-                .WithEventName("daily_rewards_claim")
-                .WithUserId("test_user_id_101_ios")
-                .WithEventProperty("test_key_1", "test_value_1")
-                .WithEventProperty("test_key_2", "test_value_2")
-                .WithUserProperty("test_user_key_1", "test_user_value_1")
-                .WithUserProperty("test_user_key_2", "test_user_value_2")
-                .Build();
-            rudderClient.Track(message1);
-
-            RudderMessage message2 = new RudderMessageBuilder()
-                .WithEventName("level_up")
-                .WithUserId("test_user_id_101_ios")
-                .WithEventProperty("test_key_1", "test_value_1")
-                .WithEventProperty("test_key_2", "test_value_2")
-                .WithUserProperty("test_user_key_1", "test_user_value_1")
-                .WithUserProperty("test_user_key_2", "test_user_value_2")
-                .Build();
-            rudderClient.Track(message2);
-
-            RudderMessage message3 = new RudderMessageBuilder()
-                .WithEventName("revenue")
-                .WithUserId("test_user_id_101_ios")
-                .WithEventProperty("test_key_1", "test_value_1")
-                .WithEventProperty("test_key_2", "test_value_2")
-                .WithEventProperty("price", 1.99)
-                .WithEventProperty("currency", "USD")
-                .WithUserProperty("test_user_key_1", "test_user_value_1")
-                .WithUserProperty("test_user_key_2", "test_user_value_2")
-                .Build();
-            rudderClient.Track(message3);
         }
     }
 }

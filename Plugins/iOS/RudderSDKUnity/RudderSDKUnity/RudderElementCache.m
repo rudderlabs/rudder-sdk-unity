@@ -8,22 +8,44 @@
 
 #import "RudderElementCache.h"
 
-static RudderContext* context;
+static RudderContext* cachedContext;
+static NSString* cachedAnonymousId;
 
 @implementation RudderElementCache
 
 + (void)initiate {
-    if (context == nil) {
-        context = [[RudderContext alloc] init];
+    if (cachedContext == nil) {
+        cachedContext = [[RudderContext alloc] init];
     }
 }
 
 + (RudderContext *)getContext {
-    return context;
+    return cachedContext;
 }
 
 + (void)updateTraits:(RudderTraits *)traits {
-    context.traits = traits;
+    [cachedContext updateTraits:traits];
+}
+
++ (void)persistTraits {
+    [cachedContext persistTraits];
+}
+
++ (void) reset {
+    [cachedContext updateTraits:nil];
+    [cachedContext persistTraits];
+}
+
++ (void)updateTraitsDict:(NSMutableDictionary<NSString *,NSObject *> *)traitsDict {
+    [cachedContext updateTraitsDict: traitsDict];
+}
+
++ (void)setAnonymousId:(NSString *)anonymousId {
+    cachedAnonymousId = anonymousId;
+}
+
++ (NSString *)getAnonymousId {
+    return cachedAnonymousId;
 }
 
 @end

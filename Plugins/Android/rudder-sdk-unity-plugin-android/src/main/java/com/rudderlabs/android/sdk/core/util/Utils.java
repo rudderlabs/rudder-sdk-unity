@@ -1,6 +1,5 @@
 package com.rudderlabs.android.sdk.core.util;
 
-import android.app.Application;
 import android.content.Context;
 import android.os.Build;
 import android.text.TextUtils;
@@ -19,6 +18,21 @@ import static android.provider.Settings.Secure.ANDROID_ID;
 import static android.provider.Settings.System.getString;
 
 public class Utils {
+
+    // range constants
+    public static final int MIN_CONFIG_REFRESH_INTERVAL = 1;
+    public static final int MAX_CONFIG_REFRESH_INTERVAL = 24;
+    public static final int MIN_SLEEP_TIMEOUT = 10;
+    public static final int MIN_FLUSH_QUEUE_SIZE = 1;
+    public static final int MAX_FLUSH_QUEUE_SIZE = 100;
+
+    // keys
+    public static final String RUDDER_PREFS = "rl_prefs";
+    public static final String RUDDER_SERVER_CONFIG_KEY = "rl_server_config";
+    public static final String RUDDER_SERVER_CONFIG_LAST_UPDATE_KEY = "rl_server_last_updated";
+    public static final String RUDDER_TRAITS_KEY = "rl_traits";
+    public static final String RUDDER_ANONYMOUS_ID_KEY = "rl_anonymous_id";
+
     public static String getTimeZone() {
         TimeZone timeZone = TimeZone.getDefault();
         return timeZone.getID();
@@ -35,9 +49,9 @@ public class Utils {
         return formatter.format(date);
     }
 
-    public static String getDeviceId(Application application) {
+    public static String getDeviceId(Context context) {
         if (Build.VERSION.SDK_INT >= 17) {
-            String androidId = getString(application.getContentResolver(), ANDROID_ID);
+            String androidId = getString(context.getContentResolver(), ANDROID_ID);
             if (!TextUtils.isEmpty(androidId)
                     && !"9774d56d682e549c".equals(androidId)
                     && !"unknown".equals(androidId)
@@ -52,6 +66,7 @@ public class Utils {
     }
 
     public static Map<String, Object> convertToMap(String json) {
+        if (json == null) return null;
         return new Gson().fromJson(json, new TypeToken<Map<String, Object>>() {
         }.getType());
     }

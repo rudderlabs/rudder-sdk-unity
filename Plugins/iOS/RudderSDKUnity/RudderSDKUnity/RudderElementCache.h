@@ -19,6 +19,16 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) updateTraits : (RudderTraits*) traits;
 
++ (void) persistTraits;
+
++ (void) reset;
+
++ (void) updateTraitsDict: (NSMutableDictionary<NSString*, NSObject*> *) traitsDict;
+
++ (void) setAnonymousId: (NSString*) anonymousId;
+
++ (NSString*) getAnonymousId;
+
 @end
 
 NS_ASSUME_NONNULL_END

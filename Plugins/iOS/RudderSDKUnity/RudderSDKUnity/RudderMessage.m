@@ -20,7 +20,11 @@
         _channel = @"mobile";
         _context = [RudderElementCache getContext];
         _originalTimestamp = [Utils getTimestamp];
-        _anonymousId = _context.device.identifier;
+        _anonymousId = [RudderElementCache getAnonymousId];
+        NSObject *userId = [_context.traits valueForKey:@"userId"];
+        if (userId != nil) {
+            _userId = [[NSString alloc] initWithFormat:@"%@", userId];
+        }
     }
     return self;
 }
@@ -35,7 +39,9 @@
     [tempDict setValue:_action forKey:@"action"];
     [tempDict setValue:_originalTimestamp forKey:@"originalTimestamp"];
     [tempDict setValue:_anonymousId forKey:@"anonymousId"];
-    [tempDict setValue:_userId forKey:@"userId"];
+    if (_userId != NULL) {
+        [tempDict setValue:_userId forKey:@"userId"];
+    }
     [tempDict setValue:_properties forKey:@"properties"];
     [tempDict setValue:_event forKey:@"event"];
     [tempDict setValue:_userProperties forKey:@"userProperties"];
@@ -51,8 +57,6 @@
 }
 
 - (void)updateTraits:(RudderTraits *)traits {
-    if (traits  != nil) {
-        self.context.traits = traits;
-    }
+    [_context updateTraits:traits];
 }
 @end
