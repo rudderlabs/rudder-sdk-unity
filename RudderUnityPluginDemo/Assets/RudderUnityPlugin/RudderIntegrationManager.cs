@@ -76,6 +76,7 @@ namespace Rudderlabs
                 }
                 else if (this.config.factories.Count == 0)
                 {
+                    // no factory to initialize
                     RudderLogger.LogInfo("No integrations: config.factories.Count is 0");
                 }
                 else
@@ -237,6 +238,16 @@ namespace Rudderlabs
             if (!this.isFactoryPrepared)
             {
                 lock (this._lockingObj)
+                if (this.rudderServerConfig == null)
+                {
+                    return;
+                }
+
+                this.integrations = new Dictionary<string, object>();
+                Dictionary<string, object> source = this.rudderServerConfig["source"] as Dictionary<string, object>;
+                List<object> destinations = source["destinations"] as List<object>;
+
+                foreach (var destinationObj in destinations)
                 {
                     factoryDumpQueue.Add(message);
                 }
