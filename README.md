@@ -25,7 +25,6 @@ A simple track event. Other options are ```Screen```, ```Page```
 ```
 RudderMessage message = new RudderMessageBuilder()
   .WithEventName("test_event_name")
-  .WithUserId("test_user_id")
   .WithEventProperty("test_key_1", "test_value_1")
   .WithEventProperty("test_key_2", "test_value_2")
   .WithUserProperty("test_user_key_1", "test_user_value_1")
