@@ -21,7 +21,14 @@ namespace Rudderlabs
         private string writeKey = null;
         private RudderConfig config = null;
 
-        object _lockingObj = new object();
+        private object _lockingObj = new object();
+
+        private List<RudderMessage> factoryDumpQueue = new List<RudderMessage>();
+        private string persistedUserId = null;
+        private RudderTraits persistedTraits = null;
+
+
+        private long lastUpdatedTimestamp = 0;
 
         public RudderIntegrationManager(string writeKey, RudderConfig config)
         {
@@ -31,7 +38,6 @@ namespace Rudderlabs
             downloadIntegrations();
         }
 
-        private long lastUpdatedTimestamp = 0;
         private void downloadIntegrations()
         {
             try
@@ -126,14 +132,18 @@ namespace Rudderlabs
                         }
                         this.factoryDumpQueue.Clear();
                     }
+                    if (persistedTraits != null && persistedUserId != null)
+                    {
+                        this.makeIntegrationIdentify(persistedUserId, persistedTraits);
+                        this.persistedTraits = null;
+                        this.persistedUserId = null;
+                    }
                 }
             }
             catch (Exception ex)
             {
                 RudderLogger.LogError(ex.Message);
             }
-
-
         }
 
         private Dictionary<string, object> parseServerConfig(string configJson)
@@ -221,7 +231,6 @@ namespace Rudderlabs
             return this.integrations;
         }
 
-        private List<RudderMessage> factoryDumpQueue = new List<RudderMessage>();
         public void makeIntegrationDump(RudderMessage message)
         {
             // if factories are not prepared dump those in the queue
@@ -241,8 +250,28 @@ namespace Rudderlabs
                     integrationOpsMap[key].Dump(message);
                 }
             }
+        }
 
-
+        public void makeIntegrationIdentify(string userId, RudderTraits traits)
+        {
+            if (!this.isFactoryPrepared)
+            {
+                lock (this._lockingObj)
+                {
+                    this.persistedUserId = userId;
+                    this.persistedTraits = traits;
+                }
+                RudderLogger.LogDebug("Factories are not prepared yet");
+            }
+            // make native integration calls
+            else
+            {
+                foreach (string key in integrationOpsMap.Keys)
+                {
+                    RudderLogger.LogDebug("Identify to " + key + " native SDK");
+                    integrationOpsMap[key].Identify(userId, traits);
+                }
+            }
         }
 
         // ssl check validator
@@ -273,6 +302,23 @@ namespace Rudderlabs
                         this.rudderServerConfig = parseServerConfig(this.serverConfigJson);
                         this.prepareFactories();
                     }
+                }
+            }
+        }
+
+        public void Reset()
+        {
+            if (!this.isFactoryPrepared)
+            {
+                RudderLogger.LogDebug("Factories are not prepared yet");
+            }
+            // make native integration calls
+            else
+            {
+                foreach (string key in integrationOpsMap.Keys)
+                {
+                    RudderLogger.LogDebug("Resetting native SDK " + key);
+                    integrationOpsMap[key].Reset();
                 }
             }
         }

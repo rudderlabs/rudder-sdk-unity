@@ -60,23 +60,20 @@ namespace Rudderlabs
                     {
                         foreach (string key in userProperties.Keys)
                         {
-                            adjustEvent.addPartnerParameter(key, userProperties[key].ToString());
+                            adjustEvent.addCallbackParameter(key, userProperties[key].ToString());
                         }
                     }
 
-                    if (message.eventName.Equals("revenue"))
+                    RudderLogger.LogDebug("Tracking revenue through Adjust SDK");
+                    if (message.eventProperties.ContainsKey("revenue"))
                     {
-                        RudderLogger.LogDebug("Tracking revenue through Adjust SDK");
-                        if (message.eventProperties.ContainsKey("price"))
+                        double amount = (double)message.eventProperties["revenue"];
+                        string currency = "";
+                        if (message.eventProperties.ContainsKey("currency"))
                         {
-                            double amount = (double)message.eventProperties["price"];
-                            string currency = "USD";
-                            if (message.eventProperties.ContainsKey("currency"))
-                            {
-                                currency = message.eventProperties["currency"] as string;
-                            }
-                            adjustEvent.setRevenue(amount, currency);
+                            currency = message.eventProperties["currency"] as string;
                         }
+                        adjustEvent.setRevenue(amount, currency);
                     }
 
                     RudderLogger.LogDebug("Tracking event");
@@ -91,6 +88,19 @@ namespace Rudderlabs
             {
                 RudderLogger.LogDebug("RudderAdjustIntegration: Event is not tracked through Adjust");
             }
+        }
+
+        public override void Identify(string userId, RudderTraits traits)
+        {
+            if (userId != null)
+            {
+                Adjust.addSessionPartnerParameter("userId", userId);
+            }
+        }
+
+        public override void Reset()
+        {
+            Adjust.resetSessionPartnerParameters();
         }
     }
 }

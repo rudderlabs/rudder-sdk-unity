@@ -204,7 +204,7 @@ namespace Rudderlabs
         public void Identify(string userId, RudderTraits traits, RudderMessage message)
         {
             RudderLogger.LogDebug("Identify Event: " + message.eventName);
-            integrationManager.makeIntegrationDump(message);
+            integrationManager.makeIntegrationIdentify(userId, traits);
 
             // put supplied userId under traits as well if it is not set
             if (traits.getId() == null)
@@ -238,6 +238,9 @@ namespace Rudderlabs
         public void Reset()
         {
             RudderLogger.LogDebug("SDK reset");
+            if (integrationManager != null) {
+                integrationManager.Reset();
+            }
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
