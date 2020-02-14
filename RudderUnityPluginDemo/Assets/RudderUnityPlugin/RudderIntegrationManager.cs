@@ -8,7 +8,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using UnityEngine;
 
-namespace Rudderlabs
+namespace RudderStack
 {
     class RudderIntegrationManager
     {

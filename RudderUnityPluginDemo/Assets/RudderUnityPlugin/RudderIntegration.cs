@@ -1,4 +1,4 @@
-namespace Rudderlabs
+namespace RudderStack
 {
     public abstract class RudderIntegration
     {

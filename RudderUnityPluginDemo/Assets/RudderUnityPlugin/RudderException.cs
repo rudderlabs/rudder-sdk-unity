@@ -1,4 +1,4 @@
-namespace Rudderlabs
+namespace RudderStack
 {
     [System.Serializable]
     public class RudderException : System.Exception

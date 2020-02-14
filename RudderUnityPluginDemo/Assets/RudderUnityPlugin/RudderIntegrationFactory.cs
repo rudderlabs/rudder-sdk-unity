@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-namespace Rudderlabs
+namespace RudderStack
 {
     public abstract class RudderIntegrationFactory
     {

@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 18/10/19.
-//  Copyright © 2019 Rudderlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

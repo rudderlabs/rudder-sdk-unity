@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using com.adjust.sdk;
 
-namespace Rudderlabs
+namespace RudderStack
 {
     class RudderAdjustIntegration : RudderIntegration
     {

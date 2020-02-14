@@ -1,5 +1,5 @@
 ﻿using com.adjust.sdk;
-using Rudderlabs;
+using RudderStack;
 using UnityEngine;
 
 namespace CompleteProject

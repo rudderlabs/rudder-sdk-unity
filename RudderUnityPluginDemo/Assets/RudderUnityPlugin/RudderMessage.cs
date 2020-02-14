@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Rudderlabs.MiniJSON;
+using RudderStack.MiniJSON;
 /* 
 wrapper class for Unity to form event
 */
-namespace Rudderlabs
+namespace RudderStack
 {
     public class RudderMessage
     {

@@ -3,7 +3,7 @@
 //  RudderSDKUnity
 //
 //  Created by Arnab Pal on 22/10/19.
-//  Copyright © 2019 Rudderlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import <UIKit/UIKit.h>

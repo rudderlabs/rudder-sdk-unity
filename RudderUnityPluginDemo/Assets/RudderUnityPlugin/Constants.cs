@@ -1,7 +1,7 @@
 /* 
     Default values for rudder client
 */
-namespace Rudderlabs
+namespace RudderStack
 {
     public static class Constants
     {

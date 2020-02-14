@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Rudderlabs
+namespace RudderStack
 {
     class RudderConfigBuilder
     {

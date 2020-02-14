@@ -2,9 +2,9 @@
 using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
-using Rudderlabs.MiniJSON;
+using RudderStack.MiniJSON;
 
-namespace Rudderlabs
+namespace RudderStack
 {
     public class RudderClient : MonoBehaviour
     {

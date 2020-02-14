@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace Rudderlabs
+namespace RudderStack
 {
     public class RudderCache
     {
