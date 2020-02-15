@@ -16,6 +16,9 @@ extern "C"
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
                            const int _sleepTimeout,
+                           const int _configRefreshInterval,
+                           const bool _trackLifecycleEvents,
+                           const bool _recordScreenViews,
                            const int _logLevel) {
         [RudderClientWrapper _initiateInstance:[[NSString alloc] initWithUTF8String:_anonymousId]
                                       writeKey:[[NSString alloc] initWithUTF8String:_writeKey]

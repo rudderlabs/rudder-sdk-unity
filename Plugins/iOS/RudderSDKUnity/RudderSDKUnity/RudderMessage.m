@@ -21,9 +21,9 @@
         _context = [RudderElementCache getContext];
         _originalTimestamp = [Utils getTimestamp];
         _anonymousId = [RudderElementCache getAnonymousId];
-        NSObject *userId = [_context.traits valueForKey:@"userId"];
-        if (userId != nil) {
-            _userId = [[NSString alloc] initWithFormat:@"%@", userId];
+        NSObject *userIdObj = [_context.traits objectForKey:@"userId"];
+        if (userIdObj != nil) {
+            _userId = [[NSString alloc] initWithFormat:@"%@", userIdObj];
         }
     }
     return self;
@@ -39,7 +39,7 @@
     [tempDict setValue:_action forKey:@"action"];
     [tempDict setValue:_originalTimestamp forKey:@"originalTimestamp"];
     [tempDict setValue:_anonymousId forKey:@"anonymousId"];
-    if (_userId != NULL) {
+    if (_userId != nil) {
         [tempDict setValue:_userId forKey:@"userId"];
     }
     [tempDict setValue:_properties forKey:@"properties"];

@@ -18,7 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString*) getUniqueId;
 + (NSString*) getLocale;
 + (NSString*) getDateString: (NSDate*) date;
-+ (NSString*) getDeviceId;
 
 @end
 

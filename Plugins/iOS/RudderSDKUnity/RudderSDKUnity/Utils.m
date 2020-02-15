@@ -47,8 +47,4 @@
     }
 }
 
-+ (NSString *)getDeviceId {
-    return [[[[UIDevice currentDevice] identifierForVendor] UUIDString]lowercaseString];
-}
-
 @end

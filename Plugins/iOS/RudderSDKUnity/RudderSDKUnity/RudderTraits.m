@@ -26,10 +26,10 @@
     return self;
 }
 
-- (instancetype)init: (NSString*) anonymouysId {
+- (instancetype)initWithAnonymousId:(NSString *)anonymousId {
     self = [super init];
-    if (self) {
-        self.anonymousId = anonymouysId;
+    if(self) {
+        self.anonymousId = anonymousId;
     }
     return self;
 }

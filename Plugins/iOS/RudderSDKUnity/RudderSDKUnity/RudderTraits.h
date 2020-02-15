@@ -22,7 +22,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *email;
 @property (nonatomic) NSString *firstName;
 @property (nonatomic) NSString *gender;
-@property (nonatomic) NSString *userId;
+@property (nonatomic, assign) NSString * userId;
 @property (nonatomic) NSString *lastName;
 @property (nonatomic) NSString *name;
 @property (nonatomic) NSString *phone;
@@ -52,6 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (NSDictionary<NSString*, NSObject*>*) dict;
 - (instancetype)initWithDict:(NSDictionary*) dict;
+- (instancetype) initWithAnonymousId: (NSString*) anonymousId;
 
 @end
 

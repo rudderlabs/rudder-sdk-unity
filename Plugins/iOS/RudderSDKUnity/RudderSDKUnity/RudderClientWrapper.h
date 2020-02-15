@@ -6,6 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "RudderLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,6 +18,9 @@ NS_ASSUME_NONNULL_BEGIN
             flushQueueSize: (int) _flushQueueSize
           dbCountThreshold: (int) _dbCountThreshold
               sleepTimeOut: (int) _sleepTimeout
+                configRefreshInterval: (int) _configRefreshInterval
+      trackLifecycleEvents: (BOOL) _trackLifecycleEvents
+         recordScreenViews: (BOOL) _recordScreenViews
                   logLevel: (int) _logLevel;
 
 + (void) _logEvent: (NSString*) _eventType

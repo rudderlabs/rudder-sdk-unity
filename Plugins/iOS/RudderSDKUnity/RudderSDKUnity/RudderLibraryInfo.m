@@ -13,7 +13,7 @@
 {
     self = [super init];
     if (self) {
-        _name = @"rudder-ios-library";
+        _name = @"com.rudderstack.ios.sdk";
         _version = @"1.0";
     }
     return self;

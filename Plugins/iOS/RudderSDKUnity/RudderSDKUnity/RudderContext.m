@@ -7,8 +7,8 @@
 //
 
 #import "RudderContext.h"
-#import "RudderElementCache.h"
 #import "Utils.h"
+#import "RudderElementCache.h"
 
 @implementation RudderContext
 
@@ -16,6 +16,8 @@
 {
     self = [super init];
     if (self) {
+        self->preferenceManager = [RudderPreferenceManager getInstance];
+        
         _app = [[RudderApp alloc] init];
         _device = [[RudderDeviceInfo alloc] init];
         _library = [[RudderLibraryInfo alloc] init];
@@ -27,8 +29,7 @@
         _network = [[RudderNetwork alloc] init];
         _timezone = [[NSTimeZone localTimeZone] name];
         
-        NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-        NSString *traitsJson = [userDefaults objectForKey:@"rl_traits"];
+        NSString *traitsJson = [preferenceManager getTraits];
         if (traitsJson == nil) {
             // no persisted traits, create new and persist
             [self createAndPersistTraits];
@@ -47,17 +48,15 @@
 }
 
 - (void) createAndPersistTraits {
-    RudderTraits* traits = [[RudderTraits alloc] init];
-    traits.anonymousId = [RudderElementCache getAnonymousId];
+    RudderTraits* traits = [[RudderTraits alloc] initWithAnonymousId:[RudderElementCache getAnonymousId]];
     _traits = [[traits dict]  mutableCopy];
-    
     [self persistTraits];
 }
 
 - (void)updateTraits:(RudderTraits *)traits {
     if(traits == nil) {
         traits = [[RudderTraits alloc] init];
-        traits.anonymousId = _device.identifier;
+        traits.anonymousId = [RudderElementCache getAnonymousId];
     }
     
     _traits = [[traits dict] mutableCopy];
@@ -67,11 +66,17 @@
     NSData *traitsJsonData = [NSJSONSerialization dataWithJSONObject:_traits options:0 error:nil];
     NSString *traitsString = [[NSString alloc] initWithData:traitsJsonData encoding:NSUTF8StringEncoding];
     
-    NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
-    [userDefaults setObject:traitsString forKey:@"rl_traits"];
+    [preferenceManager saveTraits:traitsString];
 }
 
-- (void)updateTraitsDict:(NSMutableDictionary<NSString *,NSObject *> *)traitsDict {
+- (void)updateTraitsDict:(NSMutableDictionary<NSString *, NSObject *> *)traitsDict {
+    if (traitsDict == nil) {
+        traitsDict = [[NSMutableDictionary alloc] init];
+    }
+    NSObject *anonymousId = [traitsDict objectForKey:@"anonymousId"];
+    if (anonymousId == nil) {
+        [traitsDict setObject:[RudderElementCache getAnonymousId] forKey:@"anonymousId"];
+    }
     _traits = traitsDict;
 }
 

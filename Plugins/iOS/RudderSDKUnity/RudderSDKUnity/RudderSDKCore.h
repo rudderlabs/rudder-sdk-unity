@@ -12,6 +12,8 @@
 #import "RudderMessage.h"
 #import "RudderMessageBuilder.h"
 #import "ScreenPropertyBuilder.h"
+#import "RudderLogger.h"
+
 
 //! Project version number for RudderSDKCore.
 FOUNDATION_EXPORT double RudderSDKCoreVersionNumber;

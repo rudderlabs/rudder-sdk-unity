@@ -21,7 +21,11 @@ static RudderClient *_rudderClient;
            flushQueueSize:(int)_flushQueueSize
          dbCountThreshold:(int)_dbCountThreshold
              sleepTimeOut:(int)_sleepTimeout
-                 logLevel:(int)_logLevel {
+    configRefreshInterval:(int) _configRefreshInterval
+     trackLifecycleEvents: (BOOL) _trackLifecycleEvents
+        recordScreenViews: (BOOL) _recordScreenViews
+                 logLevel:(int)_logLevel
+{
     if (_rudderClient == nil) {
         [RudderElementCache setAnonymousId:_anonymousId];
         RudderConfigBuilder *builder = [[RudderConfigBuilder alloc] init];
@@ -29,6 +33,9 @@ static RudderClient *_rudderClient;
         [builder withFlushQueueSize:_flushQueueSize];
         [builder withDBCountThreshold:_dbCountThreshold];
         [builder withSleepTimeOut:_sleepTimeout];
+        [builder withConfigRefreshInteval:_configRefreshInterval];
+        [builder withTrackLifecycleEvens:_trackLifecycleEvents];
+        [builder withRecordScreenViews:_recordScreenViews];
         [builder withLoglevel:_logLevel];
         _rudderClient = [RudderClient getInstance:_writeKey config:[builder build]];
     }
