@@ -1,1 +1,1 @@
-include ':rudder-sdk-sample-kotlin', ':rudder-sdk-unity-plugin-android'
+include ':sample-kotlin', ':unity-plugin'
