@@ -59,6 +59,20 @@ namespace RudderStack
             return this;
         }
 
+        bool trackLifecycleEvents = Constants.TRACK_LIFECYCLE_EVENTS;
+        public RudderConfigBuilder WithTrackLifecycleEvents(bool trackLifecycleEvents)
+        {
+            this.trackLifecycleEvents = trackLifecycleEvents;
+            return this;
+        }
+
+        bool recordScreenViews = Constants.RECORD_SCREEN_VIEWS;
+        public RudderConfigBuilder WithRecordScreenViews(bool recordScreenViews)
+        {
+            this.recordScreenViews = recordScreenViews;
+            return this;
+        }
+
         public RudderConfig Build()
         {
             return new RudderConfig(
@@ -68,6 +82,8 @@ namespace RudderStack
                 this.sleepTimeOut,
                 this.logLevel,
                 this.configRefreshInterval,
+                this.trackLifecycleEvents,
+                this.recordScreenViews,
                 this.factories
             );
         }

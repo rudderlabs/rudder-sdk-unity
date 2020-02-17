@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -19,6 +19,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) int sleepTimeout;
 @property (nonatomic) int logLevel;
 @property (nonatomic) int configRefreshInterval;
+@property (nonatomic) bool trackLifecycleEvents;
+@property (nonatomic) bool recordScreenViews;
 @property (nonatomic, readwrite) NSMutableArray* factories;
 
 @end

@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -14,10 +14,13 @@
 #import "RudderDeviceInfo.h"
 #import "RudderNetwork.h"
 #import "RudderTraits.h"
+#import "RudderPreferenceManager.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RudderContext : NSObject
+@interface RudderContext : NSObject {
+    RudderPreferenceManager *preferenceManager;
+}
 
 @property (nonatomic, readwrite) RudderApp* app;
 @property (nonatomic, readwrite) NSMutableDictionary<NSString*, NSObject*>* traits;

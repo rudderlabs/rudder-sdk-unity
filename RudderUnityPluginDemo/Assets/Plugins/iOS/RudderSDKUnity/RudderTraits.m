@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import "RudderTraits.h"
@@ -26,10 +26,10 @@
     return self;
 }
 
-- (instancetype)init: (NSString*) anonymouysId {
+- (instancetype)initWithAnonymousId:(NSString *)anonymousId {
     self = [super init];
-    if (self) {
-        self.anonymousId = anonymouysId;
+    if(self) {
+        self.anonymousId = anonymousId;
     }
     return self;
 }

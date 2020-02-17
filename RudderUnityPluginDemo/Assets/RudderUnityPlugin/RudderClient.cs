@@ -23,6 +23,9 @@ namespace RudderStack
             int _flushQueueSize,
             int _dbCountThreshold,
             int _sleepTimeout,
+            int _configRefreshInterval,
+            bool _trackLifecycleEvents,
+            bool _recordScreenViews,
             int _logLevel
         );
         [DllImport("__Internal")]
@@ -56,6 +59,9 @@ namespace RudderStack
             int _flushQueueSize,
             int _dbCountThreshold,
             int _sleepTimeout,
+            int _configRefreshInterval,
+            bool _trackLifecycleEvents,
+            bool _recordScreenViews,
             int _logLevel
         )
         {
@@ -77,6 +83,9 @@ namespace RudderStack
                     _flushQueueSize,
                     _dbCountThreshold,
                     _sleepTimeout,
+                    _configRefreshInterval,
+                    _trackLifecycleEvents,
+                    _recordScreenViews,
                     _logLevel
                 );
                 RudderLogger.LogDebug("Android Core SDK initiated");
@@ -94,6 +103,9 @@ namespace RudderStack
                     _flushQueueSize,
                     _dbCountThreshold,
                     _sleepTimeout,
+                    _configRefreshInterval,
+                    _trackLifecycleEvents,
+                    _recordScreenViews,
                     _logLevel
                 );
                 RudderLogger.LogDebug("iOS Core SDK initiated");
@@ -116,6 +128,9 @@ namespace RudderStack
                     config.flushQueueSize,
                     config.dbCountThreshold,
                     config.sleepTimeOut,
+                    config.configRefreshInterval,
+                    config.trackLifecycleEvents,
+                    config.recordScreenViews,
                     config.logLevel
                 );
 
@@ -126,7 +141,9 @@ namespace RudderStack
                 );
 
                 RudderCache.Init();
-            } else {
+            }
+            else
+            {
                 RudderLogger.LogDebug("RudderClient SDK is already initiated");
             }
 
@@ -245,7 +262,8 @@ namespace RudderStack
         public void Reset()
         {
             RudderLogger.LogDebug("SDK reset");
-            if (integrationManager != null) {
+            if (integrationManager != null)
+            {
                 integrationManager.Reset();
             }
             RudderCache.Reset();

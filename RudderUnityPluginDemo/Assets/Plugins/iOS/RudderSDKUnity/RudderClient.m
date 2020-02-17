@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import "RudderClient.h"
@@ -182,11 +182,14 @@ static EventRepository *_repository = nil;
 
 - (void)reset {
     [RudderElementCache reset];
+    if (_repository != nil) {
+        [_repository reset];
+    }
 }
 
 - (NSString*)getAnonymousId {
     // returns anonymousId
-    return [RudderElementCache getContext].device.identifier;
+    return [RudderElementCache getAnonymousId];
 }
 
 - (RudderConfig*)configuration {

@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (instancetype) withDBCountThreshold: (int) dbCountThreshold;
 - (instancetype) withSleepTimeOut: (int) sleepTimeOut;
 - (instancetype) withConfigRefreshInteval: (int) configRefreshInterval;
+- (instancetype) withTrackLifecycleEvens: (BOOL) trackLifecycleEvents;
+- (instancetype) withRecordScreenViews: (BOOL) recordScreenViews;
 - (instancetype) withFactory: (id <RudderIntegrationFactory> _Nonnull) factory;
 - (RudderConfig*) build;
 

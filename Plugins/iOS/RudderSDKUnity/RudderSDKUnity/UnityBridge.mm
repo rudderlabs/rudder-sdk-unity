@@ -26,6 +26,9 @@ extern "C"
                                 flushQueueSize:_flushQueueSize
                               dbCountThreshold:_dbCountThreshold
                                   sleepTimeOut:_sleepTimeout
+                         configRefreshInterval:_configRefreshInterval
+                          trackLifecycleEvents:_trackLifecycleEvents
+                             recordScreenViews:_recordScreenViews
                                       logLevel:_logLevel];
     }
 

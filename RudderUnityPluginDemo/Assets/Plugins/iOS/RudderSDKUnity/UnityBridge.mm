@@ -3,7 +3,7 @@
 //  RudderSDKUnity
 //
 //  Created by Arnab Pal on 23/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import "UnityBridge.h"
@@ -16,6 +16,9 @@ extern "C"
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
                            const int _sleepTimeout,
+                           const int _configRefreshInterval,
+                           const bool _trackLifecycleEvents,
+                           const bool _recordScreenViews,
                            const int _logLevel) {
         [RudderClientWrapper _initiateInstance:[[NSString alloc] initWithUTF8String:_anonymousId]
                                       writeKey:[[NSString alloc] initWithUTF8String:_writeKey]
@@ -23,6 +26,9 @@ extern "C"
                                 flushQueueSize:_flushQueueSize
                               dbCountThreshold:_dbCountThreshold
                                   sleepTimeOut:_sleepTimeout
+                         configRefreshInterval:_configRefreshInterval
+                          trackLifecycleEvents:_trackLifecycleEvents
+                             recordScreenViews:_recordScreenViews
                                       logLevel:_logLevel];
     }
 

@@ -3,16 +3,16 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import "EventRepository.h"
 #import "RudderElementCache.h"
 #import "Utils.h"
 #import "RudderLogger.h"
+#import "UIViewController+RudderScreen.h"
 
 static EventRepository* _instance;
-BOOL initiated;
 
 @implementation EventRepository
 
@@ -51,13 +51,182 @@ BOOL initiated;
         [RudderLogger logDebug:@"EventRepository: initiating element cache"];
         [RudderElementCache initiate];
         
+        NSData *anonymousIdData = [[[NSString alloc] initWithFormat:@"%@:", [RudderElementCache getAnonymousId]] dataUsingEncoding:NSUTF8StringEncoding];
+        anonymousIdToken = [anonymousIdData base64EncodedStringWithOptions:0];
+        [RudderLogger logDebug:[[NSString alloc] initWithFormat:@"EventRepository: anonymousIdToken: %@", anonymousIdToken]];
+        
         [RudderLogger logDebug:@"EventRepository: initiating dbPersistentManager"];
         dbpersistenceManager = [[DBPersistentManager alloc] init];
         
+        [RudderLogger logDebug:@"EventRepository: initiating server config manager"];
+        configManager = [RudderServerConfigManager getInstance:writeKey rudderConfig:config];
+        
+        [RudderLogger logDebug:@"EventRepository: initiating preferenceManager"];
+        self->preferenceManager = [RudderPreferenceManager getInstance];
+        
         [RudderLogger logDebug:@"EventRepository: initiating processor"];
         [self __initiateProcessor];
+        
+        [RudderLogger logDebug:@"EventRepository: initiating factories"];
+        [self __initiateFactories];
+        
+        if (config.trackLifecycleEvents) {
+            [RudderLogger logDebug:@"EventRepository: tracking application lifecycle"];
+            [self __checkApplicationUpdateStatus];
+        }
+        
+        if (config.recordScreenViews) {
+            [RudderLogger logDebug:@"EventRepository: starting automatic screen records"];
+            [self __prepareScreenRecorder];
+        }
+        
+        
+        
     }
     return self;
+}
+
+- (void) __checkApplicationUpdateStatus {
+    NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+    for (NSString *name in @[ UIApplicationDidEnterBackgroundNotification,
+                              UIApplicationDidFinishLaunchingNotification,
+                              UIApplicationWillEnterForegroundNotification,
+                              UIApplicationWillTerminateNotification,
+                              UIApplicationWillResignActiveNotification,
+                              UIApplicationDidBecomeActiveNotification ]) {
+        [nc addObserver:self selector:@selector(handleAppStateNotification:) name:name object:UIApplication.sharedApplication];
+    }
+}
+
+- (void) handleAppStateNotification: (NSNotification*) notification {
+    if ([notification.name isEqualToString:UIApplicationDidFinishLaunchingNotification]) {
+        [self _applicationDidFinishLaunchingWithOptions:notification.userInfo];
+    } else if ([notification.name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
+        [self _applicationWillEnterForeground];
+    } else if ([notification.name isEqualToString: UIApplicationDidEnterBackgroundNotification]) {
+      [self _applicationDidEnterBackground];
+    }
+}
+
+- (void)_applicationDidFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    if (!self->config.trackLifecycleEvents) {
+        return;
+    }
+    NSString *previousVersion = [preferenceManager getBuildVersionCode];
+
+    NSString *currentVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
+
+    if (!previousVersion) {
+        RudderMessageBuilder *messageBuilder = [[RudderMessageBuilder alloc] init];
+        [messageBuilder setEventName:@"Application Installed"];
+        [messageBuilder setPropertyDict:@{
+            @"version": currentVersion
+        }];
+        [self dump:[messageBuilder build]];
+    } else if (![currentVersion isEqualToString:previousVersion]) {
+        RudderMessageBuilder *messageBuilder = [[RudderMessageBuilder alloc] init];
+        [messageBuilder setEventName:@"Application Updated"];
+        [messageBuilder setPropertyDict:@{
+            @"previous_version" : previousVersion ?: @"",
+            @"version": currentVersion
+        }];
+        [self dump:[messageBuilder build]];
+    }
+
+    RudderMessageBuilder *messageBuilder = [[RudderMessageBuilder alloc] init];
+    [messageBuilder setEventName:@"Application Opened"];
+    [messageBuilder setPropertyDict:@{
+        @"from_background" : @NO,
+        @"version" : currentVersion ?: @"",
+        @"referring_application" : launchOptions[UIApplicationLaunchOptionsSourceApplicationKey] ?: @"",
+        @"url" : launchOptions[UIApplicationLaunchOptionsURLKey] ?: @"",
+    }];
+    [self dump:[messageBuilder build]];
+
+    [preferenceManager saveBuildVersionCode:currentVersion];
+}
+
+- (void)_applicationWillEnterForeground{
+    if (!self->config.trackLifecycleEvents) {
+        return;
+    }
+    RudderMessageBuilder *messageBuilder = [[RudderMessageBuilder alloc] init];
+    [messageBuilder setEventName:@"Application Opened"];
+    [messageBuilder setPropertyDict:@{
+        @"from_background" : @YES,
+    }];
+    [self dump:[messageBuilder build]];
+}
+
+- (void)_applicationDidEnterBackground {
+    if (!self->config.trackLifecycleEvents) {
+        return;
+    }
+    RudderMessageBuilder *messageBuilder = [[RudderMessageBuilder alloc] init];
+    [messageBuilder setEventName:@"Application Backgrounded"];
+    [self dump:[messageBuilder build]];
+}
+
+- (void) __prepareScreenRecorder {
+    [UIViewController rudder_swizzleView];
+}
+
+- (void) __initiateFactories {
+    if (self->config == nil || config.factories == nil || config.factories.count == 0) {
+        [RudderLogger logInfo:@"EventRepository: No native SDK is found in the config"];
+        self->isFactoryInitialized = YES;
+        return;
+    } else {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            RudderClient *client = [RudderClient sharedInstance];
+            int retryCount = 0;
+            while (self->isFactoryInitialized == NO && retryCount <= 5) {
+                RudderServerConfigSource *serverConfig = [self->configManager getConfig];
+                
+                if (serverConfig != nil && serverConfig.destinations != nil) {
+                    NSArray *destinations = serverConfig.destinations;
+                    if (destinations.count == 0) {
+                        [RudderLogger logInfo:@"EventRepository: No native SDK factory is found in the server config"];
+                    } else {
+                        NSMutableDictionary<NSString*, RudderServerDestination*> *destinationDict = [[NSMutableDictionary alloc] init];
+                        for (RudderServerDestination *destination in destinations) {
+                            [destinationDict setObject:destination forKey:destination.destinationDefinition.displayName];
+                        }
+                        NSMutableDictionary<NSString*, id<RudderIntegration>> *tempIntegrationOpDict = [[NSMutableDictionary alloc] init];
+                        for (id<RudderIntegrationFactory> factory in self->config.factories) {
+                            RudderServerDestination *destination = [destinationDict objectForKey:factory.key];
+                            if (destination != nil && destination.isDestinationEnabled == YES) {
+                                NSDictionary *destinationConfig = destination.destinationConfig;
+                                if (destinationConfig != nil) {
+                                    id<RudderIntegration> nativeOp = [factory initiate:destinationConfig client:client rudderConfig:self->config];
+                                    [RudderLogger logDebug:[[NSString alloc] initWithFormat:@"Initiating native SDK factory %@", factory.key]];
+                                    [tempIntegrationOpDict setValue:nativeOp forKey:factory.key];
+                                    [RudderLogger logDebug:[[NSString alloc] initWithFormat:@"Initiated native SDK factory %@", factory.key]];
+                                    // put native sdk initialization callback
+                                }
+                            }
+                        }
+                        self->integrationOperationMap = tempIntegrationOpDict;
+                    }
+                    self->isFactoryInitialized = YES;
+                    @synchronized (self->eventReplayMessage) {
+                        [RudderLogger logDebug:@"replaying old messages with factory"];
+                        NSArray *tempMessages = [self->eventReplayMessage copy];
+                        if (tempMessages.count > 0) {
+                            for (RudderMessage *msg in tempMessages) {
+                                [self makeFactoryDump:msg];
+                            }
+                        }
+                        [self->eventReplayMessage removeAllObjects];
+                    }
+                } else {
+                    retryCount += 1;
+                    [RudderLogger logDebug:@"server config is null. retrying in 10s."];
+                    usleep(10000000);
+                }
+            }
+        });
+    }
 }
 
 - (void)__initiateProcessor {
@@ -124,7 +293,7 @@ BOOL initiated;
     return [json copy];
 }
 
-- (NSString*) __flushEventsToServer: (NSString*) payload {
+- (NSString* _Nullable) __flushEventsToServer: (NSString*) payload {
     if (self->authToken == nil || [self->authToken isEqual:@""]) {
         [RudderLogger logError:@"WriteKey was not correct. Aborting flush to server"];
         return nil;
@@ -140,6 +309,7 @@ BOOL initiated;
     [urlRequest setHTTPMethod:@"POST"];
     [urlRequest addValue:@"Application/json" forHTTPHeaderField:@"Content-Type"];
     [urlRequest addValue:[[NSString alloc] initWithFormat:@"Basic %@", self->authToken] forHTTPHeaderField:@"Authorization"];
+    [urlRequest addValue:self->anonymousIdToken forHTTPHeaderField:@"AnonymousId"];
     NSData *httpBody = [payload dataUsingEncoding:NSUTF8StringEncoding];
     [urlRequest setHTTPBody:httpBody];
     
@@ -172,15 +342,59 @@ BOOL initiated;
 
 - (void) dump:(RudderMessage *)message {
     if (message == nil) return;
-    
     message.integrations = @{@"All": @YES};
-    
+    [self makeFactoryDump: message];
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[message dict] options:0 error:nil];
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
     
     [RudderLogger logDebug:[[NSString alloc] initWithFormat:@"dump: %@", jsonString]];
     
     [self->dbpersistenceManager saveEvent:jsonString];
+}
+
+- (void) makeFactoryDump:(RudderMessage *)message {
+    if (self->isFactoryInitialized) {
+        [RudderLogger logDebug:@"dumping message to native sdk factories"];
+        for (NSString *key in [self->integrationOperationMap allKeys]) {
+            [RudderLogger logDebug:[[NSString alloc] initWithFormat:@"dumping for %@", key]];
+            id<RudderIntegration> integration = [self->integrationOperationMap objectForKey:key];
+            if (integration != nil) {
+                [integration dump:message];
+            }
+        }
+    } else {
+        [RudderLogger logDebug:@"factories are not initialized. dumping to replay queue"];
+        if (self->eventReplayMessage == nil) {
+            self->eventReplayMessage = [[NSMutableArray alloc] init];
+        }
+        [self->eventReplayMessage addObject:message];
+    }
+}
+
+-(void) reset {
+    if (self->isFactoryInitialized) {
+        for (NSString *key in [self->integrationOperationMap allKeys]) {
+            [RudderLogger logDebug:[[NSString alloc] initWithFormat:@"resetting native SDK for %@", key]];
+            id<RudderIntegration> integration = [self->integrationOperationMap objectForKey:key];
+            if (integration != nil) {
+                [integration reset];
+            }
+        }
+    } else {
+        [RudderLogger logDebug:@"factories are not initialized. ignored"];
+    }
+}
+
+- (void) __prepareIntegrations {
+    RudderServerConfigSource *serverConfig = [self->configManager getConfig];
+    if (serverConfig != nil) {
+        self->integrations = [[NSMutableDictionary alloc] init];
+        for (RudderServerDestination *destination in serverConfig.destinations) {
+            if ([self->integrations objectForKey:destination.destinationDefinition.definitionName] == nil) {
+                [self->integrations setObject:[[NSNumber alloc] initWithBool:destination.isDestinationEnabled] forKey:destination.destinationDefinition.definitionName];
+            }
+        }
+    }
 }
 
 - (RudderConfig *)getConfig {

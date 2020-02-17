@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import "RudderConfigBuilder.h"
@@ -66,6 +66,22 @@
         config = [[RudderConfig alloc] init];
     }
     config.configRefreshInterval = configRefreshInterval;
+    return self;
+}
+
+- (instancetype)withTrackLifecycleEvens:(BOOL)trackLifecycleEvents {
+    if (config == nil) {
+        config = [[RudderConfig alloc] init];
+    }
+    config.trackLifecycleEvents = trackLifecycleEvents;
+    return self;
+}
+
+- (instancetype) withRecordScreenViews:(BOOL)recordScreenViews {
+    if (config == nil) {
+        config = [[RudderConfig alloc] init];
+    }
+    config.recordScreenViews = recordScreenViews;
     return self;
 }
 

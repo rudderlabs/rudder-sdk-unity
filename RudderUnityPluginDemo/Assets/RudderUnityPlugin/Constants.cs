@@ -19,5 +19,7 @@ namespace RudderStack
         public static int DB_COUNT_THRESHOLD = 10000;
         // config-plane url to get the config for the writeKey
         public static string CONFIG_PLANE_URL = "https://api.rudderlabs.com";
+        public static bool TRACK_LIFECYCLE_EVENTS = true;
+        public static bool RECORD_SCREEN_VIEWS = false;
     }
 }

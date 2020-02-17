@@ -91,7 +91,11 @@ public class RudderClientWrapper {
         }
     }
 
-    public static void _identify(String _userId, String _traitsJson, String _optionsJson) {
+    public static void _identify(
+            String _userId,
+            String _traitsJson,
+            String _optionsJson
+    ) {
         RudderLogger.logDebug(String.format(Locale.US, "_userId: %s", _userId));
         RudderLogger.logDebug(String.format(Locale.US, "_traitsJson: %s", _traitsJson));
         RudderLogger.logDebug(String.format(Locale.US, "_optionsJson: %s", _optionsJson));

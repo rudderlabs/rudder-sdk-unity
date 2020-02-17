@@ -46,7 +46,7 @@ class RudderContext {
         String traitsJson = preferenceManger.getTraits();
         RudderLogger.logDebug(String.format(Locale.US, "Traits from persistence storage%s", traitsJson));
         if (traitsJson == null) {
-            RudderTraits traits = new RudderTraits(deviceId);
+            RudderTraits traits = new RudderTraits(RudderElementCache.getAnonymousId());
             this.traits = Utils.convertToMap(new Gson().toJson(traits));
             this.persistTraits();
             RudderLogger.logDebug("New traits has been saved");

@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import "RudderLibraryInfo.h"
@@ -13,7 +13,7 @@
 {
     self = [super init];
     if (self) {
-        _name = @"rudder-ios-library";
+        _name = @"com.rudderstack.ios.sdk";
         _version = @"1.0";
     }
     return self;

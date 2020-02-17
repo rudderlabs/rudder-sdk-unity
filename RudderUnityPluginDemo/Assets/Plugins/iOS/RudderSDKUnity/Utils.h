@@ -3,7 +3,7 @@
 //  RudderSDKCore
 //
 //  Created by Arnab Pal on 18/10/19.
-//  Copyright © 2019 RudderStack. All rights reserved.
+//  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -18,7 +18,6 @@ NS_ASSUME_NONNULL_BEGIN
 + (NSString*) getUniqueId;
 + (NSString*) getLocale;
 + (NSString*) getDateString: (NSDate*) date;
-+ (NSString*) getDeviceId;
 
 @end
 
