@@ -13,6 +13,7 @@ namespace RudderStack
         public int configRefreshInterval;
         public bool trackLifecycleEvents;
         public bool recordScreenViews;
+        public string configPlaneUrl;
 
         public RudderConfig(
             string endPointUrl,
@@ -23,6 +24,7 @@ namespace RudderStack
             int configRefreshInterval,
             bool trackLifecycleEvents,
             bool recordScreenViews,
+            string configPlaneUrl,
             List<RudderIntegrationFactory> factories)
         {
             this.endPointUrl = endPointUrl;
@@ -34,6 +36,7 @@ namespace RudderStack
             this.configRefreshInterval = configRefreshInterval;
             this.trackLifecycleEvents = trackLifecycleEvents;
             this.recordScreenViews = recordScreenViews;
+            this.configPlaneUrl = configPlaneUrl;
 
             RudderLogger.Init(logLevel);
         }
@@ -49,6 +52,7 @@ namespace RudderStack
                 Constants.CONFIG_REFRESH_INTERVAL,
                 Constants.TRACK_LIFECYCLE_EVENTS,
                 Constants.RECORD_SCREEN_VIEWS,
+                Constants.CONFIG_PLANE_URL,
                 null
             );
         }
