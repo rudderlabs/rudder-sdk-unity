@@ -10,7 +10,7 @@ namespace RudderStack
     {
 
 #if UNITY_ANDROID
-        private static readonly string androidClientName = "com.rudderlabs.android.sdk.core.RudderClientWrapper";
+        private static readonly string androidClientName = "com.rudderstack.android.sdk.wrapper.RudderClientWrapper";
         private static AndroidJavaClass androidClientClass;
 #endif
 
@@ -48,8 +48,9 @@ namespace RudderStack
         private static extern void _serializeSqlite();
 #endif
 
-        private static RudderClient instance;
-        private static RudderIntegrationManager integrationManager;
+        private static RudderClient _instance;
+        private static RudderIntegrationManager _integrationManager;
+
         /* 
         private constructor to prevent instantiating
          */
@@ -92,6 +93,7 @@ namespace RudderStack
             }
 #endif
 
+// initialize iOS
 #if UNITY_IPHONE
             RudderLogger.LogDebug("Initializing iOS Core SDK");
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -118,11 +120,11 @@ namespace RudderStack
             RudderConfig config
         )
         {
-            if (instance == null)
+            if (_instance == null)
             {
                 RudderLogger.LogDebug("Instantiating RudderClient SDK");
                 // initialize the instance
-                instance = new RudderClient(
+                _instance = new RudderClient(
                     writeKey,
                     config.endPointUrl,
                     config.flushQueueSize,
@@ -135,7 +137,7 @@ namespace RudderStack
                 );
 
                 RudderLogger.LogDebug("Instantiating RudderIntegrationManager");
-                integrationManager = new RudderIntegrationManager(
+                _integrationManager = new RudderIntegrationManager(
                     writeKey,
                     config
                 );
@@ -147,7 +149,7 @@ namespace RudderStack
                 RudderLogger.LogDebug("RudderClient SDK is already initiated");
             }
 
-            return instance;
+            return _instance;
         }
 
         public static RudderClient GetInstance(string writeKey)
@@ -164,7 +166,11 @@ namespace RudderStack
         public void Track(RudderMessage message)
         {
             RudderLogger.LogDebug("Track Event: " + message.eventName);
-            integrationManager.makeIntegrationDump(message);
+            if (_integrationManager != null)
+            {
+                _integrationManager.MakeIntegrationDump(message);
+            }
+
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -195,7 +201,10 @@ namespace RudderStack
         public void Screen(RudderMessage message)
         {
             RudderLogger.LogDebug("Screen Event: " + message.eventName);
-            integrationManager.makeIntegrationDump(message);
+            if (_integrationManager != null)
+            {
+                _integrationManager.MakeIntegrationDump(message);
+            }
 #if UNITY_ANDROID
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -227,8 +236,10 @@ namespace RudderStack
         {
             RudderLogger.LogDebug("Identify Event: " + message.eventName);
             RudderCache.SetUserId(userId);
-
-            integrationManager.makeIntegrationIdentify(userId, traits);
+            if (_integrationManager != null)
+            {
+                _integrationManager.MakeIntegrationIdentify(userId, traits);
+            }
 
             // put supplied userId under traits as well if it is not set
             if (traits.getId() == null)
@@ -262,9 +273,9 @@ namespace RudderStack
         public void Reset()
         {
             RudderLogger.LogDebug("SDK reset");
-            if (integrationManager != null)
+            if (_integrationManager != null)
             {
-                integrationManager.Reset();
+                _integrationManager.Reset();
             }
             RudderCache.Reset();
 #if UNITY_ANDROID
@@ -285,7 +296,7 @@ namespace RudderStack
 
         public static RudderClient GetInstance()
         {
-            return instance;
+            return _instance;
         }
 
         public static void SerializeSqlite()
@@ -300,9 +311,9 @@ namespace RudderStack
         }
         void Update()
         {
-            if (integrationManager != null)
+            if (_integrationManager != null)
             {
-                integrationManager.Update();
+                _integrationManager.Update();
             }
         }
     }

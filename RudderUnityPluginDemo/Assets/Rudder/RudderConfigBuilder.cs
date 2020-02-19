@@ -31,45 +31,51 @@ namespace RudderStack
             return this;
         }
 
-        int dbCountThreshold = Constants.DB_COUNT_THRESHOLD;
+        private int dbCountThreshold = Constants.DB_COUNT_THRESHOLD;
         public RudderConfigBuilder WithDBCountThreshold(int dbCountThreshold)
         {
             this.dbCountThreshold = dbCountThreshold;
             return this;
         }
 
-        int sleepTimeOut = Constants.SLEEP_TIME_OUT;
+        private int sleepTimeOut = Constants.SLEEP_TIME_OUT;
         public RudderConfigBuilder WithSleepTimeout(int sleepTimeOut)
         {
             this.sleepTimeOut = sleepTimeOut;
             return this;
         }
 
-        int logLevel = RudderLogLevel.NONE;
+        private int logLevel = RudderLogLevel.NONE;
         public RudderConfigBuilder WithLogLevel(int logLevel)
         {
             this.logLevel = logLevel;
             return this;
         }
 
-        int configRefreshInterval = Constants.CONFIG_REFRESH_INTERVAL;
+        private int configRefreshInterval = Constants.CONFIG_REFRESH_INTERVAL;
         public RudderConfigBuilder WithConfigRefreshInterval(int configRefreshInterval)
         {
             this.configRefreshInterval = configRefreshInterval;
             return this;
         }
 
-        bool trackLifecycleEvents = Constants.TRACK_LIFECYCLE_EVENTS;
+        private bool trackLifecycleEvents = Constants.TRACK_LIFECYCLE_EVENTS;
         public RudderConfigBuilder WithTrackLifecycleEvents(bool trackLifecycleEvents)
         {
             this.trackLifecycleEvents = trackLifecycleEvents;
             return this;
         }
 
-        bool recordScreenViews = Constants.RECORD_SCREEN_VIEWS;
+        private bool recordScreenViews = Constants.RECORD_SCREEN_VIEWS;
         public RudderConfigBuilder WithRecordScreenViews(bool recordScreenViews)
         {
             this.recordScreenViews = recordScreenViews;
+            return this;
+        }
+
+        private string configPlaneUrl = Constants.CONFIG_PLANE_URL;
+        public RudderConfigBuilder WithConfigPlaneUrl(string configPlaneUrl) {
+            this.configPlaneUrl = configPlaneUrl;
             return this;
         }
 
@@ -84,6 +90,7 @@ namespace RudderStack
                 this.configRefreshInterval,
                 this.trackLifecycleEvents,
                 this.recordScreenViews,
+                this.configPlaneUrl,
                 this.factories
             );
         }

@@ -12,47 +12,41 @@ namespace RudderStack
 {
     class RudderIntegrationManager
     {
-        private Dictionary<string, object> rudderServerConfig = null;
-        private string serverConfigJson = null;
-        private bool isFactoryPrepared = false;
-
-        private Dictionary<string, RudderIntegration> integrationOpsMap = new Dictionary<string, RudderIntegration>();
-        private Dictionary<string, object> integrations = null;
-        private string writeKey = null;
-        private RudderConfig config = null;
-
+        private Dictionary<string, object> _rudderServerConfig = null;
+        private string _serverConfigJson = null;
+        private bool _isFactoryPrepared = false;
+        private Dictionary<string, RudderIntegration> _integrationOpsMap = new Dictionary<string, RudderIntegration>();
+        private string _writeKey = null;
+        private RudderConfig _config = null;
         private object _lockingObj = new object();
-
-        private List<RudderMessage> factoryDumpQueue = new List<RudderMessage>();
-        private string persistedUserId = null;
-        private RudderTraits persistedTraits = null;
-
-
-        private long lastUpdatedTimestamp = 0;
+        private List<RudderMessage> _factoryDumpQueue = new List<RudderMessage>();
+        private string _persistedUserId = null;
+        private RudderTraits _persistedTraits = null;
+        private long _lastUpdatedTimestamp = 0;
 
         public RudderIntegrationManager(string writeKey, RudderConfig config)
         {
-            this.writeKey = writeKey;
-            this.config = config;
+            this._writeKey = writeKey;
+            this._config = config;
             ServicePointManager.ServerCertificateValidationCallback = Validator;
-            downloadIntegrations();
+            DownloadIntegrations();
         }
 
-        private void downloadIntegrations()
+        private void DownloadIntegrations()
         {
             try
             {
                 lock (this._lockingObj)
                 {
-                    this.lastUpdatedTimestamp = long.Parse(PlayerPrefs.GetString("rl_server_update_time", "0"));
-                    RudderLogger.LogDebug("RudderIntegrationManager: downloadIntegrations: lastUpdatedTimeStamp: " + lastUpdatedTimestamp);
-                    this.serverConfigJson = PlayerPrefs.GetString("rl_server_config", null);
-                    RudderLogger.LogDebug("RudderIntegrationManager: downloadIntegrations: serverConfigJson: " + this.serverConfigJson);
+                    this._lastUpdatedTimestamp = long.Parse(PlayerPrefs.GetString("rl_server_update_time", "0"));
+                    RudderLogger.LogDebug("RudderIntegrationManager: downloadIntegrations: lastUpdatedTimeStamp: " + _lastUpdatedTimestamp);
+                    this._serverConfigJson = PlayerPrefs.GetString("rl_server_config", null);
+                    RudderLogger.LogDebug("RudderIntegrationManager: downloadIntegrations: serverConfigJson: " + this._serverConfigJson);
                 }
 
-                if (this.serverConfigJson == null || this.serverConfigJson.Equals("") || isServerConfigOutdated())
+                if (this._serverConfigJson == null || this._serverConfigJson.Equals("") || IsServerConfigOutdated())
                 {
-                    Thread t = new Thread(downloadConfig);
+                    Thread t = new Thread(DownloadConfig);
                     t.Start();
                 }
             }
@@ -62,19 +56,19 @@ namespace RudderStack
             }
         }
 
-        private void prepareFactories()
+        private void PrepareFactories()
         {
             try
             {
-                if (this.rudderServerConfig == null)
+                if (this._rudderServerConfig == null)
                 {
                     RudderLogger.LogInfo("No integrations: rudderServerConfig is null");
                 }
-                else if (this.config.factories == null)
+                else if (this._config.factories == null)
                 {
                     RudderLogger.LogInfo("No integrations: config.factories is null");
                 }
-                else if (this.config.factories.Count == 0)
+                else if (this._config.factories.Count == 0)
                 {
                     // no factory to initialize
                     RudderLogger.LogInfo("No integrations: config.factories.Count is 0");
@@ -82,24 +76,24 @@ namespace RudderStack
                 else
                 {
                     RudderClient client = RudderClient.GetInstance();
-                    Dictionary<string, object> source = this.rudderServerConfig["source"] as Dictionary<string, object>;
+                    Dictionary<string, object> source = this._rudderServerConfig["source"] as Dictionary<string, object>;
                     List<object> destinations = source["destinations"] as List<object>;
 
                     if (destinations.Count > 0)
                     {
                         Dictionary<string, object> destinationMap = new Dictionary<string, object>();
-                        RudderLogger.LogDebug("destinations are not empty");
+                        RudderLogger.LogDebug("Native SDKs enabled in Dashboard");
                         foreach (var destinationObj in destinations)
                         {
                             Dictionary<string, object> destination = destinationObj as Dictionary<string, object>;
                             Dictionary<string, object> destinationDefinition = destination["destinationDefinition"] as Dictionary<string, object>;
-                            string definitionName = destinationDefinition["displayName"] as string;
-                            RudderLogger.LogDebug("Extracted Native Destination information: " + definitionName);
+                            string destinationName = destinationDefinition["displayName"] as string;
+                            RudderLogger.LogDebug("Extracted Native Destination information: " + destinationName);
 
-                            destinationMap[definitionName] = destination;
+                            destinationMap[destinationName] = destination;
                         }
 
-                        foreach (RudderIntegrationFactory factory in this.config.factories)
+                        foreach (RudderIntegrationFactory factory in this._config.factories)
                         {
                             string factoryKey = factory.Key();
                             RudderLogger.LogDebug("Initiating native destination factory: " + factoryKey);
@@ -112,32 +106,32 @@ namespace RudderStack
                                     if (isDestinationEnabled != null && isDestinationEnabled == true)
                                     {
                                         Dictionary<string, object> destinationConfig = serverDestination["config"] as Dictionary<string, object>;
-                                        RudderIntegration integrationOp = factory.Create(destinationConfig, client, this.config);
+                                        RudderIntegration integrationOp = factory.Create(destinationConfig, client, this._config);
                                         RudderLogger.LogDebug("Native integration initiated for " + factoryKey);
-                                        this.integrationOpsMap[factoryKey] = integrationOp;
+                                        this._integrationOpsMap[factoryKey] = integrationOp;
                                     }
                                 }
                             }
                         }
                     }
                 }
-                this.isFactoryPrepared = true;
+                this._isFactoryPrepared = true;
 
                 lock (this._lockingObj)
                 {
-                    if (this.factoryDumpQueue.Count > 0)
+                    if (this._factoryDumpQueue.Count > 0)
                     {
-                        for (int index = 0; index < this.factoryDumpQueue.Count; index++)
+                        for (int index = 0; index < this._factoryDumpQueue.Count; index++)
                         {
-                            this.makeIntegrationDump(this.factoryDumpQueue[index]);
+                            this.MakeIntegrationDump(this._factoryDumpQueue[index]);
                         }
-                        this.factoryDumpQueue.Clear();
+                        this._factoryDumpQueue.Clear();
                     }
-                    if (persistedTraits != null && persistedUserId != null)
+                    if (_persistedTraits != null && _persistedUserId != null)
                     {
-                        this.makeIntegrationIdentify(persistedUserId, persistedTraits);
-                        this.persistedTraits = null;
-                        this.persistedUserId = null;
+                        this.MakeIntegrationIdentify(_persistedUserId, _persistedTraits);
+                        this._persistedTraits = null;
+                        this._persistedUserId = null;
                     }
                 }
             }
@@ -147,7 +141,7 @@ namespace RudderStack
             }
         }
 
-        private Dictionary<string, object> parseServerConfig(string configJson)
+        private Dictionary<string, object> ParseServerConfig(string configJson)
         {
             if (configJson == null || configJson.Equals(""))
             {
@@ -165,17 +159,17 @@ namespace RudderStack
             return null;
         }
 
-        private bool isServerConfigOutdated()
+        private bool IsServerConfigOutdated()
         {
-            if (this.lastUpdatedTimestamp == 0)
+            if (this._lastUpdatedTimestamp == 0)
             {
                 // no config available. cold start
                 return true;
             }
-            return (Stopwatch.GetTimestamp() - this.lastUpdatedTimestamp) > (config.configRefreshInterval * 60 * 60 * 1000);
+            return (Stopwatch.GetTimestamp() - this._lastUpdatedTimestamp) > (_config.configRefreshInterval * 60 * 60 * 1000);
         }
 
-        void downloadConfig(object obj)
+        void DownloadConfig(object obj)
         {
             bool isDone = false;
             int retryCount = 0;
@@ -185,11 +179,12 @@ namespace RudderStack
             {
                 try
                 {
-                    string configEndpointUrl = Constants.CONFIG_PLANE_URL + "/sourceConfig";
+                    string configEndpointUrl = _config.configPlaneUrl + "/sourceConfig";
+                    RudderLogger.LogDebug("configEndpontUrl: " + configEndpointUrl);
                     // create http request object
                     var http = (HttpWebRequest)WebRequest.Create(new Uri(configEndpointUrl));
                     http.Method = "GET";
-                    var authKeyBytes = System.Text.Encoding.UTF8.GetBytes(writeKey + ":");
+                    var authKeyBytes = System.Text.Encoding.UTF8.GetBytes(_writeKey + ":");
                     string authHeader = System.Convert.ToBase64String(authKeyBytes);
                     http.Headers.Add("Authorization", "Basic " + authHeader);
                     // get the response
@@ -203,7 +198,7 @@ namespace RudderStack
                     {
                         lock (this._lockingObj)
                         {
-                            this.serverConfigJson = responseJson;
+                            this._serverConfigJson = responseJson;
                         }
                         isDone = true;
                     }
@@ -222,65 +217,45 @@ namespace RudderStack
             }
         }
 
-        public Dictionary<string, object> getIntegrations()
-        {
-            if (this.integrations == null)
-            {
-                this.integrations = new Dictionary<string, object>();
-                this.integrations["All"] = true;
-            }
-            return this.integrations;
-        }
-
-        public void makeIntegrationDump(RudderMessage message)
+        public void MakeIntegrationDump(RudderMessage message)
         {
             // if factories are not prepared dump those in the queue
-            if (!this.isFactoryPrepared)
+            if (!this._isFactoryPrepared || this._rudderServerConfig == null)
             {
                 lock (this._lockingObj)
-                if (this.rudderServerConfig == null)
                 {
-                    return;
-                }
-
-                this.integrations = new Dictionary<string, object>();
-                Dictionary<string, object> source = this.rudderServerConfig["source"] as Dictionary<string, object>;
-                List<object> destinations = source["destinations"] as List<object>;
-
-                foreach (var destinationObj in destinations)
-                {
-                    factoryDumpQueue.Add(message);
+                    _factoryDumpQueue.Add(message);
                 }
             }
             // make native integration calls
             else
             {
-                foreach (string key in integrationOpsMap.Keys)
+                foreach (string key in _integrationOpsMap.Keys)
                 {
                     RudderLogger.LogDebug("Dumping " + message.eventName + " to " + key + " native SDK");
-                    integrationOpsMap[key].Dump(message);
+                    _integrationOpsMap[key].Dump(message);
                 }
             }
         }
 
-        public void makeIntegrationIdentify(string userId, RudderTraits traits)
+        public void MakeIntegrationIdentify(string userId, RudderTraits traits)
         {
-            if (!this.isFactoryPrepared)
+            if (!this._isFactoryPrepared || this._rudderServerConfig == null)
             {
                 lock (this._lockingObj)
                 {
-                    this.persistedUserId = userId;
-                    this.persistedTraits = traits;
+                    this._persistedUserId = userId;
+                    this._persistedTraits = traits;
                 }
                 RudderLogger.LogDebug("Factories are not prepared yet");
             }
             // make native integration calls
             else
             {
-                foreach (string key in integrationOpsMap.Keys)
+                foreach (string key in _integrationOpsMap.Keys)
                 {
                     RudderLogger.LogDebug("Identify to " + key + " native SDK");
-                    integrationOpsMap[key].Identify(userId, traits);
+                    _integrationOpsMap[key].Identify(userId, traits);
                 }
             }
 
@@ -295,25 +270,24 @@ namespace RudderStack
 
         public void Update()
         {
-            if (!this.isFactoryPrepared)
+            if (!this._isFactoryPrepared)
             {
                 lock (this._lockingObj)
                 {
-                    if (this.serverConfigJson != null && !this.serverConfigJson.Equals(""))
+                    if (this._serverConfigJson != null && !this._serverConfigJson.Equals(""))
                     {
-                        RudderLogger.LogDebug("RudderIntegrationManager Update: serverConfigJson: " + this.serverConfigJson);
-                        if (isServerConfigOutdated())
+                        RudderLogger.LogDebug("RudderIntegrationManager Update: serverConfigJson: " + this._serverConfigJson);
+                        if (IsServerConfigOutdated())
                         {
 #if !UNITY_EDITOR
-          PlayerPrefs.SetString("rl_server_update_time", Stopwatch.GetTimestamp().ToString());
-          PlayerPrefs.SetString("rl_server_config", this.serverConfigJson);
-          PlayerPrefs.Save();
+                            PlayerPrefs.SetString("rl_server_update_time", Stopwatch.GetTimestamp().ToString());
+                            PlayerPrefs.SetString("rl_server_config", this._serverConfigJson);
+                            PlayerPrefs.Save();
 #endif
                         }
 
-                        RudderLogger.LogDebug("RudderIntegrationManager Update: serverConfigJson: " + this.serverConfigJson);
-                        this.rudderServerConfig = parseServerConfig(this.serverConfigJson);
-                        this.prepareFactories();
+                        this._rudderServerConfig = ParseServerConfig(this._serverConfigJson);
+                        this.PrepareFactories();
                     }
                 }
             }
@@ -321,17 +295,17 @@ namespace RudderStack
 
         public void Reset()
         {
-            if (!this.isFactoryPrepared)
+            if (!this._isFactoryPrepared)
             {
                 RudderLogger.LogDebug("Factories are not prepared yet");
             }
             // make native integration calls
             else
             {
-                foreach (string key in integrationOpsMap.Keys)
+                foreach (string key in _integrationOpsMap.Keys)
                 {
                     RudderLogger.LogDebug("Resetting native SDK " + key);
-                    integrationOpsMap[key].Reset();
+                    _integrationOpsMap[key].Reset();
                 }
             }
         }
