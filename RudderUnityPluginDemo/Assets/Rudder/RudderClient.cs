@@ -122,6 +122,9 @@ namespace RudderStack
         {
             if (_instance == null)
             {
+                // initialize the cache
+                RudderCache.Init();
+
                 RudderLogger.LogDebug("Instantiating RudderClient SDK");
                 // initialize the instance
                 _instance = new RudderClient(
@@ -141,8 +144,6 @@ namespace RudderStack
                     writeKey,
                     config
                 );
-
-                RudderCache.Init();
             }
             else
             {

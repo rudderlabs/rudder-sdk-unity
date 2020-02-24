@@ -56,6 +56,9 @@
      <Compile Include="Assets\_Complete-Game\MobileInput\Scripts\Editor\CrossPlatformInputInitialize.cs" />
      <Compile Include="Assets\Editor\AdjustEditor.cs" />
      <Compile Include="Assets\TutorialInfo\Scripts\Editor\ReadmeEditor.cs" />
+     <None Include="Assets\Firebase\Editor\AppDependencies.xml" />
+     <None Include="Assets\Firebase\Editor\FirebaseAnalytics_version-6.10.0_manifest.txt" />
+     <None Include="Assets\Firebase\Editor\AnalyticsDependencies.xml" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
@@ -310,6 +313,24 @@
  </Reference>
  <Reference Include="UnityEditor.OSXStandalone.Extensions">
  <HintPath>/Applications/Unity/Hub/Editor/2018.4.8f1/Unity.app/Contents/PlaybackEngines/MacStandaloneSupport/UnityEditor.OSXStandalone.Extensions.dll</HintPath>
+ </Reference>
+ <Reference Include="Google.MiniJson">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.Analytics">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.App">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.Platform">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.TaskExtension">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.Editor">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Editor/Firebase.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Advertisements.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.Editor.dll</HintPath>

@@ -88,24 +88,26 @@
      <Compile Include="Assets\Adjust\Unity\AdjustSessionFailure.cs" />
      <Compile Include="Assets\Adjust\Unity\AdjustSessionSuccess.cs" />
      <Compile Include="Assets\Adjust\Unity\AdjustUtils.cs" />
-     <Compile Include="Assets\RudderAdjustIntegration\RudderAdjustIntegration.cs" />
-     <Compile Include="Assets\RudderAdjustIntegration\RudderAdjustIntegrationFactory.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\Constants.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\MiniJSON.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderCache.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderClient.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderConfig.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderConfigBuilder.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderException.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderIntegration.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderIntegrationFactory.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderIntegrationManager.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderLogger.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderMessage.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderMessageBuilder.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\RudderTraits.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\ScreenPropertyBuilder.cs" />
-     <Compile Include="Assets\RudderUnityPlugin\TrackPropertyBuilder.cs" />
+     <Compile Include="Assets\Rudder\Constants.cs" />
+     <Compile Include="Assets\Rudder\MiniJSON.cs" />
+     <Compile Include="Assets\Rudder\RudderCache.cs" />
+     <Compile Include="Assets\Rudder\RudderClient.cs" />
+     <Compile Include="Assets\Rudder\RudderConfig.cs" />
+     <Compile Include="Assets\Rudder\RudderConfigBuilder.cs" />
+     <Compile Include="Assets\Rudder\RudderException.cs" />
+     <Compile Include="Assets\Rudder\RudderIntegration.cs" />
+     <Compile Include="Assets\Rudder\RudderIntegrationFactory.cs" />
+     <Compile Include="Assets\Rudder\RudderIntegrationManager.cs" />
+     <Compile Include="Assets\Rudder\RudderLogger.cs" />
+     <Compile Include="Assets\Rudder\RudderMessage.cs" />
+     <Compile Include="Assets\Rudder\RudderMessageBuilder.cs" />
+     <Compile Include="Assets\Rudder\RudderTraits.cs" />
+     <Compile Include="Assets\Rudder\ScreenPropertyBuilder.cs" />
+     <Compile Include="Assets\Rudder\TrackPropertyBuilder.cs" />
+     <Compile Include="Assets\RudderAdjust\RudderAdjustIntegration.cs" />
+     <Compile Include="Assets\RudderAdjust\RudderAdjustIntegrationFactory.cs" />
+     <Compile Include="Assets\RudderFirebase\RudderFirebaseIntegration.cs" />
+     <Compile Include="Assets\RudderFirebase\RudderFirebaseIntegrationFactory.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyAttack.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyHealth.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyMovement.cs" />
@@ -118,6 +120,8 @@
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
      <None Include="Assets\Adjust\Android\AdjustAndroidManifest.xml" />
      <None Include="Assets\SurvivalShooter_Third-PartyNotice.txt" />
+     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
+     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-analytics-unity\maven-metadata.xml" />
      <None Include="Assets\Fonts\LuckiestGuy\FontLicense.txt" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
@@ -331,6 +335,21 @@
  </Reference>
  <Reference Include="UnityEngine.SpatialTracking">
  <HintPath>/Applications/Unity/Hub/Editor/2018.4.8f1/Unity.app/Contents/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+ </Reference>
+ <Reference Include="Google.MiniJson">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.Analytics">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.Analytics.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.App">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.Platform">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
+ </Reference>
+ <Reference Include="Firebase.TaskExtension">
+ <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Advertisements.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.Editor.dll</HintPath>
