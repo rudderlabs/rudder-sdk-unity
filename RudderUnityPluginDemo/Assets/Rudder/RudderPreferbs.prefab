@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7500226600108721394}
-  - component: {fileID: 978939885669776796}
+  - component: {fileID: 5512222489286726388}
   m_Layer: 0
   m_Name: RudderPreferbs
   m_TagString: MainCamera
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &978939885669776796
+--- !u!114 &5512222489286726388
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

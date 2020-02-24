@@ -43,7 +43,6 @@ namespace CompleteProject
 
             RudderConfigBuilder configBuilder = new RudderConfigBuilder()
             .WithEndPointUrl(endPointUrl)
-            .WithFactory(RudderAdjustIntegrationFactory.GetFactory())
             .WithLogLevel(RudderLogLevel.DEBUG);
             rudderClient = RudderClient.GetInstance(
                 writeKey,
