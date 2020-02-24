@@ -104,10 +104,6 @@
      <Compile Include="Assets\Rudder\RudderTraits.cs" />
      <Compile Include="Assets\Rudder\ScreenPropertyBuilder.cs" />
      <Compile Include="Assets\Rudder\TrackPropertyBuilder.cs" />
-     <Compile Include="Assets\RudderAdjust\RudderAdjustIntegration.cs" />
-     <Compile Include="Assets\RudderAdjust\RudderAdjustIntegrationFactory.cs" />
-     <Compile Include="Assets\RudderFirebase\RudderFirebaseIntegration.cs" />
-     <Compile Include="Assets\RudderFirebase\RudderFirebaseIntegrationFactory.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyAttack.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyHealth.cs" />
      <Compile Include="Assets\Scripts\Enemy\EnemyMovement.cs" />
@@ -120,8 +116,6 @@
      <Compile Include="Assets\TutorialInfo\Scripts\Readme.cs" />
      <None Include="Assets\Adjust\Android\AdjustAndroidManifest.xml" />
      <None Include="Assets\SurvivalShooter_Third-PartyNotice.txt" />
-     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
-     <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-analytics-unity\maven-metadata.xml" />
      <None Include="Assets\Fonts\LuckiestGuy\FontLicense.txt" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
@@ -335,21 +329,6 @@
  </Reference>
  <Reference Include="UnityEngine.SpatialTracking">
  <HintPath>/Applications/Unity/Hub/Editor/2018.4.8f1/Unity.app/Contents/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
- </Reference>
- <Reference Include="Google.MiniJson">
- <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Google.MiniJson.dll</HintPath>
- </Reference>
- <Reference Include="Firebase.Analytics">
- <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.Analytics.dll</HintPath>
- </Reference>
- <Reference Include="Firebase.App">
- <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.App.dll</HintPath>
- </Reference>
- <Reference Include="Firebase.Platform">
- <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.Platform.dll</HintPath>
- </Reference>
- <Reference Include="Firebase.TaskExtension">
- <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Assets/Firebase/Plugins/Firebase.TaskExtension.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Advertisements.Editor">
  <HintPath>/Users/arnab/workspace/rudder-sdk-unity/RudderUnityPluginDemo/Library/PackageCache/com.unity.ads@2.3.1/Runtime/UnityEngine.Advertisements.Editor.dll</HintPath>
