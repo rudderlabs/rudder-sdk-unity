@@ -17,13 +17,17 @@ namespace RudderStack
             string eventName = message.eventName;
             RudderLogger.LogDebug(eventName + " is sent to Firebase");
             List<Firebase.Analytics.Parameter> parameters = new List<Firebase.Analytics.Parameter>();
-            foreach (string key in message.eventProperties.Keys)
+            if (message.eventProperties != null)
             {
-                parameters.Add(new Firebase.Analytics.Parameter(
-                    key,
-                    Json.Serialize(message.eventProperties[key])
-                ));
+                foreach (string key in message.eventProperties.Keys)
+                {
+                    parameters.Add(new Firebase.Analytics.Parameter(
+                        key,
+                        Json.Serialize(message.eventProperties[key])
+                    ));
+                }
             }
+
             Firebase.Analytics.FirebaseAnalytics.LogEvent(
                 eventName,
                 parameters.ToArray()
@@ -32,16 +36,20 @@ namespace RudderStack
 
         public override void Identify(string userId, RudderTraits traits)
         {
-            // set user ID
-            // Firebase.Analytics.FirebaseAnalytics.SetUserID(userId);
+            // set user ID. FIrebase Unity doesn't support setUserId method. Set a custom property
+            Firebase.Analytics.FirebaseAnalytics.SetUserProperty("userId", userId);
             // set custom user properties to firebase
-            foreach (string key in traits.traitsDict.Keys)
+            if (traits != null && traits.traitsDict != null)
             {
-                Firebase.Analytics.FirebaseAnalytics.SetUserProperty(
-                    key,
-                    Json.Serialize(traits.traitsDict[key])
-                );
+                foreach (string key in traits.traitsDict.Keys)
+                {
+                    Firebase.Analytics.FirebaseAnalytics.SetUserProperty(
+                        key,
+                        Json.Serialize(traits.traitsDict[key])
+                    );
+                }
             }
+
         }
 
         public override void Reset()
