@@ -33,6 +33,8 @@ RudderMessage message = new RudderMessageBuilder()
 rudderClient.Track(message);
 ```
 
+For more detailed documentation check [here](https://docs.rudderstack.com/sdk-integration-guide/getting-started-with-unity-sdk).
+
 # Coming Soon
 1. More documentation
 2. More destination support
