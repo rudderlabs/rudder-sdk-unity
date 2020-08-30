@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSNetwork.h"
@@ -29,12 +29,12 @@
 
 - (NSDictionary<NSString *,NSObject *> *)dict {
     NSMutableDictionary *tempDict = [[NSMutableDictionary alloc] init];
-    
+
     [tempDict setValue:_carrier forKey:@"carrier"];
     [tempDict setValue:[NSNumber numberWithBool:_wifi] forKey:@"wifi"];
     [tempDict setValue:[NSNumber numberWithBool:_bluetooth] forKey:@"bluetooth"];
     [tempDict setValue:[NSNumber numberWithBool:_cellular] forKey:@"cellular"];
-    
+
     return [tempDict copy];
 }
 

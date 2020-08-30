@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 18/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

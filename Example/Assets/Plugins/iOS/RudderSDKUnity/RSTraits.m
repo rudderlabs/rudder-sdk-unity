@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSTraits.h"
@@ -114,7 +114,7 @@
 }
 - (NSDictionary<NSString *,NSObject *> *)dict {
     NSMutableDictionary<NSString*, NSObject*> *tempDict = [[NSMutableDictionary alloc] init];
-    
+
     if (_anonymousId != nil) {
         [tempDict setValue:_anonymousId forKey:@"anonymousId"];
     }
@@ -166,7 +166,7 @@
     if (__extras != nil) {
         [tempDict setValuesForKeysWithDictionary:__extras];
     }
-    
+
     return [tempDict copy];
 }
 

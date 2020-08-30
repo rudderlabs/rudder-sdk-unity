@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSDBPersistentManager.h"
@@ -66,7 +66,7 @@
 }
 
 - (void)clearEventFromDB:(int)messageId {
-    
+
 }
 
 - (void)clearEventsFromDB:(NSMutableArray<NSString *> *)messageIds {
@@ -77,7 +77,7 @@
             [messageIdsCsv appendString:@","];
         }
     }
-    
+
     NSString *deleteSqlString = [[NSString alloc] initWithFormat:@"DELETE FROM events WHERE id IN (%@);", messageIdsCsv];
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"deleteEventSql: %@", deleteSqlString]];
     const char* deleteSql = [deleteSqlString UTF8String];
@@ -93,7 +93,7 @@
     } else {
         // wrong statement
     }
-    
+
     sqlite3_finalize(deleteStmt);
 }
 
@@ -103,7 +103,7 @@
     const char* querySQL = [querySQLStirng UTF8String];
     NSMutableArray<NSString *> *messageIds = [[NSMutableArray alloc] init];
     NSMutableArray<NSString *> *messages = [[NSMutableArray alloc] init];
-    
+
     sqlite3_stmt *queryStmt = nil;
     if (sqlite3_prepare_v2(self->_database, querySQL, -1, &queryStmt, nil) == SQLITE_OK) {
         [RSLogger logDebug:@"events fetched from DB"];
@@ -118,22 +118,22 @@
         // wrong statement
         [RSLogger logError:@"event fetching error"];
     }
-    
+
     RSDBMessage *dbMessage = [[RSDBMessage alloc] init];
     dbMessage.messageIds = messageIds;
     dbMessage.messages = messages;
-    
+
     return dbMessage;
 }
 
 - (int)getDBRecordCount {
     NSString *countSQLString = @"SELECT COUNT(*) FROM 'events'";
-    
+
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"countSQLStirng: %@", countSQLString]];
-    
+
     int count = 0;
     const char* countSQL = [countSQLString UTF8String];
-    
+
     sqlite3_stmt *countStmt = nil;
     if (sqlite3_prepare_v2(self->_database, countSQL, -1, &countStmt, nil) == SQLITE_OK) {
         [RSLogger logDebug:@"count fetched from DB"];
@@ -144,7 +144,7 @@
         // wrong statement
         [RSLogger logError:@"count fetching error"];
     }
-    
+
     return count;
 }
 
@@ -164,7 +164,7 @@
     } else {
         // wrong statement
     }
-    
+
     sqlite3_finalize(deleteStmt);
 }
 

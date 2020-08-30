@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSServerConfigManager.h"
@@ -84,7 +84,7 @@ int receivedError = NETWORKSUCCESS;
 - (RSServerConfigSource *)_parseConfig:(NSString *)configStr {
     NSError *error;
     NSDictionary *configDict = [NSJSONSerialization JSONObjectWithData:[configStr dataUsingEncoding:NSUTF8StringEncoding] options:NSJSONReadingMutableContainers error:&error];
-    
+
     RSServerConfigSource *source;
     if (error == nil && configDict != nil) {
         NSDictionary *sourceDict = [configDict objectForKey:@"source"];
@@ -101,7 +101,7 @@ int receivedError = NETWORKSUCCESS;
         source.sourceName = sourceName;
         source.isSourceEnabled = isSourceEnabled;
         source.updatedAt = updatedAt;
-        
+
         NSArray *destinationArr = [sourceDict objectForKey:@"destinations"];
         NSMutableArray *destinations = [[NSMutableArray alloc] init];
         for (NSDictionary* destinationDict in destinationArr) {
@@ -116,15 +116,15 @@ int receivedError = NETWORKSUCCESS;
             }
             destination.isDestinationEnabled = isDestinationEnabled;
             destination.updatedAt = [destinationDict objectForKey:@"updatedAt"];
-            
+
             RSServerDestinationDefinition *destinationDefinition = [[RSServerDestinationDefinition alloc] init];
             NSDictionary *definitionDict = [destinationDict objectForKey:@"destinationDefinition"];
             destinationDefinition.definitionName = [definitionDict objectForKey:@"name"];
             destinationDefinition.displayName = [definitionDict objectForKey:@"displayName"];
             destinationDefinition.updatedAt = [definitionDict objectForKey:@"updatedAt"];
-            
+
             destination.destinationDefinition = destinationDefinition;
-            
+
             destination.destinationConfig = [destinationDict objectForKey:@"config"];
             [destinations addObject:destination];
         }
@@ -132,7 +132,7 @@ int receivedError = NETWORKSUCCESS;
     } else {
         [RSLogger logError:@"config deserializaion error"];
     }
-    
+
     return source;
 }
 
@@ -141,13 +141,13 @@ int receivedError = NETWORKSUCCESS;
     int retryCount = 0;
     while (isDone == NO && retryCount <= 3) {
         NSString* configJson = [self _networkRequest];
-        
+
         if (configJson != nil) {
             [_preferenceManager saveConfigJson:configJson];
             [_preferenceManager updateLastUpdatedTime:[RSUtils getTimeStampLong]];
-            
+
             [RSLogger logDebug:@"server config download successful"];
-            
+
             isDone = YES;
         } else {
             if(receivedError == 2){
@@ -164,21 +164,21 @@ int receivedError = NETWORKSUCCESS;
 
 - (NSString *)_networkRequest {
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    
+
     __block NSString *responseStr = nil;
     NSString *controlPlaneEndPoint = [NSString stringWithFormat:@"%@/sourceConfig?p=ios&v=%@", _rudderConfig.controlPlaneUrl, RS_VERSION];
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"configUrl: %@", controlPlaneEndPoint]];
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[[NSURL alloc] initWithString:controlPlaneEndPoint]];
     NSData *authData = [[[NSString alloc] initWithFormat:@"%@:", _writeKey] dataUsingEncoding:NSUTF8StringEncoding];
     [urlRequest addValue:[[NSString alloc] initWithFormat:@"Basic %@", [authData base64EncodedStringWithOptions:0]] forHTTPHeaderField:@"Authorization"];
-    
+
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        
+
         [RSLogger logDebug:[[NSString alloc] initWithFormat:@"response status code: %ld", (long)httpResponse.statusCode]];
         NSString *dataError = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-        
+
         if (httpResponse.statusCode == 200) {
             if (data != nil) {
                 responseStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -190,16 +190,16 @@ int receivedError = NETWORKSUCCESS;
         }else{
             receivedError = NETWORKERROR;
         }
-        
+
         dispatch_semaphore_signal(semaphore);
     }];
     [dataTask resume];
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-    
+
 #if !__has_feature(objc_arc)
     dispatch_release(sema);
 #endif
-    
+
     return responseStr;
 }
 

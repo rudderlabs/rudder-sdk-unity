@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSEventRepository.h"
@@ -25,7 +25,7 @@ typedef enum {
     if (_instance == nil) {
         _instance = [[self alloc] init:writeKey config:config];
     }
-    
+
     return _instance;
 }
 
@@ -43,41 +43,41 @@ typedef enum {
     self = [super init];
     if (self) {
         [RSLogger logDebug:[[NSString alloc] initWithFormat:@"EventRepository: writeKey: %@", _writeKey]];
-        
+
         self->isFactoryInitialized = NO;
         self->isSDKEnabled = YES;
-        
+
         writeKey = _writeKey;
         config = _config;
-        
+
         NSData *authData = [[[NSString alloc] initWithFormat:@"%@:", _writeKey] dataUsingEncoding:NSUTF8StringEncoding];
         authToken = [authData base64EncodedStringWithOptions:0];
         [RSLogger logDebug:[[NSString alloc] initWithFormat:@"EventRepository: authToken: %@", authToken]];
-        
+
         [RSLogger logDebug:@"EventRepository: initiating element cache"];
         [RSElementCache initiate];
-        
+
         NSData *anonymousIdData = [[[NSString alloc] initWithFormat:@"%@:", [RSElementCache getAnonymousId]] dataUsingEncoding:NSUTF8StringEncoding];
         anonymousIdToken = [anonymousIdData base64EncodedStringWithOptions:0];
         [RSLogger logDebug:[[NSString alloc] initWithFormat:@"EventRepository: anonymousIdToken: %@", anonymousIdToken]];
-        
+
         [RSLogger logDebug:@"EventRepository: initiating dbPersistentManager"];
         dbpersistenceManager = [[RSDBPersistentManager alloc] init];
-        
+
         [RSLogger logDebug:@"EventRepository: initiating server config manager"];
         configManager = [RSServerConfigManager getInstance:writeKey rudderConfig:config];
-        
+
         [RSLogger logDebug:@"EventRepository: initiating preferenceManager"];
         self->preferenceManager = [RSPreferenceManager getInstance];
-        
+
         [RSLogger logDebug:@"EventRepository: initiating processor and factories"];
         [self __initiateSDK];
-        
+
         if (config.trackLifecycleEvents) {
             [RSLogger logDebug:@"EventRepository: tracking application lifecycle"];
             [self __checkApplicationUpdateStatus];
         }
-        
+
         if (config.recordScreenViews) {
             [RSLogger logDebug:@"EventRepository: starting automatic screen records"];
             [self __prepareScreenRecorder];
@@ -98,7 +98,7 @@ typedef enum {
                 if  (self->isSDKEnabled) {
                     [RSLogger logDebug:@"EventRepository: initiating processor"];
                     [self __initiateProcessor];
-                    
+
                     // initiate the native SDK factories if destinations are present
                     if (serverConfig.destinations != nil && serverConfig.destinations.count > 0) {
                         [RSLogger logDebug:@"EventRepository: initiating factories"];
@@ -171,17 +171,17 @@ typedef enum {
         [RSLogger logDebug:@"processor started"];
         int errResp = 0;
         int sleepCount = 0;
-        
+
         while (YES) {
             int recordCount = [self->dbpersistenceManager getDBRecordCount];
             [RSLogger logDebug:[[NSString alloc] initWithFormat:@"DBRecordCount %d", recordCount]];
-            
+
             if (recordCount > self->config.dbCountThreshold) {
                 [RSLogger logDebug:[[NSString alloc] initWithFormat:@"Old DBRecordCount %d", (recordCount - self->config.dbCountThreshold)]];
                 RSDBMessage *dbMessage = [self->dbpersistenceManager fetchEventsFromDB:(recordCount - self->config.dbCountThreshold)];
                 [self->dbpersistenceManager clearEventsFromDB:dbMessage.messageIds];
             }
-            
+
             [RSLogger logDebug:@"Fetching events to flush to sever"];
             RSDBMessage *dbMessage = [self->dbpersistenceManager fetchEventsFromDB:(self->config.flushQueueSize)];
             if (dbMessage.messages.count > 0 && (sleepCount >= self->config.sleepTimeout)) {
@@ -219,9 +219,9 @@ typedef enum {
     NSString* sentAt = [RSUtils getTimestamp];
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"RecordCount: %lu", (unsigned long)messages.count]];
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"sentAtTimeStamp: %@", sentAt]];
-    
+
     NSMutableString* json = [[NSMutableString alloc] init];
-    
+
     [json appendString:@"{"];
     [json appendFormat:@"\"sentAt\":\"%@\",", sentAt];
     [json appendString:@"\"batch\":["];
@@ -249,7 +249,7 @@ typedef enum {
     [json appendString:@"]}"];
     // retain all events that are part of the current event
     dbMessage.messageIds = batchMessageIds;
-    
+
     return [json copy];
 }
 
@@ -258,13 +258,13 @@ typedef enum {
         [RSLogger logError:@"WriteKey was not correct. Aborting flush to server"];
         return WRONGWRITEKEY;
     }
-    
+
     dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
-    
+
     int __block respStatus = NETWORKSUCCESS;
     NSString *dataPlaneEndPoint = [self->config.dataPlaneUrl stringByAppendingString:@"/v1/batch"];
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"endPointToFlush %@", dataPlaneEndPoint]];
-    
+
     NSMutableURLRequest *urlRequest = [[NSMutableURLRequest alloc] initWithURL:[[NSURL alloc] initWithString:dataPlaneEndPoint]];
     [urlRequest setHTTPMethod:@"POST"];
     [urlRequest addValue:@"Application/json" forHTTPHeaderField:@"Content-Type"];
@@ -272,13 +272,13 @@ typedef enum {
     [urlRequest addValue:self->anonymousIdToken forHTTPHeaderField:@"AnonymousId"];
     NSData *httpBody = [payload dataUsingEncoding:NSUTF8StringEncoding];
     [urlRequest setHTTPBody:httpBody];
-    
+
     NSURLSession *session = [NSURLSession sharedSession];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:urlRequest completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         NSHTTPURLResponse *httpResponse = (NSHTTPURLResponse *)response;
-        
+
         [RSLogger logError:[[NSString alloc] initWithFormat:@"statusCode %ld", (long)httpResponse.statusCode]];
-        
+
         if (httpResponse.statusCode == 200) {
             if (data != nil) {
                 NSString *response = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
@@ -298,36 +298,36 @@ typedef enum {
             }
             [RSLogger logError:[[NSString alloc] initWithFormat:@"ServerError: %@", errorResponse]];
         }
-        
+
         dispatch_semaphore_signal(semaphore);
     }];
     [dataTask resume];
     dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
-    
+
 #if !__has_feature(objc_arc)
     dispatch_release(semaphore);
 #endif
-    
+
     return respStatus;
 }
 
 - (void) dump:(RSMessage *)message {
     if (message == nil) return;
     if (!self->isSDKEnabled) return;
-    
+
     message.integrations = @{@"All": @YES};
     [self makeFactoryDump: message];
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:[message dict] options:0 error:nil];
     NSString *jsonString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    
+
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"dump: %@", jsonString]];
-    
+
     unsigned int messageSize = [RSUtils getUTF8Length:jsonString];
     if (messageSize > MAX_EVENT_SIZE) {
         [RSLogger logError:[NSString stringWithFormat:@"dump: Event size exceeds the maximum permitted event size(%iu)", MAX_EVENT_SIZE]];
         return;
     }
-    
+
     [self->dbpersistenceManager saveEvent:jsonString];
 }
 
@@ -407,9 +407,9 @@ typedef enum {
         return;
     }
     NSString *previousVersion = [preferenceManager getBuildVersionCode];
-    
+
     NSString *currentVersion = [[NSBundle mainBundle] infoDictionary][@"CFBundleShortVersionString"];
-    
+
     if (!previousVersion) {
         [[RSClient sharedInstance] track:@"Application Installed" properties:@{
             @"version": currentVersion
@@ -420,14 +420,14 @@ typedef enum {
             @"version": currentVersion
         }];
     }
-    
+
     [[RSClient sharedInstance] track:@"Application Opened" properties:@{
         @"from_background" : @NO,
         @"version" : currentVersion ?: @"",
         @"referring_application" : [[NSString alloc] initWithFormat:@"%@", launchOptions[UIApplicationLaunchOptionsSourceApplicationKey] ?: @""],
         @"url" :  [[NSString alloc] initWithFormat:@"%@", launchOptions[UIApplicationLaunchOptionsURLKey] ?: @""] ,
     }];
-    
+
     [preferenceManager saveBuildVersionCode:currentVersion];
 }
 
@@ -435,7 +435,7 @@ typedef enum {
     if (!self->config.trackLifecycleEvents) {
         return;
     }
-    
+
     [[RSClient sharedInstance] track:@"Application Opened" properties:@{
         @"from_background" : @YES,
     }];

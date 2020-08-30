@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSContext.h"
@@ -20,13 +20,13 @@ static WKWebView *webView;
     self = [super init];
     if (self) {
         self->preferenceManager = [RSPreferenceManager getInstance];
-        
+
         _app = [[RSApp alloc] init];
         _device = [[RSDeviceInfo alloc] init];
         _library = [[RSLibraryInfo alloc] init];
         _os = [[RSOSInfo alloc] init];
         _screen = [[RSScreenInfo alloc] init];
-        
+
         dispatch_async(dispatch_get_main_queue(), ^{
             webView = [[WKWebView alloc] initWithFrame:CGRectZero];
             [webView loadHTMLString:@"<html></html>" baseURL:nil];
@@ -38,7 +38,7 @@ static WKWebView *webView;
         _locale = [RSUtils getLocale];
         _network = [[RSNetwork alloc] init];
         _timezone = [[NSTimeZone localTimeZone] name];
-        
+
         NSString *traitsJson = [preferenceManager getTraits];
         if (traitsJson == nil) {
             // no persisted traits, create new and persist
@@ -61,7 +61,7 @@ static WKWebView *webView;
     RSTraits* traits = [[RSTraits alloc] init];
     traits.anonymousId = _device.identifier;
     _traits = [[traits dict]  mutableCopy];
-    
+
     [self persistTraits];
 }
 
@@ -70,16 +70,16 @@ static WKWebView *webView;
         traits = [[RSTraits alloc] init];
         traits.anonymousId = _device.identifier;
     }
-    
+
 //    _traits = [[traits dict] mutableCopy];
-    
+
     [_traits setValuesForKeysWithDictionary:[traits dict]];
 }
 
 -(void) persistTraits {
     NSData *traitsJsonData = [NSJSONSerialization dataWithJSONObject:[RSUtils serializeDict:_traits] options:0 error:nil];
     NSString *traitsString = [[NSString alloc] initWithData:traitsJsonData encoding:NSUTF8StringEncoding];
-    
+
     [preferenceManager saveTraits:traitsString];
 }
 
@@ -104,7 +104,7 @@ static WKWebView *webView;
     [RSLogger logDebug:[[NSString alloc] initWithFormat:@"IDFA: %@", idfa]];
     BOOL adTrackingEnabled = (![idfa isEqualToString:@"00000000-0000-0000-0000-000000000000"]);
     _device.adTrackingEnabled = adTrackingEnabled;
-    
+
     if (adTrackingEnabled) {
         _device.advertisingId = idfa;
     }
@@ -122,7 +122,7 @@ static WKWebView *webView;
     [tempDict setObject:[_device dict] forKey:@"device"];
     [tempDict setObject:[_network dict] forKey:@"network"];
     [tempDict setObject:_timezone forKey:@"timezone"];
-    
+
     return [tempDict copy];
 }
 

@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSOSInfo.h"
@@ -22,10 +22,10 @@
 }
 - (NSDictionary<NSString *,NSObject *> *)dict {
     NSMutableDictionary *tempDict = [[NSMutableDictionary alloc] init];
-    
+
     [tempDict setValue:_name forKey:@"name"];
     [tempDict setValue:_version forKey:@"version"];
-    
+
     return [tempDict copy];
 }
 @end

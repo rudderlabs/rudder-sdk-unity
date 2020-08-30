@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSClient.h"
@@ -47,7 +47,7 @@ static RSEventRepository *_repository = nil;
             [RSElementCache updateTraitsDict:message.context.traits];
             [RSElementCache persistTraits];
         }
-        
+
         message.type = type;
         [_repository dump:message];
     }
@@ -139,7 +139,7 @@ static RSEventRepository *_repository = nil;
     RSMessageBuilder *builder =[[RSMessageBuilder alloc] init];
     [builder setUserId:newId];
     [builder setRSOption:options];
-    
+
     RSContext *rc = [RSElementCache getContext];
     NSMutableDictionary<NSString*,NSObject*>* traits = rc.traits;
 
@@ -147,19 +147,19 @@ static RSEventRepository *_repository = nil;
     if(prevId == nil) {
         prevId =[traits objectForKey:@"id"];
     }
-    
+
     if (prevId != nil) {
         [builder setPreviousId:[NSString stringWithFormat:@"%@", prevId]];
     }
     traits[@"id"] = newId;
     traits[@"userId"] = newId;
-    
+
     [RSElementCache updateTraitsDict:traits];
     [RSElementCache persistTraits];
-    
+
     RSMessage *message = [builder build];
     [message updateTraitsDict:traits];
-    
+
     [self dumpInternal:message type:RSAlias];
 }
 

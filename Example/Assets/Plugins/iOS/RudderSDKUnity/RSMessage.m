@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSMessage.h"
@@ -35,7 +35,7 @@
 
 - (NSDictionary<NSString*, NSObject*>*) dict {
     NSMutableDictionary* tempDict = [[NSMutableDictionary alloc] init];
-    
+
     [tempDict setValue:_messageId forKey:@"messageId"];
     [tempDict setValue:_channel forKey:@"channel"];
     [tempDict setValue:[_context dict] forKey:@"context"];
@@ -63,7 +63,7 @@
         [tempDict setValue:[RSUtils serializeDict:_userProperties] forKey:@"userProperties"];
     }
     [tempDict setValue:_integrations forKey:@"integrations"];
-    
+
     return [tempDict copy];
 }
 

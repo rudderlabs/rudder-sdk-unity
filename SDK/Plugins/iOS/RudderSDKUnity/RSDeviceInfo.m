@@ -3,7 +3,7 @@
 //  RSSDKCore
 //
 //  Created by Arnab Pal on 17/10/19.
-//  Copyright © 2019 RSlabs. All rights reserved.
+//  Copyright © 2019 RudderStack. All rights reserved.
 //
 
 #import "RSDeviceInfo.h"
@@ -26,7 +26,7 @@
 
 - (NSDictionary<NSString *,NSObject *> *)dict {
     NSMutableDictionary *tempDict = [[NSMutableDictionary alloc] init];
-    
+
     [tempDict setValue:_identifier forKey:@"id"];
     [tempDict setValue:_manufacturer forKey:@"manufacturer"];
     [tempDict setValue:_model forKey:@"model"];
@@ -39,7 +39,7 @@
         [tempDict setValue:_advertisingId forKey:@"advertisingId"];
         [tempDict setValue:[NSNumber numberWithBool:_adTrackingEnabled] forKey:@"adTrackingEnabled"];
     }
-    
+
     return [tempDict copy];
 }
 
