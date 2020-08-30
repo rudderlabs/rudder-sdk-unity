@@ -9,7 +9,7 @@ import com.rudderstack.android.sdk.core.util.Utils;
 import java.util.Locale;
 import java.util.Map;
 
-class RudderContext {
+public class RudderContext {
     @SerializedName("app")
     private RudderApp app;
     @SerializedName("traits")
@@ -46,7 +46,7 @@ class RudderContext {
         String traitsJson = preferenceManger.getTraits();
         RudderLogger.logDebug(String.format(Locale.US, "Traits from persistence storage%s", traitsJson));
         if (traitsJson == null) {
-            RudderTraits traits = new RudderTraits(RudderElementCache.getAnonymousId());
+            RudderTraits traits = new RudderTraits(deviceId);
             this.traits = Utils.convertToMap(new Gson().toJson(traits));
             this.persistTraits();
             RudderLogger.logDebug("New traits has been saved");
@@ -89,7 +89,7 @@ class RudderContext {
         }
     }
 
-    Map<String, Object> getTraits() {
+    public Map<String, Object> getTraits() {
         return traits;
     }
 
@@ -99,5 +99,9 @@ class RudderContext {
 
     String getDeviceId() {
         return deviceInfo.getDeviceId();
+    }
+
+    public void putDeviceToken(String token) {
+        this.deviceInfo.setToken(token);
     }
 }

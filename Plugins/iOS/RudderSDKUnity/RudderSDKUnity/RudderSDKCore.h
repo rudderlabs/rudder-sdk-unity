@@ -6,13 +6,13 @@
 //  Copyright © 2019 Rudderlabs. All rights reserved.
 //
 
-#import "RudderClient.h"
-#import "RudderConfig.h"
-#import "RudderConfigBuilder.h"
-#import "RudderMessage.h"
-#import "RudderMessageBuilder.h"
+#import "RSClient.h"
+#import "RSConfig.h"
+#import "RSConfigBuilder.h"
+#import "RSMessage.h"
+#import "RSMessageBuilder.h"
 #import "ScreenPropertyBuilder.h"
-#import "RudderLogger.h"
+#import "RSLogger.h"
 
 
 //! Project version number for RudderSDKCore.

@@ -7,7 +7,8 @@ import com.rudderstack.android.sdk.wrapper.RudderClientWrapper
 class MainApplication : Application() {
     companion object {
         private const val WRITE_KEY = "1TSRSskqa15PG7F89tkwEbl5Td8"
-        private const val END_POINT_URI = "https://d87e3736.ngrok.io"
+        private const val DATA_PLANE_URL = "https://d87e3736.ngrok.io"
+        private const val CONTROL_PLANE_URL = "https://d87e3736.ngrok.io"
     }
 
     override fun onCreate() {
@@ -17,7 +18,8 @@ class MainApplication : Application() {
             this,
             "some_anonymous_id",
             WRITE_KEY,
-            END_POINT_URI,
+            DATA_PLANE_URL,
+            CONTROL_PLANE_URL,
             30,
             10000,
             10,

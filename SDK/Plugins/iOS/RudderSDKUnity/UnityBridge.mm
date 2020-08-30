@@ -11,18 +11,20 @@
 extern "C"
 {
     void _initiateInstance(const char* _anonymousId,
-                           const char* _writeKey,
-                           const char* _endPointUrl,
-                           const int _flushQueueSize,
-                           const int _dbCountThreshold,
-                           const int _sleepTimeout,
-                           const int _configRefreshInterval,
-                           const bool _trackLifecycleEvents,
-                           const bool _recordScreenViews,
-                           const int _logLevel) {
+                            const char* _writeKey,
+                            const char* _dataPlaneUrl,
+                            const char* _controlPlaneUrl,
+                            const int _flushQueueSize,
+                            const int _dbCountThreshold,
+                            const int _sleepTimeout,
+                            const int _configRefreshInterval,
+                            const bool _trackLifecycleEvents,
+                            const bool _recordScreenViews,
+                            const int _logLevel) {
         [RudderClientWrapper _initiateInstance:[[NSString alloc] initWithUTF8String:_anonymousId]
                                       writeKey:[[NSString alloc] initWithUTF8String:_writeKey]
-                                   endPointUrl:[[NSString alloc] initWithUTF8String:_endPointUrl]
+                                  dataPlaneUrl:[[NSString alloc] initWithUTF8String:_dataPlaneUrl]
+                               controlPlaneUrl:[[NSString alloc] initWithUTF8String:_controlPlaneUrl]
                                 flushQueueSize:_flushQueueSize
                               dbCountThreshold:_dbCountThreshold
                                   sleepTimeOut:_sleepTimeout

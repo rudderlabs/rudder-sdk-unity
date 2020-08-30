@@ -6,30 +6,31 @@
 //
 
 #import "RudderClientWrapper.h"
-#import "RudderClient.h"
-#import "Utils.h"
-#import "RudderLogger.h"
-#import "RudderElementCache.h"
+#import "RSClient.h"
+#import "RSUtils.h"
+#import "RSLogger.h"
+#import "RSElementCache.h"
 
-static RudderClient *_rudderClient;
+static RSClient *_rudderClient;
 
 @implementation RudderClientWrapper
 
 + (void)_initiateInstance:(NSString *)_anonymousId
                  writeKey:(NSString *)_writeKey
-              endPointUrl:(NSString *)_endPointUrl
+             dataPlaneUrl:(NSString *)_dataPlaneUrl
+          controlPlaneUrl:(NSString *)_controlPlaneUrl
            flushQueueSize:(int)_flushQueueSize
          dbCountThreshold:(int)_dbCountThreshold
              sleepTimeOut:(int)_sleepTimeout
-    configRefreshInterval:(int) _configRefreshInterval
-     trackLifecycleEvents: (BOOL) _trackLifecycleEvents
-        recordScreenViews: (BOOL) _recordScreenViews
-                 logLevel:(int)_logLevel
-{
+    configRefreshInterval:(int)_configRefreshInterval
+     trackLifecycleEvents:(BOOL)_trackLifecycleEvents
+        recordScreenViews:(BOOL)_recordScreenViews
+                 logLevel:(int)_logLevel {
     if (_rudderClient == nil) {
-        [RudderElementCache setAnonymousId:_anonymousId];
-        RudderConfigBuilder *builder = [[RudderConfigBuilder alloc] init];
-        [builder withEndPointUrl:_endPointUrl];
+        [RSElementCache setAnonymousId:_anonymousId];
+        RSConfigBuilder *builder = [[RSConfigBuilder alloc] init];
+        [builder withDataPlaneUrl:_dataPlaneUrl];
+        [builder withControlPlaneUrl:_controlPlaneUrl];
         [builder withFlushQueueSize:_flushQueueSize];
         [builder withDBCountThreshold:_dbCountThreshold];
         [builder withSleepTimeOut:_sleepTimeout];
@@ -37,7 +38,7 @@ static RudderClient *_rudderClient;
         [builder withTrackLifecycleEvens:_trackLifecycleEvents];
         [builder withRecordScreenViews:_recordScreenViews];
         [builder withLoglevel:_logLevel];
-        _rudderClient = [RudderClient getInstance:_writeKey config:[builder build]];
+        _rudderClient = [RSClient getInstance:_writeKey config:[builder build]];
     }
 }
 
@@ -49,7 +50,7 @@ static RudderClient *_rudderClient;
 {
     if (_rudderClient == nil) return;
     
-    RudderMessageBuilder *builder = [[RudderMessageBuilder alloc] init];
+    RSMessageBuilder *builder = [[RSMessageBuilder alloc] init];
     [builder setEventName:_eventName];
     [builder setPropertyDict:[self _convertToDict:_eventPropsJson]];
     [builder setUserProperty:[self _convertToDict:_userPropsJson]];
@@ -60,7 +61,7 @@ static RudderClient *_rudderClient;
     } else if ([_eventType isEqualToString:@"screen"]) {
         [_rudderClient screenWithMessage:[builder build]];
     } else {
-        [RudderLogger logError:@"message type is not supported"];
+        [RSLogger logError:@"message type is not supported"];
     }
     
 }
@@ -69,12 +70,12 @@ static RudderClient *_rudderClient;
     NSDictionary *traitsDict = [self _convertToDict:_traitsJson];
     if (traitsDict == nil) {
         // if traits is not filled in, fill with anonymousId
-        traitsDict = @{@"anonymousId": [RudderElementCache getAnonymousId]};
+        traitsDict = @{@"anonymousId": [RSElementCache getAnonymousId]};
     } else {
         // if anonymousId is not filled in
         NSString *anonymoysId = [traitsDict valueForKey:@"anonymousId"];
         if (anonymoysId == nil) {
-            [[traitsDict mutableCopy] setObject:[RudderElementCache getAnonymousId] forKey:@"anonymousId"];
+            [[traitsDict mutableCopy] setObject:[RSElementCache getAnonymousId] forKey:@"anonymousId"];
         }
     }
     NSDictionary *optinsDict = [self _convertToDict:_optionsJson];

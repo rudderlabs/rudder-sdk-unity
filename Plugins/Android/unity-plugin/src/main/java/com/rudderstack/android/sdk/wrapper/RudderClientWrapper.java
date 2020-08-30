@@ -1,5 +1,6 @@
 package com.rudderstack.android.sdk.wrapper;
 
+import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
 
@@ -22,7 +23,8 @@ public class RudderClientWrapper {
             Context _context,
             String _anonymousId,
             String _writeKey,
-            String _endPointUrl,
+            String _dataPlaneUrl,
+            String _controlPlaneUrl,
             int _flushQueueSize,
             int _dbCountThreshold,
             int _sleepTimeout,
@@ -31,34 +33,37 @@ public class RudderClientWrapper {
             boolean _recordScreenViews,
             int _logLevel
     ) {
-        if (_context == null) {
-            RudderLogger.logError("Context can not be null");
-            return;
+        if (rudderClient == null) {
+            if (_context == null) {
+                RudderLogger.logError("Context can not be null");
+                return;
+            }
+
+            if (TextUtils.isEmpty(_writeKey)) {
+                RudderLogger.logError("WriteKey can not be null or empty");
+                return;
+            }
+
+            if (TextUtils.isEmpty(_anonymousId)) {
+                _anonymousId = Utils.getDeviceId(_context);
+            }
+
+            RudderConfig config = new RudderConfig.Builder()
+                    .withDataPlaneUrl(_dataPlaneUrl)
+                    .withControlPlaneUrl(_controlPlaneUrl)
+                    .withFlushQueueSize(_flushQueueSize)
+                    .withDbThresholdCount(_dbCountThreshold)
+                    .withSleepCount(_sleepTimeout)
+                    .withLogLevel(_logLevel)
+                    .withConfigRefreshInterval(_configRefreshInterval)
+                    .withTrackLifecycleEvents(_trackLifecycleEvents)
+                    .withRecordScreenViews(_recordScreenViews)
+                    .build();
+
+            rudderClient = RudderClient.getInstance(_context, _writeKey, config);
+            RudderElementCache.setAnonymousId(_anonymousId);
+            RudderLogger.logDebug("Client initiated successfully");
         }
-
-        if (TextUtils.isEmpty(_writeKey)) {
-            RudderLogger.logError("WriteKey can not be null or empty");
-            return;
-        }
-
-        if (TextUtils.isEmpty(_anonymousId)) {
-            _anonymousId = Utils.getDeviceId(_context);
-        }
-        RudderElementCache.setAnonymousId(_anonymousId);
-
-        RudderConfig config = new RudderConfig.Builder()
-                .withEndPointUri(_endPointUrl)
-                .withFlushQueueSize(_flushQueueSize)
-                .withDbThresholdCount(_dbCountThreshold)
-                .withSleepCount(_sleepTimeout)
-                .withLogLevel(_logLevel)
-                .withConfigRefreshInterval(_configRefreshInterval)
-                .withTrackLifecycleEvents(_trackLifecycleEvents)
-                .withRecordScreenViews(_recordScreenViews)
-                .build();
-
-        rudderClient = RudderClient.getInstance(_context, _writeKey, config);
-        RudderLogger.logDebug("Client initiated successfully");
     }
 
     public static void _logEvent(
@@ -96,13 +101,13 @@ public class RudderClientWrapper {
             String _traitsJson,
             String _optionsJson
     ) {
-        RudderLogger.logDebug(String.format(Locale.US, "_userId: %s", _userId));
-        RudderLogger.logDebug(String.format(Locale.US, "_traitsJson: %s", _traitsJson));
-        RudderLogger.logDebug(String.format(Locale.US, "_optionsJson: %s", _optionsJson));
-
         if (rudderClient == null) {
             return;
         }
+
+        RudderLogger.logDebug(String.format(Locale.US, "_userId: %s", _userId));
+        RudderLogger.logDebug(String.format(Locale.US, "_traitsJson: %s", _traitsJson));
+        RudderLogger.logDebug(String.format(Locale.US, "_optionsJson: %s", _optionsJson));
 
         // check for anonymousId
         Map<String, Object> traitsMap = Utils.convertToMap(_traitsJson);
