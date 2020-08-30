@@ -6,7 +6,7 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "RudderLogger.h"
+#import "RSLogger.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -14,7 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) _initiateInstance: (NSString*) _anonymousId
                   writeKey: (NSString*) _writeKey
-               endPointUrl: (NSString*) _endPointUrl
+              dataPlaneUrl: (NSString*) _dataPlaneUrl
+           controlPlaneUrl: (NSString*) _controlPlaneUrl
             flushQueueSize: (int) _flushQueueSize
           dbCountThreshold: (int) _dbCountThreshold
               sleepTimeOut: (int) _sleepTimeout

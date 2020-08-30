@@ -2,6 +2,7 @@ package com.rudderstack.android.sdk.core;
 
 import android.app.Application;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /*
@@ -38,14 +39,10 @@ public class RudderElementCache {
         cachedContext.updateTraitsMap(traits);
     }
 
-    private static String _anonymousId;
-
-    static String getAnonymousId() {
-        return _anonymousId;
-    }
-
     public static void setAnonymousId(String anonymousId) {
-        _anonymousId = anonymousId;
+        Map<String, Object> traits =new HashMap<>();
+        traits.put("anonymousId",anonymousId);
+        cachedContext.updateTraitsMap(traits);
     }
 }
 

@@ -72,6 +72,7 @@ public class RudderClient {
             // assert writeKey is not null or empty
             if (TextUtils.isEmpty(writeKey)) {
                 RudderLogger.logError("RudderClient: getInstance: writeKey can not be null or empty");
+
             }
             // assert config is not null
             if (config == null) {
@@ -79,9 +80,9 @@ public class RudderClient {
                 config = new RudderConfig();
             } else {
                 RudderLogger.logVerbose("getInstance: config present. using config.");
-                if (TextUtils.isEmpty(config.getEndPointUri())) {
+                if (TextUtils.isEmpty(config.getDataPlaneUrl())) {
                     RudderLogger.logVerbose("getInstance: EndPointUri is blank or null. using default.");
-                    config.setEndPointUri(Constants.BASE_URL);
+                    config.setDataPlaneUrl(Constants.DATA_PLANE_URL);
                 }
                 if (config.getFlushQueueSize() < 0 || config.getFlushQueueSize() > 100) {
                     RudderLogger.logVerbose("getInstance: FlushQueueSize is wrong. using default.");
@@ -103,12 +104,15 @@ public class RudderClient {
 
             // initiate RudderClient instance
             instance = new RudderClient();
-
+            System.out.println(instance);
+            System.out.println("instance");
             // initiate EventRepository class
             if (application != null && writeKey != null) {
                 RudderLogger.logVerbose("getInstance: creating EventRepository.");
                 repository = new EventRepository(application, writeKey, config);
             }
+            System.out.println(repository);
+            System.out.println("repository");
         }
         return instance;
     }
@@ -316,23 +320,6 @@ public class RudderClient {
     }
 
     /**
-     * Identify user
-     *
-     * @param userId User ID of the user
-     * @param traits Other user properties
-     * @param options Message options
-     */
-    public void identify(@NonNull String userId, @NonNull Map<String, Object> traits, @NonNull Map<String, Object> options) {
-        RudderMessage message = new RudderMessageBuilder()
-                .setEventName(MessageType.IDENTIFY)
-                .setUserId(userId)
-                .setRudderOption(options)
-                .build();
-        message.updateTraits(traits);
-        identify(message);
-    }
-
-    /**
      * Identify your user
      *
      * @param traits RudderTraits object
@@ -376,25 +363,149 @@ public class RudderClient {
         traits.putId(userId);
         identify(traits, option);
     }
+    /**
+     * Identify user
+     *
+     * @param userId User ID of the user
+     * @param traits Other user properties
+     * @param options Message options
+     */
+    public void identify(@NonNull String userId, @NonNull Map<String, Object> traits, @NonNull Map<String, Object> options) {
+        RudderMessage message = new RudderMessageBuilder()
+                .setEventName(MessageType.IDENTIFY)
+                .setUserId(userId)
+                .setRudderOption(options)
+                .build();
+        message.updateTraits(traits);
+        identify(message);
+    }
+    //ALIAS
 
-    public void alias(String event) {
-        alias(event, null);
+    /**
+     * Alias call
+     *
+     * @param builder RudderMessage.Builder
+     */
+    public void alias(@NonNull RudderMessageBuilder builder) {
+        alias(builder.build());
     }
 
-    public void alias(String event, RudderOption option) {
-        // TODO:  yet to be decided
+    /**
+     * Alias call
+     *
+     * @param message RudderMessage
+     */
+    void alias(@NonNull RudderMessage message) {
+        message.setType(MessageType.ALIAS);
+        if (repository != null) repository.dump(message);
     }
 
-    public void group(String groupId) {
+    /**
+     * Alias call
+     *
+     * <b>Segment compatible API</b>
+     *
+     * @param newId New userId for the user
+     */
+    public void alias(String newId) {
+        alias(newId, null);
+    }
+
+    /**
+     * Alias call
+     *
+     * <b>Segment compatible API</b>
+     *
+     * @param newId  New userId for the user
+     * @param option RudderOptions for this event
+     */
+    public void alias(@NonNull String newId, @Nullable RudderOption option) {
+        Map<String, Object> traits = getRudderContext().getTraits();
+        RudderMessageBuilder builder = new RudderMessageBuilder()
+                .setUserId(newId)
+                .setRudderOption(option);
+
+        String prevUserId = null;
+        if (traits.containsKey("userId")) {
+            prevUserId = (String) traits.get("userId");
+        } else if (traits.containsKey("id")) {
+            prevUserId = (String) traits.get("id");
+        }
+        if (prevUserId != null) {
+            builder.setPreviousId(prevUserId);
+        }
+        traits.put("userId", newId);
+        traits.put("id", newId);
+        RudderMessage message = builder.build();
+        message.updateTraits(traits);
+
+        RudderElementCache.updateTraits(traits);
+        RudderElementCache.persistTraits();
+
+        alias(message);
+    }
+
+    // GROUP CALLS
+
+    /**
+     * Add the user to a group
+     *
+     * @param builder RudderMessageBuilder
+     */
+    public void group(@NonNull RudderMessageBuilder builder) {
+        group(builder.build());
+    }
+
+    /**
+     * Add the user to a group
+     *
+     * @param message RudderMessage
+     */
+    public void group(@NonNull RudderMessage message) {
+        message.setType(MessageType.GROUP);
+        if (repository != null) repository.dump(message);
+    }
+
+    /**
+     * Add the user to a group
+     *
+     * <b>Segment compatible API</b>
+     *
+     * @param groupId Group ID you want your user to attach to
+     */
+    public void group(@NonNull String groupId) {
         group(groupId, null);
     }
 
-    public void group(String groupId, RudderTraits traits) {
+    /**
+     * Add the user to a group
+     *
+     * <b>Segment compatible API</b>
+     *
+     * @param groupId Group ID you want your user to attach to
+     * @param traits  Traits of the group
+     */
+    public void group(@NonNull String groupId, @Nullable RudderTraits traits) {
         group(groupId, traits, null);
     }
 
-    public void group(String groupId, RudderTraits traits, RudderOption option) {
-        // TODO:  yet to be decided
+    /**
+     * Add the user to a group
+     *
+     * <b>Segment compatible API</b>
+     *
+     * @param groupId Group ID you want your user to attach to
+     * @param traits  Traits of the group
+     * @param option  Options for this group call
+     */
+    public void group(@NonNull String groupId, @Nullable RudderTraits traits, @Nullable RudderOption option) {
+        RudderMessage message = new RudderMessageBuilder()
+                .setGroupId(groupId)
+                .setGroupTraits(traits)
+                .setRudderOption(option)
+                .build();
+        group(message);
+
     }
 
     /**
@@ -417,17 +528,19 @@ public class RudderClient {
         return RudderElementCache.getCachedContext();
     }
 
-
-//    public EventRepository getSnapShot() {
-//        return repository;
-//    }
-
     /**
      * Reset SDK
      */
     public void reset() {
         RudderElementCache.reset();
         if (repository != null) repository.reset();
+    }
+
+    /**
+     * Flush Events
+     */
+    public void flush() {
+        if (repository != null) repository.flush();
     }
 
     /**
@@ -571,7 +684,8 @@ public class RudderClient {
         /**
          * @return build your RudderClient to be used
          */
-        public @Nullable RudderClient build() {
+        public @Nullable
+        RudderClient build() {
             if (this.application == null) {
                 RudderLogger.logError("Context is null. Aborting initialization. Returning null Client");
                 return null;

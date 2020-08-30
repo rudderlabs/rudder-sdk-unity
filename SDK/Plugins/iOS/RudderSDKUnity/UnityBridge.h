@@ -13,7 +13,8 @@ extern "C" {
 #endif
     void _initiateInstance(const char* _anonymousId,
                            const char* _writeKey,
-                           const char* _endPointUrl,
+                           const char* _dataPlaneUrl,
+                           const char* _controlPlaneUrl,
                            const int _flushQueueSize,
                            const int _dbCountThreshold,
                            const int _sleepTimeout,
