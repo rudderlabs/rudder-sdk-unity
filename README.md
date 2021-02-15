@@ -22,6 +22,7 @@ RudderClient rudderClient = RudderClient.GetInstance(<WRITE_KEY>, config);
 ## Send Events
 
 A simple track event is as shown: 
+
 ```
 RudderMessage message = new RudderMessageBuilder()
   .WithEventName("test_event_name")
@@ -33,7 +34,7 @@ RudderMessage message = new RudderMessageBuilder()
 rudderClient.Track(message);
 ```
 
-Other options are ```Screen``` and ```Identify```
+Other supported methods are ```Screen``` and ```Identify```.
 
 For more details, check out our [documentation](https://docs.rudderstack.com/rudderstack-sdk-integration-guides/getting-started-with-unity-sdk).
 
