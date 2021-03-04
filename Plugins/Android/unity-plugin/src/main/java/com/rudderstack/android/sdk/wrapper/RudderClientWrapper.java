@@ -10,6 +10,8 @@ import com.rudderstack.android.sdk.core.RudderElementCache;
 import com.rudderstack.android.sdk.core.RudderLogger;
 import com.rudderstack.android.sdk.core.RudderMessage;
 import com.rudderstack.android.sdk.core.RudderMessageBuilder;
+import com.rudderstack.android.sdk.core.RudderOption;
+import com.rudderstack.android.sdk.core.RudderTraits;
 import com.rudderstack.android.sdk.core.util.Utils;
 
 import java.util.Locale;
@@ -20,6 +22,7 @@ public class RudderClientWrapper {
     private static RudderClient rudderClient;
 
     public static void _initiateInstance(
+            Application application,
             Context _context,
             String _anonymousId,
             String _writeKey,
@@ -45,7 +48,7 @@ public class RudderClientWrapper {
             }
 
             if (TextUtils.isEmpty(_anonymousId)) {
-                _anonymousId = Utils.getDeviceId(_context);
+                _anonymousId = Utils.getDeviceId(application);
             }
 
             RudderConfig config = new RudderConfig.Builder()
@@ -71,7 +74,7 @@ public class RudderClientWrapper {
             String _eventName,
             String _eventPropsJson,
             String _userPropsJson,
-            String _optionsJson
+            RudderOption _optionsJson
     ) {
         if (rudderClient == null) {
             return;
@@ -81,7 +84,7 @@ public class RudderClientWrapper {
                 .setEventName(_eventName)
                 .setProperty(Utils.convertToMap(_eventPropsJson))
                 .setUserProperty(Utils.convertToMap(_userPropsJson))
-                .setRudderOption(Utils.convertToMap(_optionsJson))
+                .setRudderOption(_optionsJson)
                 .build();
 
         switch (_eventType) {
@@ -98,8 +101,8 @@ public class RudderClientWrapper {
 
     public static void _identify(
             String _userId,
-            String _traitsJson,
-            String _optionsJson
+            RudderTraits _traitsJson,
+            RudderOption _optionsJson
     ) {
         if (rudderClient == null) {
             return;
@@ -110,14 +113,13 @@ public class RudderClientWrapper {
         RudderLogger.logDebug(String.format(Locale.US, "_optionsJson: %s", _optionsJson));
 
         // check for anonymousId
-        Map<String, Object> traitsMap = Utils.convertToMap(_traitsJson);
-        if (!traitsMap.containsKey("anonymousId")) {
-            traitsMap.put("anonymousId", Utils.getDeviceId(rudderClient.getApplication()));
+        if(_traitsJson == null){
+            _traitsJson = new RudderTraits();
         }
         rudderClient.identify(
                 _userId,
-                traitsMap,
-                Utils.convertToMap(_optionsJson)
+                _traitsJson,
+                _optionsJson
         );
     }
 

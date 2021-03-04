@@ -4,3 +4,4 @@
 *.iml
 **/Build/
 **/.DS_Store
+**/.vs

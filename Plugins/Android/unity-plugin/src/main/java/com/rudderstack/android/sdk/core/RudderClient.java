@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.rudderstack.android.sdk.core.util.Utils;
 
+import java.util.List;
 import java.util.Map;
 
 /*
@@ -20,6 +21,8 @@ public class RudderClient {
     // repository instance
     private static EventRepository repository;
     private static Application application;
+    private static String _advertisingId;
+    private static String _anonymousId;
 
     /*
      * private constructor
@@ -72,7 +75,6 @@ public class RudderClient {
             // assert writeKey is not null or empty
             if (TextUtils.isEmpty(writeKey)) {
                 RudderLogger.logError("RudderClient: getInstance: writeKey can not be null or empty");
-
             }
             // assert config is not null
             if (config == null) {
@@ -104,15 +106,12 @@ public class RudderClient {
 
             // initiate RudderClient instance
             instance = new RudderClient();
-            System.out.println(instance);
-            System.out.println("instance");
+
             // initiate EventRepository class
             if (application != null && writeKey != null) {
                 RudderLogger.logVerbose("getInstance: creating EventRepository.");
-                repository = new EventRepository(application, writeKey, config);
+                repository = new EventRepository(application, writeKey, config, _anonymousId, _advertisingId);
             }
-            System.out.println(repository);
-            System.out.println("repository");
         }
         return instance;
     }
@@ -121,7 +120,7 @@ public class RudderClient {
      * package private api to be used in EventRepository
      * */
     @Nullable
-    static RudderClient getInstance() {
+    public static RudderClient getInstance() {
         return instance;
     }
 
@@ -147,7 +146,7 @@ public class RudderClient {
      * @return Application context
      */
     @Nullable
-    public Application getApplication() {
+    public static Application getApplication() {
         return application;
     }
 
@@ -155,6 +154,7 @@ public class RudderClient {
      * Track your event using RudderMessageBuilder
      *
      * @param builder instance of RudderMessageBuilder
+     * @deprecated Will be removed soon
      */
     public void track(@NonNull RudderMessageBuilder builder) {
         track(builder.build());
@@ -164,10 +164,13 @@ public class RudderClient {
      * Track your event using RudderMessage
      *
      * @param message RudderMessage you want to track. Use RudderMessageBuilder to create the message object
+     * @deprecated Will be removed soon
      */
     public void track(@NonNull RudderMessage message) {
         message.setType(MessageType.TRACK);
-        if (repository != null) repository.dump(message);
+        if (repository != null) {
+            repository.dump(message);
+        }
     }
 
     /**
@@ -214,6 +217,7 @@ public class RudderClient {
      * Record screen view with RudderMessageBuilder
      *
      * @param builder instance of RudderMessageBuilder
+     * @deprecated Will be removed soon
      */
     public void screen(@NonNull RudderMessageBuilder builder) {
         screen(builder.build());
@@ -223,10 +227,13 @@ public class RudderClient {
      * Record screen view with RudderMessage
      *
      * @param message instance of RudderMessage
+     * @deprecated Will be removed soon
      */
     public void screen(@NonNull RudderMessage message) {
         message.setType(MessageType.SCREEN);
-        if (repository != null) repository.dump(message);
+        if (repository != null) {
+            repository.dump(message);
+        }
     }
 
     /**
@@ -277,6 +284,10 @@ public class RudderClient {
      * @param option     Options related to this screen call
      */
     public void screen(@NonNull String screenName, @Nullable RudderProperty property, @Nullable RudderOption option) {
+        if (property == null) {
+            property = new RudderProperty();
+        }
+        property.put("name", screenName);
         screen(new RudderMessageBuilder()
                 .setEventName(screenName)
                 .setProperty(property)
@@ -288,17 +299,30 @@ public class RudderClient {
      * Identify your user
      *
      * @param message instance of RudderMessage
+     * @deprecated Will be removed soon
      */
     public void identify(@NonNull RudderMessage message) {
         // update cached traits and persist
         RudderElementCache.updateTraits(message.getTraits());
         RudderElementCache.persistTraits();
 
+        //  handle external Ids
+        RudderOption option = message.getRudderOption();
+        if (option != null) {
+            List<Map<String, Object>> externalIds = option.getExternalIds();
+            if (externalIds != null && !externalIds.isEmpty()) {
+                RudderElementCache.updateExternalIds(externalIds);
+            }
+        }
+
         // set message type to identify
         message.setType(MessageType.IDENTIFY);
+        message.updateContext();
 
         // dump to repository
-        if (repository != null) repository.dump(message);
+        if (repository != null) {
+            repository.dump(message);
+        }
     }
 
     /**
@@ -359,32 +383,20 @@ public class RudderClient {
      */
     public void identify(@NonNull String userId, @Nullable RudderTraits traits, @Nullable RudderOption option) {
         // create new traits object from cache if supplied traits is null
-        if (traits == null) traits = new RudderTraits();
+        if (traits == null) {
+            traits = new RudderTraits();
+        }
         traits.putId(userId);
         identify(traits, option);
     }
-    /**
-     * Identify user
-     *
-     * @param userId User ID of the user
-     * @param traits Other user properties
-     * @param options Message options
-     */
-    public void identify(@NonNull String userId, @NonNull Map<String, Object> traits, @NonNull Map<String, Object> options) {
-        RudderMessage message = new RudderMessageBuilder()
-                .setEventName(MessageType.IDENTIFY)
-                .setUserId(userId)
-                .setRudderOption(options)
-                .build();
-        message.updateTraits(traits);
-        identify(message);
-    }
+
     //ALIAS
 
     /**
      * Alias call
      *
      * @param builder RudderMessage.Builder
+     * @deprecated Will be removed soon
      */
     public void alias(@NonNull RudderMessageBuilder builder) {
         alias(builder.build());
@@ -394,10 +406,13 @@ public class RudderClient {
      * Alias call
      *
      * @param message RudderMessage
+     * @deprecated Will be removed soon
      */
     void alias(@NonNull RudderMessage message) {
         message.setType(MessageType.ALIAS);
-        if (repository != null) repository.dump(message);
+        if (repository != null) {
+            repository.dump(message);
+        }
     }
 
     /**
@@ -430,10 +445,11 @@ public class RudderClient {
             prevUserId = (String) traits.get("userId");
         } else if (traits.containsKey("id")) {
             prevUserId = (String) traits.get("id");
+        } else {
+            prevUserId = RudderContext.getAnonymousId();
         }
-        if (prevUserId != null) {
-            builder.setPreviousId(prevUserId);
-        }
+
+        builder.setPreviousId(prevUserId);
         traits.put("userId", newId);
         traits.put("id", newId);
         RudderMessage message = builder.build();
@@ -451,6 +467,7 @@ public class RudderClient {
      * Add the user to a group
      *
      * @param builder RudderMessageBuilder
+     * @deprecated Will be removed soon
      */
     public void group(@NonNull RudderMessageBuilder builder) {
         group(builder.build());
@@ -460,10 +477,13 @@ public class RudderClient {
      * Add the user to a group
      *
      * @param message RudderMessage
+     * @deprecated Will be removed soon
      */
     public void group(@NonNull RudderMessage message) {
         message.setType(MessageType.GROUP);
-        if (repository != null) repository.dump(message);
+        if (repository != null) {
+            repository.dump(message);
+        }
     }
 
     /**
@@ -529,18 +549,59 @@ public class RudderClient {
     }
 
     /**
+     * Set the AdvertisingId yourself. If set, SDK will not capture idfa automatically
+     *
+     * <b>Call this method before initializing the RudderClient</b>
+     *
+     * @param advertisingId IDFA for the device
+     */
+    public static void updateWithAdvertisingId(@Nullable String advertisingId) {
+        if (instance != null) {
+            RudderLogger.logWarn("Set the advertisingId before calling getInstance");
+            return;
+        }
+        _advertisingId = advertisingId;
+    }
+
+    /**
+     * Set the push token for the device to be passed to the downstream destinations
+     *
+     * @param deviceToken Push Token from FCM
+     */
+    public void putDeviceToken(@Nullable String deviceToken) {
+        RudderElementCache.cachedContext.putDeviceToken(deviceToken);
+    }
+
+    /**
+     * Set the anonymousId for the device to be used further
+     *
+     * @param anonymousId AnonymousId you want to use for the application
+     */
+    public static void setAnonymousId(String anonymousId) {
+        if (instance != null) {
+            RudderLogger.logWarn("Set the anonymousId before calling getInstance");
+            return;
+        }
+        _anonymousId = anonymousId;
+    }
+
+    /**
      * Reset SDK
      */
     public void reset() {
         RudderElementCache.reset();
-        if (repository != null) repository.reset();
+        if (repository != null) {
+            repository.reset();
+        }
     }
 
     /**
      * Flush Events
      */
     public void flush() {
-        if (repository != null) repository.flush();
+        if (repository != null) {
+            repository.flush();
+        }
     }
 
     /**
@@ -550,11 +611,15 @@ public class RudderClient {
      * @param callback RudderClient.Callback object
      */
     public void onIntegrationReady(String key, Callback callback) {
-        if (repository != null) repository.onIntegrationReady(key, callback);
+        if (repository != null) {
+            repository.onIntegrationReady(key, callback);
+        }
     }
 
     public void optOut() {
-        if (repository != null) repository.optOut();
+        if (repository != null) {
+            repository.optOut();
+        }
     }
 
     /**
@@ -565,7 +630,9 @@ public class RudderClient {
     }
 
     public void shutdown() {
-        if (repository != null) repository.shutdown();
+        if (repository != null) {
+            repository.shutdown();
+        }
     }
 
     /*

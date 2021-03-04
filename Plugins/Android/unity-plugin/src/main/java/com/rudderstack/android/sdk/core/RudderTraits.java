@@ -1,5 +1,7 @@
 package com.rudderstack.android.sdk.core;
 
+import android.app.Application;
+
 import com.google.gson.Gson;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
@@ -261,8 +263,10 @@ public class RudderTraits {
      * constructor
      */
     public RudderTraits() {
-        RudderContext rudderContext = RudderElementCache.getCachedContext();
-        if (rudderContext != null) this.anonymousId = rudderContext.getDeviceId();
+        Application application = RudderClient.getApplication();
+        if (application != null) {
+            this.anonymousId = RudderContext.getAnonymousId();
+        }
     }
 
 
@@ -295,7 +299,10 @@ public class RudderTraits {
      * @param userName    String
      */
     public RudderTraits(Address address, String age, String birthday, Company company, String createdAt, String description, String email, String firstName, String gender, String id, String lastName, String name, String phone, String title, String userName) {
-        this.anonymousId = RudderElementCache.getCachedContext().getDeviceId();
+        Application application = RudderClient.getApplication();
+        if (application != null) {
+            this.anonymousId = RudderContext.getAnonymousId();
+        }
         this.address = address;
         this.age = age;
         this.birthday = birthday;
@@ -538,7 +545,7 @@ public class RudderTraits {
         private String street;
 
         /**
-         *  default public constructor
+         * default public constructor
          */
         public Address() {
         }
@@ -680,7 +687,7 @@ public class RudderTraits {
         private String industry;
 
         /**
-         *  default public constructor
+         * default public constructor
          */
         public Company() {
         }

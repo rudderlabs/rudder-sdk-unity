@@ -40,7 +40,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
     private DBPersistentManager dbManager;
     private RudderServerConfigManager configManager;
     private RudderPreferenceManager preferenceManager;
-    private Map<String, RudderIntegration> integrationOperationsMap = new HashMap<>();
+    private Map<String, RudderIntegration<?>> integrationOperationsMap = new HashMap<>();
     private Map<String, RudderClient.Callback> integrationCallbacks = new HashMap<>();
 
     private boolean isSDKInitialized = false;
@@ -58,7 +58,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
      * 5. start processor thread
      * 6. initiate factories
      * */
-    EventRepository(Application _application, String _writeKey, RudderConfig _config) {
+    EventRepository(Application _application, String _writeKey, RudderConfig _config, String _anonymousId, String _advertisingId) {
         // 1. set the values of writeKey, config
         try {
             RudderLogger.logDebug(String.format(Locale.US, "EventRepository: constructor: writeKey: %s", _writeKey));
@@ -73,9 +73,9 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
         try {
             // 2. initiate RudderElementCache
             RudderLogger.logDebug("EventRepository: constructor: Initiating RudderElementCache");
-            RudderElementCache.initiate(_application);
+            RudderElementCache.initiate(_application, _anonymousId, _advertisingId);
 
-            String anonymousId = RudderElementCache.getCachedContext().getDeviceId();
+            String anonymousId = RudderContext.getAnonymousId();
             RudderLogger.logDebug(String.format(Locale.US, "EventRepository: constructor: anonymousId: %s", anonymousId));
             this.anonymousIdHeaderString = Base64.encodeToString(anonymousId.getBytes("UTF-8"), Base64.DEFAULT);
             RudderLogger.logDebug(String.format(Locale.US, "EventRepository: constructor: anonymousIdHeaderString: %s", this.anonymousIdHeaderString));
@@ -86,7 +86,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
 
             // 4. initiate RudderServerConfigManager
             RudderLogger.logDebug("EventRepository: constructor: Initiating RudderServerConfigManager");
-            this.configManager = RudderServerConfigManager.getInstance(_application, _writeKey, _config);
+            this.configManager = new RudderServerConfigManager(_application, _writeKey, _config);
 
             // 5. start processor thread
             RudderLogger.logDebug("EventRepository: constructor: Initiating processor and factories");
@@ -110,11 +110,12 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                 try {
                     int retryCount = 0;
                     while (!isSDKInitialized && retryCount <= 5) {
+                        Utils.NetworkResponses receivedError = configManager.getError();
                         RudderServerConfig serverConfig = configManager.getConfig();
                         if (serverConfig != null) {
-                            // initiate processor
                             isSDKEnabled = serverConfig.source.isSourceEnabled;
                             if (isSDKEnabled) {
+                                // initiate processor
                                 RudderLogger.logDebug("EventRepository: initiateSDK: Initiating processor");
                                 Thread processorThread = new Thread(getProcessorRunnable());
                                 processorThread.start();
@@ -132,10 +133,14 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                             }
 
                             isSDKInitialized = true;
+                        } else if (receivedError == Utils.NetworkResponses.WRITE_KEY_ERROR) {
+                            RudderLogger.logError("WRONG WRITE_KEY");
+                            break;
                         } else {
                             retryCount += 1;
                             RudderLogger.logDebug("EventRepository: initiateFactories: retry count: " + retryCount);
-                            Thread.sleep(10000);
+                            RudderLogger.logInfo("initiateSDK: Retrying in " + retryCount * 2 + "s");
+                            Thread.sleep(retryCount * 2 * 1000);
                         }
                     }
                 } catch (Exception ex) {
@@ -248,6 +253,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
             public void run() {
                 // initiate sleepCount
                 int sleepCount = 0;
+                Utils.NetworkResponses networkResponse = Utils.NetworkResponses.SUCCESS;
 
                 // initiate lists for messageId and message
                 ArrayList<Integer> messageIds = new ArrayList<>();
@@ -288,11 +294,10 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                             RudderLogger.logInfo(String.format(Locale.US, "EventRepository: processor: EventCount: %d", messageIds.size()));
                             if (payload != null) {
                                 // send payload to server if it is not null
-                                String response = flushEventsToServer(payload);
-                                RudderLogger.logInfo(String.format(Locale.US, "EventRepository: processor: ServerResponse: %s", response));
-                                System.out.println(String.format(Locale.US, "EventRepository: processor: ServerResponse: %s", response));
+                                networkResponse = flushEventsToServer(payload);
+                                RudderLogger.logInfo(String.format(Locale.US, "EventRepository: processor: ServerResponse: %s", networkResponse));
                                 // if success received from server
-                                if (response != null && response.equalsIgnoreCase("OK")) {
+                                if (networkResponse == Utils.NetworkResponses.SUCCESS) {
                                     // remove events from DB
                                     dbManager.clearEventsFromDB(messageIds);
                                     // reset sleep count to indicate successful flush
@@ -301,10 +306,18 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                             }
                         }
                         // increment sleepCount to track total elapsed seconds
-                        RudderLogger.logDebug(String.format(Locale.US, "EventRepository: processor: SleepCount: %d", sleepCount));
                         sleepCount += 1;
-                        // retry entire logic in 1 second
-                        Thread.sleep(1000);
+                        RudderLogger.logDebug(String.format(Locale.US, "EventRepository: processor: SleepCount: %d", sleepCount));
+                        if (networkResponse == Utils.NetworkResponses.WRITE_KEY_ERROR) {
+                            RudderLogger.logInfo("Wrong WriteKey. Aborting");
+                            break;
+                        } else if (networkResponse == Utils.NetworkResponses.ERROR) {
+                            RudderLogger.logInfo("flushEvents: Retrying in " + sleepCount + "s");
+                            Thread.sleep(Math.abs(sleepCount - config.getSleepTimeOut()) * 1000);
+                        } else {
+                            // retry entire logic in 1 second
+                            Thread.sleep(1000);
+                        }
                     } catch (Exception ex) {
                         RudderLogger.logError(ex);
                     }
@@ -377,7 +390,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
     /*
      * flush events payload to server and return response as String
      * */
-    private String flushEventsToServer(String payload) {
+    private Utils.NetworkResponses flushEventsToServer(String payload) {
         try {
             if (TextUtils.isEmpty(this.authHeaderString)) {
                 RudderLogger.logError("EventRepository: flushEventsToServer: WriteKey was not correct. Aborting flush to server");
@@ -387,7 +400,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
             // get endPointUrl form config object
             String dataPlaneEndPoint = config.getDataPlaneUrl() + "v1/batch";
             RudderLogger.logDebug("EventRepository: flushEventsToServer: dataPlaneEndPoint: " + dataPlaneEndPoint);
-            System.out.println("EventRepository: flushEventsToServer: dataPlaneEndPoint: " + dataPlaneEndPoint);
+
             // create url object
             URL url = new URL(dataPlaneEndPoint);
             // get connection object
@@ -402,22 +415,15 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
             httpConnection.setRequestProperty("AnonymousId", this.anonymousIdHeaderString);
             // set request method
             httpConnection.setRequestMethod("POST");
-            System.out.println("check http");
-            System.out.println(httpConnection.getOutputStream().toString());
             // get output stream and write payload content
             OutputStream os = httpConnection.getOutputStream();
-            System.out.println("check os");
-            System.out.println(os.toString());
             OutputStreamWriter osw = new OutputStreamWriter(os, "UTF-8");
             osw.write(payload);
-            System.out.println("check osw");
-            System.out.println(osw.toString());
             osw.flush();
             osw.close();
             os.close();
             // create connection
             httpConnection.connect();
-
             // get input stream from connection to get output from the server
             if (httpConnection.getResponseCode() == 200) {
                 BufferedInputStream bis = new BufferedInputStream(httpConnection.getInputStream());
@@ -429,9 +435,9 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                     res = bis.read();
                 }
                 // finally return response when reading from server is completed
-                System.out.println("Successful 200");
-                return baos.toString();
-
+                if (baos.toString().equalsIgnoreCase("OK")) {
+                    return Utils.NetworkResponses.SUCCESS;
+                }
             } else {
                 BufferedInputStream bis = new BufferedInputStream(httpConnection.getErrorStream());
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -442,27 +448,31 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                     res = bis.read();
                 }
                 // finally return response when reading from server is completed
-                RudderLogger.logError("EventRepository: flushEventsToServer: ServerError: " + baos.toString());
-                System.out.println("EventRepository: flushEventsToServer: ServerError: " + baos.toString());
+                String errorResp = baos.toString();
+                RudderLogger.logError("EventRepository: flushEventsToServer: ServerError: " + errorResp);
                 // return null as request made is not successful
-                return null;
+                if (errorResp.toLowerCase().contains("invalid write key")) {
+                    return Utils.NetworkResponses.WRITE_KEY_ERROR;
+                }
             }
         } catch (Exception ex) {
             RudderLogger.logError(ex);
-            System.out.println("Catch error");
-            System.out.println(ex);
         }
-        return null;
+        return Utils.NetworkResponses.ERROR;
     }
 
     /*
      * generic method for dumping all the events
      * */
     void dump(@NonNull RudderMessage message) {
-        if (!isSDKEnabled) return;
+        if (!isSDKEnabled) {
+            return;
+        }
 
         RudderLogger.logDebug(String.format(Locale.US, "EventRepository: dump: eventName: %s", message.getEventName()));
-        System.out.println(String.format(Locale.US, "EventRepository: dump: eventName: %s", message.getEventName()));
+        Map<String, Object> integrations = new HashMap<>();
+        integrations.put("All", true);
+        message.setIntegrations(integrations);
 
         makeFactoryDump(message, false);
         String eventJson = new Gson().toJson(message);
@@ -481,7 +491,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
                 message.setIntegrations(prepareIntegrations());
                 for (String key : integrationOperationsMap.keySet()) {
                     RudderLogger.logDebug(String.format(Locale.US, "EventRepository: makeFactoryDump: dumping for %s", key));
-                    RudderIntegration integration = integrationOperationsMap.get(key);
+                    RudderIntegration<?> integration = integrationOperationsMap.get(key);
                     if (integration != null) {
                         integration.dump(message);
                     }
@@ -505,7 +515,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
             RudderLogger.logDebug("EventRepository: resetting native SDKs");
             for (String key : integrationOperationsMap.keySet()) {
                 RudderLogger.logDebug(String.format(Locale.US, "EventRepository: reset for %s", key));
-                RudderIntegration integration = integrationOperationsMap.get(key);
+                RudderIntegration<?> integration = integrationOperationsMap.get(key);
                 if (integration != null) {
                     integration.reset();
                 }
@@ -520,7 +530,7 @@ class EventRepository implements Application.ActivityLifecycleCallbacks {
             RudderLogger.logDebug("EventRepository: flush native SDKs");
             for (String key : integrationOperationsMap.keySet()) {
                 RudderLogger.logDebug(String.format(Locale.US, "EventRepository: flush for %s", key));
-                RudderIntegration integration = integrationOperationsMap.get(key);
+                RudderIntegration<?> integration = integrationOperationsMap.get(key);
                 if (integration != null) {
                     integration.flush();
                 }

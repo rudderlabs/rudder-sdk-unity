@@ -49,9 +49,9 @@ public class Utils {
         return formatter.format(date);
     }
 
-    public static String getDeviceId(Context context) {
+    public static String getDeviceId(Application application) {
         if (Build.VERSION.SDK_INT >= 17) {
-            String androidId = getString(context.getContentResolver(), ANDROID_ID);
+            String androidId = getString(application.getContentResolver(), ANDROID_ID);
             if (!TextUtils.isEmpty(androidId)
                     && !"9774d56d682e549c".equals(androidId)
                     && !"unknown".equals(androidId)
@@ -101,5 +101,20 @@ public class Utils {
 
     public static int getUTF8Length(StringBuilder message) {
         return getUTF8Length(message.toString());
+    }
+
+    public static boolean isOnClassPath(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    public enum NetworkResponses {
+        SUCCESS,
+        ERROR,
+        WRITE_KEY_ERROR
     }
 }

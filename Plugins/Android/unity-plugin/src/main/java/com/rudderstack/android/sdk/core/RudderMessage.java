@@ -1,5 +1,6 @@
 package com.rudderstack.android.sdk.core;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.annotations.Expose;
@@ -45,9 +46,11 @@ public class RudderMessage {
     @SerializedName("groupId")
     private String groupId;
 
+    private transient RudderOption rudderOption;
+
     RudderMessage() {
-        context = RudderElementCache.getCachedContext();
-        this.anonymousId = context.getDeviceId();
+        this.context = RudderElementCache.getCachedContext();
+        this.anonymousId = RudderContext.getAnonymousId();
 
         Map<String, Object> traits = context.getTraits();
         if (traits != null && traits.containsKey("id")) {
@@ -168,5 +171,32 @@ public class RudderMessage {
      */
     public String getAnonymousId() {
         return anonymousId;
+    }
+
+    RudderOption getRudderOption() {
+        return rudderOption;
+    }
+
+    void setRudderOption(RudderOption rudderOption) {
+        this.rudderOption = rudderOption;
+    }
+
+    /**
+     * @return Returns message level context
+     */
+    @NonNull
+    public RudderContext getContext() {
+        return context;
+    }
+
+    void updateContext() {
+        this.context = RudderElementCache.getCachedContext();
+    }
+
+    /**
+     * @return Group ID for the event
+     */
+    public String getGroupId() {
+        return this.groupId;
     }
 }
