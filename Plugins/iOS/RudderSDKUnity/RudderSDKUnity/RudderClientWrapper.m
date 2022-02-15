@@ -100,4 +100,11 @@ static RSClient *_rudderClient;
     }
 }
 
++ (void) _setAnonymousId:(NSString *)_anonymousId {
+    [RSLogger logDebug:[[NSString alloc] initWithFormat:@"_setAnonymousId: %@", _anonymousId]];
+    if(_anonymousId != nil) {
+    [RSClient putAnonymousId:_anonymousId];
+    }
+}
+
 @end

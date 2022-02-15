@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 
 import com.rudderstack.android.sdk.core.util.Utils;
 
-import java.util.List;
 import java.util.Map;
 
 /*
@@ -23,6 +22,8 @@ public class RudderClient {
     private static Application application;
     private static String _advertisingId;
     private static String _anonymousId;
+    private static RudderOption defaultOptions;
+    private static String _deviceToken;
 
     /*
      * private constructor
@@ -60,6 +61,22 @@ public class RudderClient {
 
     /**
      * API for getting <b>RudderClient</b> instance with custom values for settings through
+     * RudderConfig
+     *
+     * @param context  Application context
+     * @param writeKey Your Android WriteKey from RudderStack dashboard
+     * @param config   Instance of RudderConfig for customised settings
+     * @param option   Instance of RudderOption for customizing integrations to which events to be sent
+     * @return RudderClient instance to be used further
+     */
+    @NonNull
+    public static RudderClient getInstance(@NonNull Context context, @Nullable String writeKey, @NonNull RudderConfig config, @Nullable RudderOption option) {
+        defaultOptions = option;
+        return getInstance(context, writeKey, config);
+    }
+
+    /**
+     * API for getting <b>RudderClient</b> instance with custom values for settings through
      * RudderConfig.Builder
      *
      * @param context  Application context
@@ -74,7 +91,7 @@ public class RudderClient {
             RudderLogger.logVerbose("getInstance: instance null. creating instance");
             // assert writeKey is not null or empty
             if (TextUtils.isEmpty(writeKey)) {
-                RudderLogger.logError("RudderClient: getInstance: writeKey can not be null or empty");
+                throw new IllegalArgumentException("RudderClient: getInstance: writeKey can not be null or empty");
             }
             // assert config is not null
             if (config == null) {
@@ -108,9 +125,9 @@ public class RudderClient {
             instance = new RudderClient();
 
             // initiate EventRepository class
-            if (application != null && writeKey != null) {
+            if (application != null) {
                 RudderLogger.logVerbose("getInstance: creating EventRepository.");
-                repository = new EventRepository(application, writeKey, config, _anonymousId, _advertisingId);
+                repository = new EventRepository(application, writeKey, config, _anonymousId, _advertisingId, _deviceToken);
             }
         }
         return instance;
@@ -157,6 +174,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void track(@NonNull RudderMessageBuilder builder) {
+        if (getOptOutStatus()) {
+            return;
+        }
         track(builder.build());
     }
 
@@ -167,6 +187,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void track(@NonNull RudderMessage message) {
+        if (getOptOutStatus()) {
+            return;
+        }
         message.setType(MessageType.TRACK);
         if (repository != null) {
             repository.dump(message);
@@ -181,6 +204,9 @@ public class RudderClient {
      * @param event Name of the event you want to track
      */
     public void track(@NonNull String event) {
+        if (getOptOutStatus()) {
+            return;
+        }
         track(new RudderMessageBuilder().setEventName(event).build());
     }
 
@@ -193,6 +219,9 @@ public class RudderClient {
      * @param property RudderProperty object you want to pass with the track call
      */
     public void track(@NonNull String event, @Nullable RudderProperty property) {
+        if (getOptOutStatus()) {
+            return;
+        }
         track(new RudderMessageBuilder().setEventName(event).setProperty(property).build());
     }
 
@@ -206,6 +235,9 @@ public class RudderClient {
      * @param option   Options related to this track call
      */
     public void track(@NonNull String event, @Nullable RudderProperty property, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
         track(new RudderMessageBuilder()
                 .setEventName(event)
                 .setProperty(property)
@@ -220,6 +252,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void screen(@NonNull RudderMessageBuilder builder) {
+        if (getOptOutStatus()) {
+            return;
+        }
         screen(builder.build());
     }
 
@@ -230,6 +265,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void screen(@NonNull RudderMessage message) {
+        if (getOptOutStatus()) {
+            return;
+        }
         message.setType(MessageType.SCREEN);
         if (repository != null) {
             repository.dump(message);
@@ -244,6 +282,9 @@ public class RudderClient {
      * @param screenName Name of the screen
      */
     public void screen(@NonNull String screenName) {
+        if (getOptOutStatus()) {
+            return;
+        }
         RudderProperty property = new RudderProperty();
         property.put("name", screenName);
         screen(new RudderMessageBuilder().setEventName(screenName).setProperty(property).build());
@@ -256,6 +297,9 @@ public class RudderClient {
      * @param property   RudderProperty object you want to pass with the screen call
      */
     public void screen(@NonNull String screenName, @Nullable RudderProperty property) {
+        if (getOptOutStatus()) {
+            return;
+        }
         if (property == null) property = new RudderProperty();
         property.put("name", screenName);
         screen(new RudderMessageBuilder().setEventName(screenName).setProperty(property).build());
@@ -270,6 +314,9 @@ public class RudderClient {
      * @param option     Options related to this screen call
      */
     public void screen(@NonNull String screenName, @NonNull String category, @Nullable RudderProperty property, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
         if (property == null) property = new RudderProperty();
         property.put("category", category);
         property.put("name", screenName);
@@ -284,6 +331,9 @@ public class RudderClient {
      * @param option     Options related to this screen call
      */
     public void screen(@NonNull String screenName, @Nullable RudderProperty property, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
         if (property == null) {
             property = new RudderProperty();
         }
@@ -302,23 +352,10 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void identify(@NonNull RudderMessage message) {
-        // update cached traits and persist
-        RudderElementCache.updateTraits(message.getTraits());
-        RudderElementCache.persistTraits();
-
-        //  handle external Ids
-        RudderOption option = message.getRudderOption();
-        if (option != null) {
-            List<Map<String, Object>> externalIds = option.getExternalIds();
-            if (externalIds != null && !externalIds.isEmpty()) {
-                RudderElementCache.updateExternalIds(externalIds);
-            }
+        if (getOptOutStatus()) {
+            return;
         }
-
-        // set message type to identify
         message.setType(MessageType.IDENTIFY);
-        message.updateContext();
-
         // dump to repository
         if (repository != null) {
             repository.dump(message);
@@ -334,12 +371,17 @@ public class RudderClient {
      * @param option RudderOption object
      */
     public void identify(@NonNull RudderTraits traits, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
+
         RudderMessage message = new RudderMessageBuilder()
                 .setEventName(MessageType.IDENTIFY)
                 .setUserId(traits.getId())
                 .setRudderOption(option)
                 .build();
         message.updateTraits(traits);
+        message.updateExternalIds(option);
         identify(message);
     }
 
@@ -349,6 +391,9 @@ public class RudderClient {
      * @param traits RudderTraits object
      */
     public void identify(@NonNull RudderTraits traits) {
+        if (getOptOutStatus()) {
+            return;
+        }
         identify(traits, null);
     }
 
@@ -358,6 +403,9 @@ public class RudderClient {
      * @param builder RudderTraitsBuilder object
      */
     public void identify(@NonNull RudderTraitsBuilder builder) {
+        if (getOptOutStatus()) {
+            return;
+        }
         identify(builder.build());
     }
 
@@ -369,6 +417,9 @@ public class RudderClient {
      * @param userId userId of your User
      */
     public void identify(@NonNull String userId) {
+        if (getOptOutStatus()) {
+            return;
+        }
         identify(new RudderTraitsBuilder().setId(userId));
     }
 
@@ -382,6 +433,9 @@ public class RudderClient {
      * @param option Extra options using RudderOption class
      */
     public void identify(@NonNull String userId, @Nullable RudderTraits traits, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
         // create new traits object from cache if supplied traits is null
         if (traits == null) {
             traits = new RudderTraits();
@@ -399,6 +453,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void alias(@NonNull RudderMessageBuilder builder) {
+        if (getOptOutStatus()) {
+            return;
+        }
         alias(builder.build());
     }
 
@@ -409,6 +466,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     void alias(@NonNull RudderMessage message) {
+        if (getOptOutStatus()) {
+            return;
+        }
         message.setType(MessageType.ALIAS);
         if (repository != null) {
             repository.dump(message);
@@ -423,6 +483,9 @@ public class RudderClient {
      * @param newId New userId for the user
      */
     public void alias(String newId) {
+        if (getOptOutStatus()) {
+            return;
+        }
         alias(newId, null);
     }
 
@@ -435,10 +498,10 @@ public class RudderClient {
      * @param option RudderOptions for this event
      */
     public void alias(@NonNull String newId, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
         Map<String, Object> traits = getRudderContext().getTraits();
-        RudderMessageBuilder builder = new RudderMessageBuilder()
-                .setUserId(newId)
-                .setRudderOption(option);
 
         String prevUserId = null;
         if (traits.containsKey("userId")) {
@@ -449,15 +512,16 @@ public class RudderClient {
             prevUserId = RudderContext.getAnonymousId();
         }
 
-        builder.setPreviousId(prevUserId);
         traits.put("userId", newId);
         traits.put("id", newId);
-        RudderMessage message = builder.build();
+
+        RudderMessage message = new RudderMessageBuilder()
+                .setUserId(newId)
+                .setRudderOption(option)
+                .setPreviousId(prevUserId)
+                .build();
+
         message.updateTraits(traits);
-
-        RudderElementCache.updateTraits(traits);
-        RudderElementCache.persistTraits();
-
         alias(message);
     }
 
@@ -470,6 +534,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void group(@NonNull RudderMessageBuilder builder) {
+        if (getOptOutStatus()) {
+            return;
+        }
         group(builder.build());
     }
 
@@ -480,6 +547,9 @@ public class RudderClient {
      * @deprecated Will be removed soon
      */
     public void group(@NonNull RudderMessage message) {
+        if (getOptOutStatus()) {
+            return;
+        }
         message.setType(MessageType.GROUP);
         if (repository != null) {
             repository.dump(message);
@@ -494,6 +564,9 @@ public class RudderClient {
      * @param groupId Group ID you want your user to attach to
      */
     public void group(@NonNull String groupId) {
+        if (getOptOutStatus()) {
+            return;
+        }
         group(groupId, null);
     }
 
@@ -506,6 +579,9 @@ public class RudderClient {
      * @param traits  Traits of the group
      */
     public void group(@NonNull String groupId, @Nullable RudderTraits traits) {
+        if (getOptOutStatus()) {
+            return;
+        }
         group(groupId, traits, null);
     }
 
@@ -519,6 +595,9 @@ public class RudderClient {
      * @param option  Options for this group call
      */
     public void group(@NonNull String groupId, @Nullable RudderTraits traits, @Nullable RudderOption option) {
+        if (getOptOutStatus()) {
+            return;
+        }
         RudderMessage message = new RudderMessageBuilder()
                 .setGroupId(groupId)
                 .setGroupTraits(traits)
@@ -545,6 +624,9 @@ public class RudderClient {
      * @return cached RudderContext object
      */
     public RudderContext getRudderContext() {
+        if (getOptOutStatus()) {
+            return null;
+        }
         return RudderElementCache.getCachedContext();
     }
 
@@ -554,13 +636,30 @@ public class RudderClient {
      * <b>Call this method before initializing the RudderClient</b>
      *
      * @param advertisingId IDFA for the device
+     *
+     * @deprecated Will be removed soon
      */
-    public static void updateWithAdvertisingId(@Nullable String advertisingId) {
-        if (instance != null) {
-            RudderLogger.logWarn("Set the advertisingId before calling getInstance");
+    public static void updateWithAdvertisingId(@NonNull String advertisingId) {
+        RudderClient.putAdvertisingId(advertisingId);
+    }
+
+    /**
+     * Set the AdvertisingId yourself. If set, SDK will not capture idfa automatically
+     *
+     * <b>Call this method before initializing the RudderClient</b>
+     *
+     * @param advertisingId IDFA for the device
+     */
+    public static void putAdvertisingId(@NonNull String advertisingId) {
+        if (instance == null) {
+            // rudder sdk is not initialised yet. let's use the advertisingId from the beginning
+            _advertisingId = advertisingId;
             return;
         }
-        _advertisingId = advertisingId;
+        if (getOptOutStatus()) {
+            return;
+        }
+        RudderElementCache.cachedContext.updateWithAdvertisingId(advertisingId);
     }
 
     /**
@@ -568,7 +667,15 @@ public class RudderClient {
      *
      * @param deviceToken Push Token from FCM
      */
-    public void putDeviceToken(@Nullable String deviceToken) {
+    public static void putDeviceToken(@NonNull String deviceToken) {
+        if (instance == null) {
+            // rudder sdk is not initialised yet. let's use the deviceToken from the beginning
+            _deviceToken = deviceToken;
+            return;
+        }
+        if (getOptOutStatus()) {
+            return;
+        }
         RudderElementCache.cachedContext.putDeviceToken(deviceToken);
     }
 
@@ -576,13 +683,30 @@ public class RudderClient {
      * Set the anonymousId for the device to be used further
      *
      * @param anonymousId AnonymousId you want to use for the application
+     *
+     * @deprecated Will be removed soon
      */
-    public static void setAnonymousId(String anonymousId) {
-        if (instance != null) {
-            RudderLogger.logWarn("Set the anonymousId before calling getInstance");
+    public static void setAnonymousId(@NonNull String anonymousId) {
+        RudderClient.putAnonymousId(anonymousId);
+    }
+
+    /**
+     * Set the anonymousId for the device to be used further
+     *
+     * @param anonymousId AnonymousId you want to use for the application
+     */
+    public static void putAnonymousId(@NonNull String anonymousId) {
+        if (instance == null) {
+            // rudder sdk is not initialised yet. let's use the anonymousId from the beginning
+            _anonymousId = anonymousId;
             return;
         }
-        _anonymousId = anonymousId;
+        if (getOptOutStatus()) {
+            return;
+        }
+        if (repository != null) {
+            repository.updateAnonymousId(anonymousId);
+        }
     }
 
     /**
@@ -599,9 +723,50 @@ public class RudderClient {
      * Flush Events
      */
     public void flush() {
+        if (getOptOutStatus()) {
+            return;
+        }
         if (repository != null) {
             repository.flush();
         }
+    }
+
+    /**
+     * To retrieve OptOut status
+     *
+     * @return true, if either SDK is not initialised or OptOut status is set to true else it return false
+     */
+    private static boolean getOptOutStatus() {
+        if (repository == null) {
+            RudderLogger.logError("SDK is not initialised. Hence dropping the event");
+            return true;
+        }
+        if (repository.getOptStatus()) {
+            RudderLogger.logDebug("User Opted out for tracking the activity, hence dropping the event");
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Opts out a user from tracking the activity. When enabled all the events will be dropped by the SDK.
+     *
+     * @param optOut Boolean value to store optOut status
+     */
+    public void optOut(boolean optOut) {
+        if (repository != null) {
+            repository.saveOptStatus(optOut);
+            RudderLogger.logInfo("optOut() flag is set to " + optOut);
+        } else {
+            RudderLogger.logError("SDK is not initialised. Hence aborting optOut API call");
+        }
+    }
+
+    /**
+     * Stops this instance from accepting further requests.
+     */
+    public void shutdown() {
+        // TODO: decide shutdown behavior
     }
 
     /**
@@ -611,15 +776,19 @@ public class RudderClient {
      * @param callback RudderClient.Callback object
      */
     public void onIntegrationReady(String key, Callback callback) {
+        if (getOptOutStatus()) {
+            return;
+        }
         if (repository != null) {
             repository.onIntegrationReady(key, callback);
         }
     }
 
-    public void optOut() {
-        if (repository != null) {
-            repository.optOut();
-        }
+    /**
+     * @return default RudderOption object which was set on the initialization of sdk
+     */
+    static RudderOption getDefaultOptions() {
+        return defaultOptions;
     }
 
     /**
@@ -627,12 +796,6 @@ public class RudderClient {
      */
     public interface Callback {
         void onReady(Object instance);
-    }
-
-    public void shutdown() {
-        if (repository != null) {
-            repository.shutdown();
-        }
     }
 
     /*

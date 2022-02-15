@@ -6,10 +6,13 @@ import android.content.Context;
 import android.provider.Settings;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
+import com.rudderstack.android.sdk.core.util.RudderTraitsSerializer;
 import com.rudderstack.android.sdk.core.util.Utils;
 
 import java.util.ArrayList;
@@ -43,6 +46,7 @@ public class RudderContext {
     private String timezone;
     @SerializedName("externalId")
     private List<Map<String, Object>> externalIds = null;
+    public Map<String, Object> customContextMap = null;
 
     private static transient String _anonymousId;
 
@@ -51,16 +55,20 @@ public class RudderContext {
         // cachedContext is used every time, once initialized
     }
 
-    RudderContext(Application application, String anonymousId, String advertisingId) {
+    RudderContext(Application application, String anonymousId, String advertisingId, String deviceToken) {
+        RudderPreferenceManager preferenceManger = RudderPreferenceManager.getInstance(application);
+
         if (TextUtils.isEmpty(anonymousId)) {
-            anonymousId = Utils.getDeviceId(application);
+            anonymousId = preferenceManger.getAnonymousId() != null ? preferenceManger.getAnonymousId() : Utils.getDeviceId(application);
+        } else {
+            preferenceManger.saveAnonymousId(anonymousId);
         }
+
         _anonymousId = anonymousId;
 
         this.app = new RudderApp(application);
 
         // get saved traits from prefs. if not present create new one and save
-        RudderPreferenceManager preferenceManger = RudderPreferenceManager.getInstance(application);
         String traitsJson = preferenceManger.getTraits();
         RudderLogger.logDebug(String.format(Locale.US, "Traits from persistence storage%s", traitsJson));
         if (traitsJson == null) {
@@ -83,12 +91,19 @@ public class RudderContext {
 
         this.screenInfo = new RudderScreenInfo(application);
         this.userAgent = System.getProperty("http.agent");
-        this.deviceInfo = new RudderDeviceInfo(advertisingId);
+        this.deviceInfo = new RudderDeviceInfo(advertisingId, deviceToken);
         this.networkInfo = new RudderNetwork(application);
         this.osInfo = new RudderOSInfo();
         this.libraryInfo = new RudderLibraryInfo();
         this.locale = Locale.getDefault().getLanguage() + "-" + Locale.getDefault().getCountry();
         this.timezone = Utils.getTimeZone();
+    }
+
+    void resetTraits() {
+        RudderTraits traits = new RudderTraits();
+        // convert the whole traits to map and take care of the extras
+        Gson gson = new GsonBuilder().registerTypeAdapter(RudderTraits.class, new RudderTraitsSerializer()).create();
+        this.traits = Utils.convertToMap(gson.toJson(traits));
     }
 
     void updateTraits(RudderTraits traits) {
@@ -98,13 +113,26 @@ public class RudderContext {
         }
 
         // convert the whole traits to map and take care of the extras
-        Map<String, Object> traitsMap = Utils.convertToMap(new Gson().toJson(traits));
-        if (traits.getExtras() != null) {
-            traitsMap.putAll(traits.getExtras());
+        Gson gson = new GsonBuilder().registerTypeAdapter(RudderTraits.class, new RudderTraitsSerializer()).create();
+        Map<String, Object> traitsMap = Utils.convertToMap(gson.toJson(traits));
+
+        String existingId = (String) this.traits.get("id");
+        String newId = (String) traitsMap.get("id");
+
+        // If a user is already loggedIn and then a new user tries to login
+        if (existingId != null && newId != null && !existingId.equals(newId)) {
+            this.traits = traitsMap;
+            resetExternalIds();
+            return;
         }
 
         // update traits object here
-        this.traits = traitsMap;
+        this.traits.putAll(traitsMap);
+
+    }
+
+    void updateAnonymousIdTraits() {
+        this.traits.put("anonymousId", _anonymousId);
     }
 
     void persistTraits() {
@@ -196,7 +224,7 @@ public class RudderContext {
             return false;
         }
 
-        if (this.deviceInfo.getAdvertisingId() == null || this.deviceInfo.getAdvertisingId().isEmpty()) {
+        if (TextUtils.isEmpty(this.deviceInfo.getAdvertisingId())) {
             // set the values if and only if the values are not set
             // if value exists, it must have been set by the developer. don't overwrite
             this.deviceInfo.setAdvertisingId((String) advertisingInfo.getClass().getMethod("getId").invoke(advertisingInfo));
@@ -221,7 +249,7 @@ public class RudderContext {
             return false;
         }
 
-        if (this.deviceInfo.getAdvertisingId() == null || this.deviceInfo.getAdvertisingId().isEmpty()) {
+        if (TextUtils.isEmpty(this.deviceInfo.getAdvertisingId())) {
             // set the values if and only if the values are not set
             // if value exists, it must have been set by the developer. don't overwrite
             this.deviceInfo.setAdvertisingId(Settings.Secure.getString(contentResolver, "advertising_id"));
@@ -264,33 +292,70 @@ public class RudderContext {
         return externalIds;
     }
 
-    void updateExternalIds(@Nullable List<Map<String, Object>> externalIds) {
-        try {
-            RudderPreferenceManager preferenceManger = null;
-            Application application = RudderClient.getApplication();
-            if (application != null) {
-                preferenceManger = RudderPreferenceManager.getInstance(application);
-            }
-
-            // update local variable
-            this.externalIds = externalIds;
-
-            if (preferenceManger != null) {
-                if (externalIds == null) {
-                    // clear persistence storage : RESET call
-                    preferenceManger.clearExternalIds();
-                } else {
-                    // update persistence storage
-                    preferenceManger.saveExternalIds(new Gson().toJson(this.externalIds));
+    void updateExternalIds(@NonNull List<Map<String, Object>> externalIds) {
+        // update local variable
+        if (this.externalIds == null) {
+            this.externalIds = new ArrayList<>();
+            this.externalIds.addAll(externalIds);
+            return;
+        }
+        for (Map<String, Object> newExternalId : externalIds) {
+            String newExternalIdType = (String) newExternalId.get("type");
+            boolean typeAlreadyExists = false;
+            if (newExternalIdType != null) {
+                for (Map<String, Object> existingExternalId : this.externalIds) {
+                    String existingExternalIdType = (String) existingExternalId.get("type");
+                    if (existingExternalIdType != null && existingExternalIdType.equals(newExternalIdType)) {
+                        typeAlreadyExists = true;
+                        existingExternalId.put("id", newExternalId.get("id"));
+                    }
                 }
+                if (!typeAlreadyExists) {
+                    this.externalIds.add(newExternalId);
+                }
+            }
+        }
+    }
+
+    void persistExternalIds() {
+        // persist updated externalIds to shared preferences
+        try {
+            if (RudderClient.getApplication() != null) {
+                RudderPreferenceManager preferenceManger = RudderPreferenceManager.getInstance(RudderClient.getApplication());
+                preferenceManger.saveExternalIds(new Gson().toJson(this.externalIds));
             }
         } catch (NullPointerException ex) {
             RudderLogger.logError(ex);
         }
     }
 
+    void resetExternalIds() {
+        this.externalIds = null;
+        // reset externalIds from shared preferences
+        try {
+            if (RudderClient.getApplication() != null) {
+                RudderPreferenceManager preferenceManger = RudderPreferenceManager.getInstance(RudderClient.getApplication());
+                preferenceManger.clearExternalIds();
+            }
+        } catch (NullPointerException ex) {
+            RudderLogger.logError(ex);
+        }
+    }
+
+    void setCustomContexts(Map<String, Object> customContexts) {
+        if (customContexts == null)
+            return;
+        if (this.customContextMap == null)
+            this.customContextMap = new HashMap<>();
+        this.customContextMap.putAll(customContexts);
+    }
+
     static String getAnonymousId() {
         return _anonymousId;
+    }
+
+    static void updateAnonymousId(@NonNull String anonymousId) {
+        _anonymousId = anonymousId;
     }
 
     RudderContext copy() {
