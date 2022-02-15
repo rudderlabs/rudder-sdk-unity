@@ -83,6 +83,12 @@ static RSClient *_rudderClient;
     [_rudderClient identify:_userId traits:traitsDict options:optinsDict];
 }
 
++ (void)setAnonymousId:(NSString *)_anonymousId {
+    if(anonymousId != nil) {
+    [RSClient putAnonymousId:anonymousId];
+    }
+}
+
 + (void)_reset {
     if (_rudderClient == nil) return;
     [_rudderClient reset];
