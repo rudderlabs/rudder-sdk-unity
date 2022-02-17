@@ -27,7 +27,7 @@ static RSClient *_rudderClient;
         recordScreenViews:(BOOL)_recordScreenViews
                  logLevel:(int)_logLevel {
     if (_rudderClient == nil) {
-        [RSClient putAnonymousId:_anonymousId];
+        [RSClient putAnonymousId: _anonymousId];
         RSConfigBuilder *builder = [[RSConfigBuilder alloc] init];
         [builder withDataPlaneUrl:_dataPlaneUrl];
         [builder withControlPlaneUrl:_controlPlaneUrl];
@@ -53,10 +53,20 @@ static RSClient *_rudderClient;
     RSMessageBuilder *builder = [[RSMessageBuilder alloc] init];
     [builder setEventName:_eventName];
     [builder setPropertyDict:[self _convertToDict:_eventPropsJson]];
-    [builder setUserProperty:[self _convertToDict:_userPropsJson]];
-//    [builder setRudderOption:[self _convertToDict:_optionsJson]];
-    
-    if ([_eventType isEqualToString:@"track"]) {
+  
+// if(_userPropsJson != nil) {
+//     NSDictionary<NSString*, NSObject*>* userTraitsDict = [self _convertToDict:_userPropsJson];
+//     RSTraits *traits = [[RSTraits alloc] initWithDict:userTraitsDict];
+//     [builder setTraits:traits];
+// }
+
+if(_optionsJson != nil) {
+     NSDictionary<NSString*, NSObject*>* optionsDict = [self _convertToDict:_optionsJson];
+     RSOption *option = [self _getRudderOptionsObject:optionsDict];
+     [builder setRSOption:option];
+}
+
+  if ([_eventType isEqualToString:@"track"]) {
         [_rudderClient trackMessage:[builder build]];
     } else if ([_eventType isEqualToString:@"screen"]) {
         [_rudderClient screenWithMessage:[builder build]];
@@ -68,24 +78,26 @@ static RSClient *_rudderClient;
 
 + (void)_identify:(NSString *)_userId traitsJson:(NSString *)_traitsJson optionsJson:(NSString *)_optionsJson {
     NSDictionary *traitsDict = [self _convertToDict:_traitsJson];
-    if (traitsDict == nil) {
-        // if traits is not filled in, fill with anonymousId
-        traitsDict = @{@"anonymousId": [RSElementCache getAnonymousId]};
-    } else {
-        // if anonymousId is not filled in
-        NSString *anonymoysId = [traitsDict valueForKey:@"anonymousId"];
-        if (anonymoysId == nil) {
-            [[traitsDict mutableCopy] setObject:[RSElementCache getAnonymousId] forKey:@"anonymousId"];
-        }
+    
+    RSOption *option = nil;
+    if(_optionsJson != nil) {
+      NSDictionary<NSString*, NSObject*>* optionsDict = [self _convertToDict:_optionsJson];
+      option = [self _getRudderOptionsObject:optionsDict];
     }
-    NSDictionary *optinsDict = [self _convertToDict:_optionsJson];
     // make the identify call
-    [_rudderClient identify:_userId traits:traitsDict options:optinsDict];
+    [_rudderClient identify:_userId traits:traitsDict options:option];
 }
 
 + (void)_reset {
     if (_rudderClient == nil) return;
     [_rudderClient reset];
+}
+
++ (void) _setAnonymousId:(NSString *)_anonymousId {
+    [RSLogger logDebug:[[NSString alloc] initWithFormat:@"_setAnonymousId: %@", _anonymousId]];
+    if(_anonymousId != nil) {
+    [RSClient putAnonymousId:_anonymousId];
+    }
 }
 
 + (NSDictionary<NSString*, NSObject*>*) _convertToDict: (NSString*) _json {
@@ -100,11 +112,24 @@ static RSClient *_rudderClient;
     }
 }
 
-+ (void) _setAnonymousId:(NSString *)_anonymousId {
-    [RSLogger logDebug:[[NSString alloc] initWithFormat:@"_setAnonymousId: %@", _anonymousId]];
-    if(_anonymousId != nil) {
-    [RSClient putAnonymousId:_anonymousId];
++ (RSOption*) _getRudderOptionsObject:(NSDictionary *) optionsDict {
+    RSOption * options = [[RSOption alloc]init];
+    if([optionsDict objectForKey:@"externalIds"])
+    {
+        NSArray *externalIdsArray =  [optionsDict objectForKey:@"externalIds"];
+        for(NSDictionary *externalId in externalIdsArray) {
+            [options putExternalId:[externalId objectForKey:@"type"] withId:[externalId objectForKey:@"id"]];
+        }
     }
+    if([optionsDict objectForKey:@"integrations"])
+    {
+        NSDictionary *integrationsDict = [optionsDict objectForKey:@"integrations"];
+        for(NSString* key in integrationsDict)
+        {
+            [options putIntegration:key isEnabled:[[integrationsDict objectForKey:key] boolValue]];
+        }
+    }
+    return options;
 }
 
 @end

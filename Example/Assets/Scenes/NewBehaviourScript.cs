@@ -15,7 +15,7 @@ public class NewBehaviourScript : MonoBehaviour
         RudderClient.SerializeSqlite();
 
         RudderConfig config = new RudderConfigBuilder()
-          .WithDataPlaneUrl("https://702b-175-101-36-4.ngrok.io")
+          .WithDataPlaneUrl("https://f1a9-61-95-158-116.ngrok.io")
           .WithLogLevel(RudderLogLevel.VERBOSE)
           .Build();
         rudderClient = RudderClient.GetInstance("1pAKRv50y15Ti6UWpYroGJaO0Dj", config);
