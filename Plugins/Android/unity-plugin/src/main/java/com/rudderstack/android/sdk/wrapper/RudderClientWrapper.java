@@ -1,16 +1,17 @@
 package com.rudderstack.android.sdk.wrapper;
 
-import android.app.Application;
 import android.content.Context;
 import android.text.TextUtils;
 import com.rudderstack.android.sdk.core.RudderClient;
 import com.rudderstack.android.sdk.core.RudderConfig;
 import com.rudderstack.android.sdk.core.RudderLogger;
-import com.rudderstack.android.sdk.core.RudderMessage;
 import com.rudderstack.android.sdk.core.RudderMessageBuilder;
 import com.rudderstack.android.sdk.core.RudderOption;
 import com.rudderstack.android.sdk.core.RudderTraits;
+import com.rudderstack.android.sdk.core.RudderTraitsBuilder;
 import com.rudderstack.android.sdk.core.util.Utils;
+
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -148,7 +149,7 @@ public class RudderClientWrapper {
     }
   }
 
-  public RudderTraits _getRudderTraitsObject(Map<String, Object> traitsMap) {
+  public static RudderTraits _getRudderTraitsObject(Map<String, Object> traitsMap) {
         RudderTraitsBuilder builder = new RudderTraitsBuilder();
         if (traitsMap.containsKey("address")) {
             Map<String, Object> addressMap = (Map<String, Object>) traitsMap.get(
@@ -239,7 +240,7 @@ public class RudderClientWrapper {
         return traits;
     }
 
-    public RudderOption _getRudderOptionsObject(
+    public static RudderOption _getRudderOptionsObject(
             Map<String, Object> optionsMap
     ) {
         RudderOption option = new RudderOption();
