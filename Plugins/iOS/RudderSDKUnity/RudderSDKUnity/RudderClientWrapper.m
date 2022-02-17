@@ -27,7 +27,7 @@ static RSClient *_rudderClient;
         recordScreenViews:(BOOL)_recordScreenViews
                  logLevel:(int)_logLevel {
     if (_rudderClient == nil) {
-        [RSElementCache setAnonymousId:_anonymousId];
+        [RSClient putAnonymousId:_anonymousId];
         RSConfigBuilder *builder = [[RSConfigBuilder alloc] init];
         [builder withDataPlaneUrl:_dataPlaneUrl];
         [builder withControlPlaneUrl:_controlPlaneUrl];
