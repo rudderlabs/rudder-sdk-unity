@@ -47,6 +47,8 @@ namespace RudderStack
         private static extern void _reset();
         [DllImport("__Internal")]
         private static extern void _serializeSqlite();
+        [DllImport("__Internal")]
+        private static extern void _setAnonymousId(string _anonymousId);
 #endif
 
         private static RudderClient _instance;
@@ -96,7 +98,7 @@ namespace RudderStack
             }
 #endif
 
-// initialize iOS
+            // initialize iOS
 #if UNITY_IPHONE
             RudderLogger.LogDebug("Initializing iOS Core SDK");
             if (Application.platform == RuntimePlatform.IPhonePlayer)
@@ -296,6 +298,26 @@ namespace RudderStack
             if (Application.platform == RuntimePlatform.IPhonePlayer)
             {
                 _reset();
+            }
+#endif
+        }
+
+        public void setAnonymousId(string _anonymousId)
+        {
+            RudderLogger.LogDebug("SetAnonymousId: " + _anonymousId);
+#if UNITY_ANDROID
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                androidClientClass.CallStatic(
+                    "_setAnonymousId",
+                    _anonymousId
+                );
+            }
+#endif
+#if UNITY_IPHONE
+            if (Application.platform == RuntimePlatform.IPhonePlayer)
+            {
+                _setAnonymousId(_anonymousId);
             }
 #endif
         }

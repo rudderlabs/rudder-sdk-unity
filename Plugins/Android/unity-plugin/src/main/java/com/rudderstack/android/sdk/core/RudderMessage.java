@@ -3,11 +3,11 @@ package com.rudderstack.android.sdk.core;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.rudderstack.android.sdk.core.util.Utils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +36,7 @@ public class RudderMessage {
     @SerializedName("userProperties")
     private Map<String, Object> userProperties;
     @SerializedName("integrations")
-    private Map<String, Boolean> integrations = new HashMap<>();
+    private Map<String, Object> integrations = new HashMap<>();
     @SerializedName("destinationProps")
     private Map<String, Map> destinationProps = null;
     @SerializedName("previousId")
@@ -47,6 +47,7 @@ public class RudderMessage {
     private String groupId;
 
     private transient RudderOption rudderOption;
+    private transient Map<String, Object> customContexts;
 
     RudderMessage() {
         this.context = RudderElementCache.getCachedContext();
@@ -91,11 +92,23 @@ public class RudderMessage {
     }
 
     void updateTraits(RudderTraits traits) {
-        this.context.updateTraits(traits);
+        RudderElementCache.updateTraits(traits);
+        updateContext();
     }
 
     void updateTraits(Map<String, Object> traits) {
-        this.context.updateTraitsMap(traits);
+        RudderElementCache.updateTraits(traits);
+        updateContext();
+    }
+
+    void updateExternalIds(RudderOption option) {
+        if (option != null) {
+            List<Map<String, Object>> externalIds = option.getExternalIds();
+            if (externalIds != null && !externalIds.isEmpty()) {
+                RudderElementCache.updateExternalIds(externalIds);
+                updateContext();
+            }
+        }
     }
 
     /**
@@ -158,8 +171,14 @@ public class RudderMessage {
     void setIntegrations(Map<String, Object> integrations) {
         if (integrations == null) return;
         for (String key : integrations.keySet()) {
-            this.integrations.put(key, (Boolean) integrations.get(key));
+            this.integrations.put(key, integrations.get(key));
         }
+    }
+
+    void setCustomContexts(Map<String, Object> customContexts) {
+        if (customContexts == null) return;
+        this.customContexts = customContexts;
+        this.context.setCustomContexts(customContexts);
     }
 
     public Map<String, Object> getTraits() {
@@ -179,6 +198,10 @@ public class RudderMessage {
 
     void setRudderOption(RudderOption rudderOption) {
         this.rudderOption = rudderOption;
+        if (rudderOption != null) {
+            setIntegrations(rudderOption.getIntegrations());
+            setCustomContexts(rudderOption.getCustomContexts());
+        }
     }
 
     /**
@@ -191,6 +214,8 @@ public class RudderMessage {
 
     void updateContext() {
         this.context = RudderElementCache.getCachedContext();
+        if (this.customContexts != null)
+            this.context.setCustomContexts(this.customContexts);
     }
 
     /**
@@ -198,5 +223,13 @@ public class RudderMessage {
      */
     public String getGroupId() {
         return this.groupId;
+    }
+
+    /**
+     * @return Integrations Map passed for the event
+     */
+    @NonNull
+    public Map<String, Object> getIntegrations() {
+        return this.integrations;
     }
 }

@@ -3,7 +3,6 @@ package com.rudderstack.android.sdk.core;
 import android.app.Application;
 
 import com.google.gson.Gson;
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import com.rudderstack.android.sdk.core.util.Utils;
 
@@ -46,10 +45,9 @@ public class RudderTraits {
     private String title;
     @SerializedName("username")
     private String userName;
-    @Expose(serialize = false)
-    private transient Map<String, Object> extras;
+    private Map<String, Object> extras;
 
-    private static final String ANONYMOUSID_KEY = "anonymousid";
+    private static final String ANONYMOUSID_KEY = "anonymousId";
     private static final String ADDRESS_KEY = "address";
     private static final String AGE_KEY = "age";
     private static final String BIRTHDAY_KEY = "birthday";
@@ -59,7 +57,7 @@ public class RudderTraits {
     private static final String EMAIL_KEY = "email";
     private static final String FIRSTNAME_KEY = "firstname";
     private static final String GENDER_KEY = "gender";
-    private static final String USERID_KEY = "userid";
+    private static final String USERID_KEY = "userId";
     private static final String LASTNAME_KEY = "lastname";
     private static final String NAME_KEY = "name";
     private static final String PHONE_KEY = "phone";

@@ -1,14 +1,21 @@
 package com.rudderstack.android.sdk.core;
 
 import android.app.Application;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabaseCorruptException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Queue;
 
 /*
  * Helper class for SQLite operations
@@ -20,10 +27,12 @@ class DBPersistentManager extends SQLiteOpenHelper {
     private static final String DB_NAME = "rl_persistence.db";
     // SQLite database version number
     private static final int DB_VERSION = 1;
-    private static final String EVENTS_TABLE_NAME = "events";
-    private static final String MESSAGE = "message";
+    static final String EVENTS_TABLE_NAME = "events";
+    static final String MESSAGE = "message";
     private static final String MESSAGE_ID = "id";
-    private static final String UPDATED = "updated";
+    static final String UPDATED = "updated";
+    DBInsertionHandlerThread dbInsertionHandlerThread;
+    final Queue<Message> queue = new LinkedList<Message>();
 
     /*
      * create table initially if not exists
@@ -41,18 +50,17 @@ class DBPersistentManager extends SQLiteOpenHelper {
      * */
     void saveEvent(String messageJson) {
         try {
-            SQLiteDatabase database = getWritableDatabase();
-            if (database.isOpen()) {
-                String saveEventSQL = String.format(Locale.US, "INSERT INTO %s (%s, %s) VALUES ('%s', %d)",
-                        EVENTS_TABLE_NAME, MESSAGE, UPDATED, messageJson.replaceAll("'", "\\\\\'"), System.currentTimeMillis());
-                RudderLogger.logDebug(String.format(Locale.US, "DBPersistentManager: saveEvent: saveEventSQL: %s", saveEventSQL));
-                database.execSQL(saveEventSQL);
-                RudderLogger.logInfo("DBPersistentManager: saveEvent: Event saved to DB");
-            } else {
-                RudderLogger.logError("DBPersistentManager: saveEvent: database is not writable");
+            Message msg = new Message().obtain();
+            msg.obj = messageJson;
+            if (dbInsertionHandlerThread == null) {
+                queue.add(msg);
+                return;
             }
-        } catch (SQLiteDatabaseCorruptException ex) {
-            RudderLogger.logError(ex);
+            synchronized (this) {
+                dbInsertionHandlerThread.addMessage(msg);
+            }
+        } catch (Exception e) {
+            RudderLogger.logError(e.getCause());
         }
     }
 
@@ -195,11 +203,25 @@ class DBPersistentManager extends SQLiteOpenHelper {
 
     private DBPersistentManager(Application application) {
         super(application, DB_NAME, null, DB_VERSION);
-        try {
-            getWritableDatabase();
-        } catch (SQLiteDatabaseCorruptException ex) {
-            RudderLogger.logError(ex);
-        }
+
+        // Need to perform db operations on a separate thread to support strict mode.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    DBPersistentManager.this.getWritableDatabase();
+                    synchronized (this) {
+                        dbInsertionHandlerThread = new DBInsertionHandlerThread("db_insertion_thread", DBPersistentManager.this.getWritableDatabase());
+                        dbInsertionHandlerThread.start();
+                        for (Message msg : queue) {
+                            dbInsertionHandlerThread.addMessage(msg);
+                        }
+                    }
+                } catch (SQLiteDatabaseCorruptException ex) {
+                    RudderLogger.logError(ex);
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -226,6 +248,50 @@ class DBPersistentManager extends SQLiteOpenHelper {
             }
         } catch (SQLiteDatabaseCorruptException ex) {
             RudderLogger.logError(ex);
+        }
+    }
+}
+
+class DBInsertionHandlerThread extends HandlerThread {
+
+    DBInsertionHandler dbInsertionHandler;
+    SQLiteDatabase database;
+
+    public DBInsertionHandlerThread(String name, SQLiteDatabase database) {
+        super(name);
+        this.database = database;
+    }
+
+    public void addMessage(Message message) {
+        if (dbInsertionHandler == null) {
+            dbInsertionHandler = new DBInsertionHandler(getLooper(), this.database);
+        }
+        dbInsertionHandler.sendMessage(message);
+    }
+
+    private class DBInsertionHandler extends Handler {
+        SQLiteDatabase database;
+
+        public DBInsertionHandler(Looper looper, SQLiteDatabase database) {
+            super(looper);
+            this.database = database;
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (this.database.isOpen()) {
+                String messageJson = (String) msg.obj;
+                long updatedTime = System.currentTimeMillis();
+                RudderLogger.logDebug(String.format(Locale.US, "DBPersistentManager: saveEvent: Inserting Message %s into table %s as Updated at %d", messageJson.replaceAll("'", "\\\\\'"), DBPersistentManager.EVENTS_TABLE_NAME, updatedTime));
+                ContentValues insertValues = new ContentValues();
+                insertValues.put(DBPersistentManager.MESSAGE, messageJson.replaceAll("'", "\\\\\'"));
+                insertValues.put(DBPersistentManager.UPDATED, updatedTime);
+                database.insert(DBPersistentManager.EVENTS_TABLE_NAME, null, insertValues);
+                RudderLogger.logInfo("DBPersistentManager: saveEvent: Event saved to DB");
+            } else {
+                RudderLogger.logError("DBPersistentManager: saveEvent: database is not writable");
+            }
         }
     }
 }

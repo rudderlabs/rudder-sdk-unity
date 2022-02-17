@@ -5,3 +5,9 @@
 **/Build/
 **/.DS_Store
 **/.vs
+/Example/Android Build/*
+/Example/iOS Build/*
+/Example/UserSettings/*
+.vsconfig
+/Example/Assets/Resources/*
+
