@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (void) _reset;
 
-+ (void) _setAnonymousId:(NSString *)_anonymousId;
++ (void) _setAnonymousId: (NSString*) _anonymousId;
 
 @end
 

@@ -35,8 +35,6 @@ extern "C" {
     
     void _reset();
 
-    void _setAnonymousId(const char* _anonymousId);
-
 #ifdef __cplusplus
 }
 #endif

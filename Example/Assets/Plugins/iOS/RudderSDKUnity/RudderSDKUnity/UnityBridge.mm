@@ -58,10 +58,6 @@ extern "C"
         [RudderClientWrapper _reset];
     }
 
-    void _setAnonymousId(const char* _anonymousId) {
-        [RudderClientWrapper _setAnonymousId:[[NSString alloc] initWithUTF8String:_anonymousId]];
-    }
-
     void _serializeSqlite() {
         sqlite3_config(SQLITE_CONFIG_SERIALIZED);
     }
