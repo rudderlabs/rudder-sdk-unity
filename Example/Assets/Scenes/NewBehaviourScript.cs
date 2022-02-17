@@ -36,7 +36,7 @@ public class NewBehaviourScript : MonoBehaviour
         options.Add("externalIds", externalIds);
 
         RudderConfig config = new RudderConfigBuilder()
-          .WithDataPlaneUrl("https://f1a9-61-95-158-116.ngrok.io")
+          .WithDataPlaneUrl("https://ccfa-175-101-36-4.ngrok.io")
           .WithLogLevel(RudderLogLevel.VERBOSE)
           .Build();
         rudderClient = RudderClient.GetInstance("1pAKRv50y15Ti6UWpYroGJaO0Dj", config);
