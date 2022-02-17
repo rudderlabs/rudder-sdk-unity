@@ -2,6 +2,7 @@ package com.rudderstack.android.sdk.wrapper;
 
 import android.content.Context;
 import android.text.TextUtils;
+
 import com.rudderstack.android.sdk.core.RudderClient;
 import com.rudderstack.android.sdk.core.RudderConfig;
 import com.rudderstack.android.sdk.core.RudderLogger;
@@ -17,139 +18,139 @@ import java.util.Map;
 
 public class RudderClientWrapper {
 
-  private static RudderClient rudderClient;
+    private static RudderClient rudderClient;
 
-  public static void _initiateInstance(
-    Context _context,
-    String _anonymousId,
-    String _writeKey,
-    String _dataPlaneUrl,
-    String _controlPlaneUrl,
-    int _flushQueueSize,
-    int _dbCountThreshold,
-    int _sleepTimeout,
-    int _configRefreshInterval,
-    boolean _trackLifecycleEvents,
-    boolean _recordScreenViews,
-    int _logLevel
-  ) {
-    if (rudderClient == null) {
-      if (_context == null) {
-        RudderLogger.logError("Context can not be null");
-        return;
-      }
+    public static void _initiateInstance(
+            Context _context,
+            String _anonymousId,
+            String _writeKey,
+            String _dataPlaneUrl,
+            String _controlPlaneUrl,
+            int _flushQueueSize,
+            int _dbCountThreshold,
+            int _sleepTimeout,
+            int _configRefreshInterval,
+            boolean _trackLifecycleEvents,
+            boolean _recordScreenViews,
+            int _logLevel
+    ) {
+        if (rudderClient == null) {
+            if (_context == null) {
+                RudderLogger.logError("Context can not be null");
+                return;
+            }
 
-      if (TextUtils.isEmpty(_writeKey)) {
-        RudderLogger.logError("WriteKey can not be null or empty");
-        return;
-      }
+            if (TextUtils.isEmpty(_writeKey)) {
+                RudderLogger.logError("WriteKey can not be null or empty");
+                return;
+            }
 
-      if(_anonymousId != null) {
-      RudderClient.putAnonymousId(_anonymousId);
-      }
-      
-      RudderConfig config = new RudderConfig.Builder()
-        .withDataPlaneUrl(_dataPlaneUrl)
-        .withControlPlaneUrl(_controlPlaneUrl)
-        .withFlushQueueSize(_flushQueueSize)
-        .withDbThresholdCount(_dbCountThreshold)
-        .withSleepCount(_sleepTimeout)
-        .withLogLevel(_logLevel)
-        .withConfigRefreshInterval(_configRefreshInterval)
-        .withTrackLifecycleEvents(_trackLifecycleEvents)
-        .withRecordScreenViews(_recordScreenViews)
-        .build();
+            if (_anonymousId != null) {
+                _setAnonymousId(_anonymousId);
+            }
 
-      rudderClient = RudderClient.getInstance(_context, _writeKey, config);
-      RudderLogger.logDebug("Client initiated successfully");
-    }
-  }
+            RudderConfig config = new RudderConfig.Builder()
+                    .withDataPlaneUrl(_dataPlaneUrl)
+                    .withControlPlaneUrl(_controlPlaneUrl)
+                    .withFlushQueueSize(_flushQueueSize)
+                    .withDbThresholdCount(_dbCountThreshold)
+                    .withSleepCount(_sleepTimeout)
+                    .withLogLevel(_logLevel)
+                    .withConfigRefreshInterval(_configRefreshInterval)
+                    .withTrackLifecycleEvents(_trackLifecycleEvents)
+                    .withRecordScreenViews(_recordScreenViews)
+                    .build();
 
-  public static void _logEvent(
-    String _eventType,
-    String _eventName,
-    String _eventPropsJson,
-    String _userPropsJson,
-    String _optionsJson
-  ) {
-    if (rudderClient == null) {
-      return;
+            rudderClient = RudderClient.getInstance(_context, _writeKey, config);
+            RudderLogger.logDebug("Client initiated successfully");
+        }
     }
 
-    RudderMessageBuilder builder = new RudderMessageBuilder();
+    public static void _logEvent(
+            String _eventType,
+            String _eventName,
+            String _eventPropsJson,
+            String _userPropsJson,
+            String _optionsJson
+    ) {
+        if (rudderClient == null) {
+            return;
+        }
 
-      builder.setEventName(_eventName);
-      if(_eventPropsJson != null) {
-      builder.setProperty(Utils.convertToMap(_eventPropsJson));
-      }
-      // if(_userPropsJson != null) {
-      //   builder.setUserProperty(Utils.convertToMap(_userPropsJson));
-      // }
-      if(_optionsJson != null) {
-        Map<String, Object> optionsMap = Utils.convertToMap(_optionsJson);
-       builder.setRudderOption(_getRudderOptionsObject(optionsMap));
-      }
-      
-    switch (_eventType) {
-      case "track":
-        rudderClient.track(builder.build());
-        break;
-      case "screen":
-        rudderClient.screen(builder.build());
-        break;
-      case "identify":
-        RudderLogger.logError("message type is not supported");
-    }
-  }
+        RudderMessageBuilder builder = new RudderMessageBuilder();
 
-  public static void _identify(
-    String _userId,
-    String _traitsJson,
-    String _optionsJson
-  ) {
-    if (rudderClient == null) {
-      return;
-    }
+        builder.setEventName(_eventName);
+        if (_eventPropsJson != null) {
+            builder.setProperty(Utils.convertToMap(_eventPropsJson));
+        }
+        // if(_userPropsJson != null) {
+        //   builder.setUserProperty(Utils.convertToMap(_userPropsJson));
+        // }
+        if (_optionsJson != null) {
+            Map<String, Object> optionsMap = Utils.convertToMap(_optionsJson);
+            builder.setRudderOption(_getRudderOptionsObject(optionsMap));
+        }
 
-    RudderLogger.logDebug(String.format(Locale.US, "_userId: %s", _userId));
-    RudderLogger.logDebug(
-      String.format(Locale.US, "_traitsJson: %s", _traitsJson)
-    );
-    RudderLogger.logDebug(
-      String.format(Locale.US, "_optionsJson: %s", _optionsJson)
-    );
-    
-    RudderTraits traits = null;
-    if(_traitsJson != null) {
-        Map<String, Object> traitsMap = Utils.convertToMap(_traitsJson); 
-        traits = _getRudderTraitsObject(traitsMap);
-    }
-    
-    RudderOption option = null;
-    if(_optionsJson != null) {
-       Map<String, Object> optionsMap = Utils.convertToMap(_optionsJson);
-       option = _getRudderOptionsObject(optionsMap);
+        switch (_eventType) {
+            case "track":
+                rudderClient.track(builder.build());
+                break;
+            case "screen":
+                rudderClient.screen(builder.build());
+                break;
+            case "identify":
+                RudderLogger.logError("message type is not supported");
+        }
     }
 
-    rudderClient.identify(_userId, traits, option);
-  }
+    public static void _identify(
+            String _userId,
+            String _traitsJson,
+            String _optionsJson
+    ) {
+        if (rudderClient == null) {
+            return;
+        }
 
-  public static void _reset() {
-    if (rudderClient == null) {
-      return;
+        RudderLogger.logDebug(String.format(Locale.US, "_userId: %s", _userId));
+        RudderLogger.logDebug(
+                String.format(Locale.US, "_traitsJson: %s", _traitsJson)
+        );
+        RudderLogger.logDebug(
+                String.format(Locale.US, "_optionsJson: %s", _optionsJson)
+        );
+
+        RudderTraits traits = null;
+        if (_traitsJson != null) {
+            Map<String, Object> traitsMap = Utils.convertToMap(_traitsJson);
+            traits = _getRudderTraitsObject(traitsMap);
+        }
+
+        RudderOption option = null;
+        if (_optionsJson != null) {
+            Map<String, Object> optionsMap = Utils.convertToMap(_optionsJson);
+            option = _getRudderOptionsObject(optionsMap);
+        }
+
+        rudderClient.identify(_userId, traits, option);
     }
 
-    rudderClient.reset();
-  }
+    public static void _reset() {
+        if (rudderClient == null) {
+            return;
+        }
 
-  public static void _setAnonymousId(String _anonymousId) {
-    RudderLogger.logDebug(String.format(Locale.US, "_setAnonymousId: %s", _anonymousId));
-    if (_anonymousId != null) {
-      RudderClient.putAnonymousId(_anonymousId);
+        rudderClient.reset();
     }
-  }
 
-  public static RudderTraits _getRudderTraitsObject(Map<String, Object> traitsMap) {
+    public static void _setAnonymousId(String _anonymousId) {
+        RudderLogger.logDebug(String.format(Locale.US, "_setAnonymousId: %s", _anonymousId));
+        if (_anonymousId != null) {
+            RudderClient.putAnonymousId(_anonymousId);
+        }
+    }
+
+    public static RudderTraits _getRudderTraitsObject(Map<String, Object> traitsMap) {
         RudderTraitsBuilder builder = new RudderTraitsBuilder();
         if (traitsMap.containsKey("address")) {
             Map<String, Object> addressMap = (Map<String, Object>) traitsMap.get(
