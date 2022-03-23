@@ -30,6 +30,7 @@ public class RudderClientWrapper {
             int _dbCountThreshold,
             int _sleepTimeout,
             int _configRefreshInterval,
+            boolean _autoCollectAdvertId,
             boolean _trackLifecycleEvents,
             boolean _recordScreenViews,
             int _logLevel
@@ -57,6 +58,7 @@ public class RudderClientWrapper {
                     .withSleepCount(_sleepTimeout)
                     .withLogLevel(_logLevel)
                     .withConfigRefreshInterval(_configRefreshInterval)
+                    .withAutoCollectAdvertId(_autoCollectAdvertId)
                     .withTrackLifecycleEvents(_trackLifecycleEvents)
                     .withRecordScreenViews(_recordScreenViews)
                     .build();

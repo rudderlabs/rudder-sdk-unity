@@ -65,6 +65,7 @@ namespace RudderStack
             int _dbCountThreshold,
             int _sleepTimeout,
             int _configRefreshInterval,
+            bool _autoCollectAdvertId,
             bool _trackLifecycleEvents,
             bool _recordScreenViews,
             int _logLevel
@@ -90,6 +91,7 @@ namespace RudderStack
                     _dbCountThreshold,
                     _sleepTimeout,
                     _configRefreshInterval,
+                    _autoCollectAdvertId,
                     _trackLifecycleEvents,
                     _recordScreenViews,
                     _logLevel
@@ -141,6 +143,7 @@ namespace RudderStack
                     config.dbCountThreshold,
                     config.sleepTimeOut,
                     config.configRefreshInterval,
+                    config.autoCollectAdvertId,
                     config.trackLifecycleEvents,
                     config.recordScreenViews,
                     config.logLevel

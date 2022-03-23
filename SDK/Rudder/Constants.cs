@@ -19,6 +19,8 @@ namespace RudderStack
         public static int DB_COUNT_THRESHOLD = 10000;
         // config-plane url to get the config for the writeKey
         public static string CONTROL_PLANE_URL = "https://api.rudderlabs.com";
+        // whether we should automatically capture the advertisingId or not
+        public static bool AUTO_COLLECT_ADVERTID = false;
         // whether we should track application life cycle events automatically or not
         public static bool TRACK_LIFECYCLE_EVENTS = true;
         // whether we should record screen views automatically or not
