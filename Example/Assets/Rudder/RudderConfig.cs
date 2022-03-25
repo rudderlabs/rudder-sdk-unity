@@ -12,6 +12,7 @@ namespace RudderStack
         public List<RudderIntegrationFactory> factories;
         public int logLevel;
         public int configRefreshInterval;
+        public bool autoCollectAdvertId;
         public bool trackLifecycleEvents;
         public bool recordScreenViews;
         public string configPlaneUrl;
@@ -24,6 +25,7 @@ namespace RudderStack
             int sleepTimeOut,
             int logLevel,
             int configRefreshInterval,
+            bool autoCollectAdvertId,
             bool trackLifecycleEvents,
             bool recordScreenViews,
             List<RudderIntegrationFactory> factories
@@ -37,6 +39,7 @@ namespace RudderStack
             this.factories = factories;
             this.logLevel = logLevel;
             this.configRefreshInterval = configRefreshInterval;
+            this.autoCollectAdvertId = autoCollectAdvertId;
             this.trackLifecycleEvents = trackLifecycleEvents;
             this.recordScreenViews = recordScreenViews;
 
@@ -53,6 +56,7 @@ namespace RudderStack
                 Constants.SLEEP_TIME_OUT,
                 RudderLogLevel.NONE,
                 Constants.CONFIG_REFRESH_INTERVAL,
+                Constants.AUTO_COLLECT_ADVERTID,
                 Constants.TRACK_LIFECYCLE_EVENTS,
                 Constants.RECORD_SCREEN_VIEWS,
                 null

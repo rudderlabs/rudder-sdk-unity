@@ -125,9 +125,9 @@ class DBPersistentManager extends SQLiteOpenHelper {
     }
 
     /*
-     * retrieve `count` number of messages from DB and store messageIds and messages separately
+     * returns messageIds and messages returned on executing the supplied SQL statement
      * */
-    void fetchEventsFromDB(ArrayList<Integer> messageIds, ArrayList<String> messages, int count) {
+    void getEventsFromDB(List<Integer> messageIds, List<String> messages, String selectSQL) {
         // clear lists if not empty
         if (!messageIds.isEmpty()) messageIds.clear();
         if (!messages.isEmpty()) messages.clear();
@@ -136,14 +136,16 @@ class DBPersistentManager extends SQLiteOpenHelper {
             // get readable database instance
             SQLiteDatabase database = getReadableDatabase();
             if (database.isOpen()) {
-                String selectSQL = String.format(Locale.US, "SELECT * FROM %s ORDER BY %s ASC LIMIT %d", EVENTS_TABLE_NAME, UPDATED, count);
-                RudderLogger.logDebug(String.format(Locale.US, "DBPersistentManager: fetchEventsFromDB: selectSQL: %s", selectSQL));
                 Cursor cursor = database.rawQuery(selectSQL, null);
                 if (cursor.moveToFirst()) {
                     RudderLogger.logInfo("DBPersistentManager: fetchEventsFromDB: fetched messages from DB");
                     while (!cursor.isAfterLast()) {
-                        messageIds.add(cursor.getInt(cursor.getColumnIndex(MESSAGE_ID)));
-                        messages.add(cursor.getString(cursor.getColumnIndex(MESSAGE)));
+                        final int messageIdColIndex = cursor.getColumnIndex(MESSAGE_ID);
+                        final int messageColIndex = cursor.getColumnIndex(MESSAGE);
+                        if(messageIdColIndex > -1)
+                            messageIds.add(cursor.getInt(messageIdColIndex));
+                        if(messageColIndex > -1)
+                            messages.add(cursor.getString(messageColIndex));
                         cursor.moveToNext();
                     }
                 } else {
@@ -157,6 +159,25 @@ class DBPersistentManager extends SQLiteOpenHelper {
             RudderLogger.logError(ex);
         }
     }
+
+    /*
+     * retrieve `count` number of messages from DB and store messageIds and messages separately
+     * */
+    void fetchEventsFromDB(ArrayList<Integer> messageIds, ArrayList<String> messages, int count) {
+        String selectSQL = String.format(Locale.US, "SELECT * FROM %s ORDER BY %s ASC LIMIT %d", EVENTS_TABLE_NAME, UPDATED, count);
+        RudderLogger.logDebug(String.format(Locale.US, "DBPersistentManager: fetchEventsFromDB: selectSQL: %s", selectSQL));
+        getEventsFromDB(messageIds, messages, selectSQL);
+    }
+
+    /*
+     * retrieve all messages from DB and store messageIds and messages separately
+     * */
+    void fetchAllEventsFromDB(List<Integer> messageIds, List<String> messages) {
+        String selectSQL = String.format(Locale.US, "SELECT * FROM %s ORDER BY %s ASC", EVENTS_TABLE_NAME, UPDATED);
+        RudderLogger.logDebug(String.format(Locale.US, "DBPersistentManager: fetchAllEventsFromDB: selectSQL: %s", selectSQL));
+        getEventsFromDB(messageIds, messages, selectSQL);
+    }
+
 
     int getDBRecordCount() {
         // initiate count
@@ -210,7 +231,7 @@ class DBPersistentManager extends SQLiteOpenHelper {
             public void run() {
                 try {
                     DBPersistentManager.this.getWritableDatabase();
-                    synchronized (this) {
+                    synchronized (DBPersistentManager.this) {
                         dbInsertionHandlerThread = new DBInsertionHandlerThread("db_insertion_thread", DBPersistentManager.this.getWritableDatabase());
                         dbInsertionHandlerThread.start();
                         for (Message msg : queue) {

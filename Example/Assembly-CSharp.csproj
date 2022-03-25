@@ -56,24 +56,24 @@
     <Analyzer Include="/Applications/Visual Studio.app/Contents/Resources/lib/monodevelop/AddIns/MonoDevelop.Unity/Analyzers/Microsoft.Unity.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets/Rudder/RudderIntegrationFactory.cs" />
-    <Compile Include="Assets/Rudder/RudderMessage.cs" />
-    <Compile Include="Assets/Rudder/RudderClient.cs" />
     <Compile Include="Assets/Scenes/TestScript.cs" />
+    <Compile Include="Assets/Rudder/RudderIntegrationFactory.cs" />
     <Compile Include="Assets/Rudder/TrackPropertyBuilder.cs" />
-    <Compile Include="Assets/Rudder/RudderIntegration.cs" />
-    <Compile Include="Assets/Rudder/RudderConfigBuilder.cs" />
-    <Compile Include="Assets/Rudder/RudderCache.cs" />
-    <Compile Include="Assets/Rudder/ScreenPropertyBuilder.cs" />
-    <Compile Include="Assets/Rudder/RudderIntegrationManager.cs" />
-    <Compile Include="Assets/Scenes/NewBehaviourScript.cs" />
-    <Compile Include="Assets/Rudder/RudderException.cs" />
     <Compile Include="Assets/Rudder/MiniJSON.cs" />
-    <Compile Include="Assets/Rudder/Constants.cs" />
     <Compile Include="Assets/Rudder/RudderMessageBuilder.cs" />
+    <Compile Include="Assets/Rudder/RudderIntegrationManager.cs" />
+    <Compile Include="Assets/Rudder/RudderConfigBuilder.cs" />
     <Compile Include="Assets/Rudder/RudderLogger.cs" />
     <Compile Include="Assets/Rudder/RudderConfig.cs" />
+    <Compile Include="Assets/Rudder/Constants.cs" />
+    <Compile Include="Assets/Rudder/RudderCache.cs" />
+    <Compile Include="Assets/Scenes/NewBehaviourScript.cs" />
+    <Compile Include="Assets/Rudder/RudderMessage.cs" />
+    <Compile Include="Assets/Rudder/RudderClient.cs" />
     <Compile Include="Assets/Rudder/RudderTraits.cs" />
+    <Compile Include="Assets/Rudder/ScreenPropertyBuilder.cs" />
+    <Compile Include="Assets/Rudder/RudderIntegration.cs" />
+    <Compile Include="Assets/Rudder/RudderException.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
@@ -289,11 +289,11 @@
     <Reference Include="UnityEditor.UnityConnectModule">
       <HintPath>/Applications/Unity/Hub/Editor/2020.3.28f1/Unity.app/Contents/Managed/UnityEngine/UnityEditor.UnityConnectModule.dll</HintPath>
     </Reference>
-    <Reference Include="Unity.Analytics.Editor">
-      <HintPath>Library/PackageCache/com.unity.analytics@3.6.12/Unity.Analytics.Editor.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Analytics.StandardEvents">
       <HintPath>Library/PackageCache/com.unity.analytics@3.6.12/AnalyticsStandardEvents/Unity.Analytics.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Analytics.Editor">
+      <HintPath>Library/PackageCache/com.unity.analytics@3.6.12/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>Library/PackageCache/com.unity.analytics@3.6.12/Unity.Analytics.Tracker.dll</HintPath>
