@@ -1,6 +1,7 @@
 package com.rudderstack.android.sdk.core;
 
 import com.google.gson.annotations.SerializedName;
+import com.rudderstack.android.sdk.BuildConfig;
 
 class RudderLibraryInfo {
     @SerializedName("name")
