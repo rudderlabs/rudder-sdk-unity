@@ -59,6 +59,12 @@ namespace RudderStack
             return this;
         }
 
+        private bool autoCollectAdvertId = Constants.AUTO_COLLECT_ADVERTID;
+        public RudderConfigBuilder withAutoCollectAdvertId(bool autoCollectAdvertId)
+        {
+            this.autoCollectAdvertId = autoCollectAdvertId;
+            return this;
+        }
         private bool trackLifecycleEvents = Constants.TRACK_LIFECYCLE_EVENTS;
         public RudderConfigBuilder WithTrackLifecycleEvents(bool trackLifecycleEvents)
         {
@@ -89,6 +95,7 @@ namespace RudderStack
                 this.sleepTimeOut,
                 this.logLevel,
                 this.configRefreshInterval,
+                this.autoCollectAdvertId,
                 this.trackLifecycleEvents,
                 this.recordScreenViews,
                 this.factories
