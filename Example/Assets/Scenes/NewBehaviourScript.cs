@@ -12,6 +12,7 @@ public class NewBehaviourScript : MonoBehaviour
     void Start()
     {
         Debug.Log("Info Here");
+        Debug.Log("NewBehaviourScript Start");
 
         RudderClient.SerializeSqlite();
 
@@ -36,11 +37,10 @@ public class NewBehaviourScript : MonoBehaviour
         options.Add("externalIds", externalIds);
 
         RudderConfig config = new RudderConfigBuilder()
-          .WithDataPlaneUrl("https://9953-175-101-36-4.ngrok.io")
+          .WithDataPlaneUrl("https://9c98-175-101-36-93.ngrok.io")
           .WithLogLevel(RudderLogLevel.VERBOSE)
           .Build();
-        rudderClient = RudderClient.GetInstance("1pAKRv50y15Ti6UWpYroGJaO0Dj", config);
-
+        rudderClient = RudderClient.GetInstance("1yOKUAJ5a6PzEOyECgOFXIUVHN0", config);
         // create event properties
         Dictionary<string, object> eventProperties = new Dictionary<string, object>();
         eventProperties.Add("test_key_1", "test_value_1");
@@ -82,12 +82,18 @@ public class NewBehaviourScript : MonoBehaviour
 
         RudderMessage identifyMessage = new RudderMessageBuilder().Build();
         identifyMessage.options = options;
-        RudderTraits traits = new RudderTraits().PutEmail("some@example.com");
+        RudderTraits traits = new RudderTraits();
+        traits.PutEmail("venkat@example.com");
+        traits.PutAge("23");
+        traits.Put("location", "India");
+        traits.Put("team", "SDK's");
+
         rudderClient.Identify("some_user_id", traits, identifyMessage);
     }
 
     int count = 0;
 
+    
     // Update is called once per frame
     void Update()
     {
@@ -123,5 +129,23 @@ public class NewBehaviourScript : MonoBehaviour
             msg.options = options;
             rudderClient.Track(msg);
         }
+
     }
+
+     void OnDestroy()
+    {
+        Debug.Log("OnDestroy");
+    }
+
+
+     void OnBecameVisible()
+    {
+        Debug.Log("Rudder: OnBecameVisible");
+    }
+
+    void OnBecameInvisible()
+    {
+        Debug.Log("Rudder: OnBecameInVisible");
+    }
+
 }

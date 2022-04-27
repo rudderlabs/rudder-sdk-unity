@@ -2,12 +2,72 @@
 using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 using RudderStack.MiniJSON;
 
 namespace RudderStack
 {
     public class RudderClient : MonoBehaviour
     {
+        private static bool isSDKInitialized;
+        private static RudderClient _instance;
+#if UNITY_ANDROID
+        private static List<Action> actionsList = new List<Action>();
+
+        void OnApplicationFocus(bool focus)
+        {
+            Action action;
+
+            if (focus)
+            {
+                action = () =>
+                {
+                    RudderLogger.LogDebug("Application Opened");
+                    RudderMessage message = new RudderMessageBuilder().WithEventName("Application Opened").Build();
+                    _instance.Track(message);
+
+                };
+            }
+            else
+            {
+                action = () =>
+                {
+                    RudderLogger.LogDebug("Application Backgrounded");
+                    RudderMessage message = new RudderMessageBuilder().WithEventName("Application Backgrounded").Build();
+                    _instance.Track(message);
+
+                };
+            }
+            
+            if (isSDKInitialized)
+            {
+                RudderLogger.LogDebug("SDK Already initialized, executing the actions directly");
+                action();
+            }
+            else
+            {
+                RudderLogger.LogDebug("SDK not initialized yet, adding the actions to the list");
+                actionsList.Add(action);
+            }
+        }
+
+        // void Start()
+        // {
+        //    RudderLogger.LogDebug("RudderClient: Start");    
+        // }
+#endif
+
+        //void OnApplicationPause(bool pause)
+        //{
+        //    if (pause)
+        //    {
+        //        RudderLogger.LogDebug("OnApplicationPause is true ");
+        //        return;
+        //    }
+        //    RudderLogger.LogDebug("OnApplicationPause is false");
+        //}
+
 
 #if UNITY_ANDROID
         private static readonly string androidClientName = "com.rudderstack.android.sdk.wrapper.RudderClientWrapper";
@@ -51,7 +111,6 @@ namespace RudderStack
         private static extern void _setAnonymousId(string _anonymousId);
 #endif
 
-        private static RudderClient _instance;
         private static RudderIntegrationManager _integrationManager;
 
         /*
@@ -148,6 +207,15 @@ namespace RudderStack
                     config.recordScreenViews,
                     config.logLevel
                 );
+
+#if UNITY_ANDROID
+                foreach (Action action in actionsList)
+                {
+                    RudderLogger.LogDebug("SDK Initialized, executing all the actions in the list");
+                    action();
+                }
+                isSDKInitialized = true;
+#endif
 
                 RudderLogger.LogDebug("Instantiating RudderIntegrationManager");
                 _integrationManager = new RudderIntegrationManager(
@@ -347,5 +415,20 @@ namespace RudderStack
                 _integrationManager.Update();
             }
         }
+
+        //private void OnBecameVisible()
+        //{
+        //    RudderLogger.LogDebug("Rudder: OnBecameVisible");
+        //}
+
+        //private void OnBecameInvisible()
+        //{
+        //    RudderLogger.LogDebug("Rudder: OnBecameInVisible");
+        //}
+
+        //private void OnDestroy()
+        //{
+        //    RudderLogger.LogDebug("Rudder: Destroyed");
+        //}
     }
 }
