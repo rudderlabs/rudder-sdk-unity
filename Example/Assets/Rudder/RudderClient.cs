@@ -11,6 +11,7 @@ namespace RudderStack
     public class RudderClient : MonoBehaviour
     {
         private static bool isSDKInitialized;
+        private static bool fromBackGround = false;
         private static RudderClient _instance;
 #if UNITY_ANDROID
         private static List<Action> actionsList = new List<Action>();
@@ -23,17 +24,20 @@ namespace RudderStack
             {
                 action = () =>
                 {
-                    RudderLogger.LogDebug("Application Opened");
-                    RudderMessage message = new RudderMessageBuilder().WithEventName("Application Opened").Build();
+                    RudderLogger.LogDebug("Tracking event Application Opened");
+                    Dictionary<string, object> eventProperties = new Dictionary<string, object>();
+                    eventProperties.Add("from_background", fromBackGround);
+                    RudderMessage message = new RudderMessageBuilder().WithEventName("Application Opened").WithEventProperties(eventProperties).Build();
                     _instance.Track(message);
 
                 };
             }
             else
             {
+                fromBackGround = true;
                 action = () =>
                 {
-                    RudderLogger.LogDebug("Application Backgrounded");
+                    RudderLogger.LogDebug("Tracking event Application Backgrounded");
                     RudderMessage message = new RudderMessageBuilder().WithEventName("Application Backgrounded").Build();
                     _instance.Track(message);
 
@@ -51,22 +55,8 @@ namespace RudderStack
                 actionsList.Add(action);
             }
         }
-
-        // void Start()
-        // {
-        //    RudderLogger.LogDebug("RudderClient: Start");    
-        // }
 #endif
 
-        //void OnApplicationPause(bool pause)
-        //{
-        //    if (pause)
-        //    {
-        //        RudderLogger.LogDebug("OnApplicationPause is true ");
-        //        return;
-        //    }
-        //    RudderLogger.LogDebug("OnApplicationPause is false");
-        //}
 
 
 #if UNITY_ANDROID
@@ -415,20 +405,5 @@ namespace RudderStack
                 _integrationManager.Update();
             }
         }
-
-        //private void OnBecameVisible()
-        //{
-        //    RudderLogger.LogDebug("Rudder: OnBecameVisible");
-        //}
-
-        //private void OnBecameInvisible()
-        //{
-        //    RudderLogger.LogDebug("Rudder: OnBecameInVisible");
-        //}
-
-        //private void OnDestroy()
-        //{
-        //    RudderLogger.LogDebug("Rudder: Destroyed");
-        //}
     }
 }
