@@ -2,12 +2,67 @@
 using System.Runtime.InteropServices;
 #endif
 using UnityEngine;
+using System;
+using System.Collections.Generic;
 using RudderStack.MiniJSON;
 
 namespace RudderStack
 {
     public class RudderClient : MonoBehaviour
     {
+        private static RudderClient _instance;
+#if UNITY_ANDROID
+        private static bool isSDKInitialized;
+        private static bool fromBackGround = false;
+        private static bool trackLifeCycleEvents = true;
+        
+        private static List<Action> actionsList = new List<Action>();
+
+        void OnApplicationFocus(bool focus)
+        {
+            Action action;
+
+            if (trackLifeCycleEvents)
+            {
+                if (focus)
+                {
+                    action = () =>
+                    {
+                        RudderLogger.LogDebug("Tracking event Application Opened");
+                        Dictionary<string, object> eventProperties = new Dictionary<string, object>();
+                        eventProperties.Add("from_background", fromBackGround);
+                        RudderMessage message = new RudderMessageBuilder().WithEventName("Application Opened").WithEventProperties(eventProperties).Build();
+                        _instance.Track(message);
+
+                    };
+                }
+                else
+                {
+                    fromBackGround = true;
+                    action = () =>
+                    {
+                        RudderLogger.LogDebug("Tracking event Application Backgrounded");
+                        RudderMessage message = new RudderMessageBuilder().WithEventName("Application Backgrounded").Build();
+                        _instance.Track(message);
+
+                    };
+                }
+
+                if (isSDKInitialized)
+                {
+                    RudderLogger.LogDebug("SDK Already initialized, executing the actions directly");
+                    action();
+                }
+                else
+                {
+                    RudderLogger.LogDebug("SDK not initialized yet, adding the actions to the list");
+                    actionsList.Add(action);
+                }
+            }
+        }
+#endif
+
+
 
 #if UNITY_ANDROID
         private static readonly string androidClientName = "com.rudderstack.android.sdk.wrapper.RudderClientWrapper";
@@ -51,7 +106,6 @@ namespace RudderStack
         private static extern void _setAnonymousId(string _anonymousId);
 #endif
 
-        private static RudderClient _instance;
         private static RudderIntegrationManager _integrationManager;
 
         /*
@@ -73,6 +127,7 @@ namespace RudderStack
         {
             // initialize android
 #if UNITY_ANDROID
+            trackLifeCycleEvents = _trackLifecycleEvents;
             RudderLogger.LogDebug("Initializing Android Core SDK");
             if (Application.platform == RuntimePlatform.Android)
             {
@@ -148,6 +203,20 @@ namespace RudderStack
                     config.recordScreenViews,
                     config.logLevel
                 );
+
+#if UNITY_ANDROID
+                if (config.trackLifecycleEvents)
+                {
+                    foreach (Action action in actionsList)
+                    {
+                        RudderLogger.LogDebug("SDK Initialized, executing all the actions in the list");
+                        action();
+                    }
+                }
+                RudderLogger.LogDebug("Clearing all the actions in the action list");
+                actionsList.Clear();
+                isSDKInitialized = true;
+#endif
 
                 RudderLogger.LogDebug("Instantiating RudderIntegrationManager");
                 _integrationManager = new RudderIntegrationManager(

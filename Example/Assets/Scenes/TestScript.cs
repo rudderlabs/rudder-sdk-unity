@@ -14,10 +14,10 @@ public class TestScript : MonoBehaviour
     RudderClient.SerializeSqlite();
 
     RudderConfig config = new RudderConfigBuilder()
-      .WithDataPlaneUrl("https://8452ddb9ed62.ngrok.io")
+      //.WithDataPlaneUrl("https://8452ddb9ed62.ngrok.io")
       .WithLogLevel(RudderLogLevel.VERBOSE)
       .Build();
-    rudderClient = RudderClient.GetInstance("1glg5JWDIVF1c90oLs6CDePrFy9", config);
+    rudderClient = RudderClient.GetInstance("27K3Jlu0wvHcyrNXLDFZhSWyewz", config);
 
     // create event properties
     Dictionary<string, object> eventProperties = new Dictionary<string, object>();

@@ -39,6 +39,7 @@ static NSString* _deviceToken = nil;
         dispatch_once(&onceToken, ^{
             _instance = [[self alloc] init];
             _repository = [RSEventRepository initiate:writeKey config:config];
+            [_repository _applicationDidFinishLaunchingWithOptions:nil];
             if(_deviceToken != nil && [_deviceToken length] != 0)
             {
                 [[_instance getContext] putDeviceToken:_deviceToken];

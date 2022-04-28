@@ -533,7 +533,7 @@ typedef enum {
 - (void) handleAppStateNotification: (NSNotification*) notification {
 #if !TARGET_OS_WATCH
     if ([notification.name isEqualToString:UIApplicationDidFinishLaunchingNotification]) {
-        [self _applicationDidFinishLaunchingWithOptions:notification.userInfo];
+        // [self _applicationDidFinishLaunchingWithOptions:notification.userInfo];
     } else if ([notification.name isEqualToString:UIApplicationWillEnterForegroundNotification]) {
         [self _applicationWillEnterForeground];
     } else if ([notification.name isEqualToString: UIApplicationDidEnterBackgroundNotification]) {
@@ -541,7 +541,7 @@ typedef enum {
     }
 #else
     if ([notification.name isEqualToString:WKApplicationDidFinishLaunchingNotification]) {
-        [self _applicationDidFinishLaunchingWithOptions:notification.userInfo];
+        // [self _applicationDidFinishLaunchingWithOptions:notification.userInfo];
     } else if ([notification.name isEqualToString: WKApplicationDidBecomeActiveNotification]) {
         [self _applicationWillEnterForeground];
     } else if ([notification.name isEqualToString: WKApplicationWillResignActiveNotification]) {
