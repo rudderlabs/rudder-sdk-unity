@@ -37,7 +37,7 @@ public class NewBehaviourScript : MonoBehaviour
         options.Add("externalIds", externalIds);
 
         RudderConfig config = new RudderConfigBuilder()
-          .WithDataPlaneUrl("https://9c98-175-101-36-93.ngrok.io")
+          .WithDataPlaneUrl("https://70a1-175-101-36-93.ngrok.io")
           .WithLogLevel(RudderLogLevel.VERBOSE)
           .Build();
         rudderClient = RudderClient.GetInstance("1yOKUAJ5a6PzEOyECgOFXIUVHN0", config);
@@ -99,7 +99,7 @@ public class NewBehaviourScript : MonoBehaviour
     {
         count += 1;
 
-        if (count % 100 == 0)
+        if (count % 10000 == 0)
         {
             Dictionary<string, object> externalId1 = new Dictionary<string, object>();
             externalId1.Add("id", "some_external_id_1");
