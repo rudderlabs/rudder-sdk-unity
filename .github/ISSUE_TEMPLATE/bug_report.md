@@ -15,6 +15,13 @@ Please provide the following information:
 4. Include the error's stack trace
 5. Mention the date when the issue began
 
+**Which platform is the issue occurring on**
+Is the error occurring on:
+
+- [ ] Android
+- [ ] iOS
+- [ ] Both Android and iOS
+
 **To Reproduce**
 Steps to reproduce the behaviour:
 
@@ -28,8 +35,8 @@ A clear and concise description of what you expected to happen.
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
 
-**Version of the _Unity_ SDK**
-Please mention the version of the Rudder Unity SDK you are using (e.g., Unity SDK v1.0.0).
+**Device mode integrations utilized**
+Please mention the list of device mode integrations utilized (e.g., rudder-integration-amplitude-android or rudder-integration-amplitude-ios).
 
 **SDK initialisation snippet**
 Share the code snippet used for initializing the Unity SDK.
