@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: gradle
+    directory: /Plugins/Android
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    cooldown:
+      default-days: 7
+
+  # The dependency-submission workflow introduces actual Action dependencies.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 0
+    cooldown:
+      default-days: 7
